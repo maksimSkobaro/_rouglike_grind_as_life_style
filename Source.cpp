@@ -14,8 +14,8 @@ void printDebug(World &world)
 		printf_s("[%i/%i][%i]: %32s", world.pEntity[i].coords.x, world.pEntity[i].coords.y, world.pEntity[i].ID, world.pEntity[i].name);
 		if(world.pEntity[i].character != nullptr)
 		{
-			printf_s("\tisAlive: %5s\tDMG: %4i\tHLTH: %4i\tMNA: %4i\tLVL: %4i\tINV: %i/%i\n", world.pEntity[i].character->isAlive ? "true" : "false", world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthCurrent, 
-					 world.pEntity[i].character->manaCurrent, world.pEntity[i].character->level, world.pEntity[i].character->inventory.itemsAmount, world.pEntity[i].character->inventory.capacityCurrent);
+			printf_s("\tisAlive: %5s\tDMG: %4i\tHLTH: %4i\tMNA: %4i\tLVL: %4i\tINV: %i/%i\tisVisn: %5s", world.pEntity[i].character->isAlive ? "true" : "false", world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthCurrent, 
+					 world.pEntity[i].character->manaCurrent, world.pEntity[i].character->level, world.pEntity[i].character->inventory.itemsAmount, world.pEntity[i].character->inventory.capacityCurrent, world.pEntity[i].isInRange ? "true" : "false");
 		}
 		putchar('\n');
 	}
@@ -30,16 +30,16 @@ int main()
 
 	World *pWorld = nullptr;
 	worldInit(pWorld, {5, 10}, PATH_LEVEL_DEV);
-	worldEntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyDragon, {10,10});
+	worldEntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyDragon, {6,10});
 
 
 	while(true)
 	{
 		system("cls");
+		worldLogic(*pWorld);
 		printLevel(*pWorld);
 		printDebug(*pWorld);
 		worldInput(*pWorld);
-		worldLogic(*pWorld);
 	}
 
 
