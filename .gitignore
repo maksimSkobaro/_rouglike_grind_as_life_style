@@ -1,7 +1,7 @@
 /.vs/
 /Debug/
 /Release/
-/log/
+/log/*log*
 *.sln
 *.vcxproj*
 

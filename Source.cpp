@@ -1,7 +1,10 @@
-#include "RL_main.h"
-#include "RL_dataStructs.h"
-#include "RL_mem.h"
+#include "RL_global.h"
+#include "RL_world_struct.h"
+#include "RL_entity_struct.h"
 
+//	SetConsoleTextAttribute
+//	\b
+//	Волновой алгоритм
 
 #ifdef DEBUG
 
@@ -30,7 +33,7 @@ int main()
 
 	World *pWorld = nullptr;
 	worldInit(pWorld, {5, 10}, PATH_LEVEL_DEV);
-	worldEntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyDragon, {6,10});
+	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyDragon, {6,10});
 
 
 	while(true)
