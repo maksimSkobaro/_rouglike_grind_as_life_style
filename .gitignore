@@ -1,7 +1,9 @@
+# ignore VisualStudio project/solution data
 /.vs/
 /Debug/
 /Release/
-/log/*log*
 *.sln
 *.vcxproj*
 
+# ignore all .log files
+/**/*.log
