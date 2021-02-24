@@ -43,7 +43,7 @@ struct World
 		cameraRange;
 	bool isMapMode;
 
-	int entityAmount = 0;
+	int entityAmount;
 	Entity *pEntity = nullptr;
 	char levelName[64];
 };

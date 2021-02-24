@@ -107,7 +107,7 @@ struct Entity
 	Character *character;
 	Direction direction;
 	Point coords;
-	char name[ENTITY_NAME_LEN_MAX]{};
+	char name[ENTITY_NAME_LEN_MAX];
 };
 
 

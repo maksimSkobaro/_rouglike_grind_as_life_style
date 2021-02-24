@@ -17,9 +17,9 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 	pWorldNew->pEntity = nullptr;
 	pWorldNew->entityAmount = 0;
 	pWorldNew->mainCharacterID = EntityAdd(pWorldNew->pEntity, pWorldNew->entityAmount,
-												EntitySymb::mainCharacter, mainCharacterCoords);
+										   EntitySymb::mainCharacter, mainCharacterCoords);
 	pWorldNew->cameraID = EntityAdd(pWorldNew->pEntity, pWorldNew->entityAmount,
-										 EntitySymb::camera, mainCharacterCoords);
+									EntitySymb::camera, mainCharacterCoords);
 	pWorldNew->cameraRange = 18;
 	pWorldNew->isMapMode = false;
 
@@ -203,19 +203,16 @@ int printLevel(const World &world)
 				putchar((char) world.pCell[j][i].cellSymb);
 			}
 
-			//if(!world.pCell[j][i].isGhost)
+			for(int k = 0; k < world.entityAmount; k++)
 			{
-
-				for(int k = 0; k < world.entityAmount; k++)
+				if(world.pEntity[k].isInRange && world.pEntity[k].coords.x == j && world.pEntity[k].coords.y == i && world.pEntity[k].ID != world.pEntity[world.cameraID].ID)
 				{
-					if(world.pEntity[k].isInRange && world.pEntity[k].coords.x == j && world.pEntity[k].coords.y == i && world.pEntity[k].ID != world.pEntity[world.cameraID].ID)
-					{
-						putchar('\b');
-						putchar((char) world.pEntity[k].entitySymb);
-					}
+					putchar('\b');
+					putchar((char) world.pEntity[k].entitySymb);
 				}
 			}
 		}
+
 
 		putchar('\n');
 

@@ -16,11 +16,10 @@
 ////////////////////DEFINES////////////////////
 ///////////////////////////////////////////////
 
-#define DEBUG 
+#define DEBUG
 
 #define ERR_NO_ERR 0
 #define ERR_FILE 10
-#define ERR_MEMORY 20
 #define ERR_MEMORY 20
 
 #define PATH_NAME_LEN_MAX 32
