@@ -53,6 +53,11 @@ struct World
 ////////////////////FUNCTIONS_DECLARATION///////////////////
 ////////////////////////////////////////////////////////////
 
+
+#ifdef DEBUG
+//	Выводит отладочную информацию под вывод orintLevel()
+void printDebug(World &world);
+#endif // DEBUG
 //	Загружает уровень из файла в массив[][] структур
 int worldLoadLevel(World &world);
 //	Инициализирует стандартными значениями World

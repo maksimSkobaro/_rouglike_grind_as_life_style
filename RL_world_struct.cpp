@@ -5,6 +5,23 @@
 ////////////////////FUNCTIONS_DEFINITION////////////////////
 ////////////////////////////////////////////////////////////
 
+
+#ifdef DEBUG
+void printDebug(World &world)
+{
+	for(int i = 0; i < world.entityAmount; i++)
+	{
+		printf_s("[%i] %12s [%i/%i]: ", world.pEntity[i].ID, world.pEntity[i].name, world.pEntity[i].coords.x, world.pEntity[i].coords.y);
+		if(world.pEntity[i].character != nullptr)
+		{
+			printf_s("\n\t[isAlive: %c] [DMG: %i] [HLTH: %i] [MNA: %i] [LVL: %i] [INV: %i/%i] [isVisn: %c]", world.pEntity[i].character->isAlive ? 'T' : 'F', world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthCurrent,
+					 world.pEntity[i].character->manaCurrent, world.pEntity[i].character->level, world.pEntity[i].character->inventory.itemsAmount, world.pEntity[i].character->inventory.capacityCurrent, world.pEntity[i].isInRange ? 'T' : 'F');
+		}
+		puts("\n");
+	}
+}
+#endif // DEBUG
+
 int worldInit(World *&world, Point mainCharacterCoords, const char *const worldName)
 {
 	World *pWorldNew = (World *) malloc(sizeof(*pWorldNew));
