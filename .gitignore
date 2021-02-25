@@ -5,5 +5,5 @@
 *.sln
 *.vcxproj*
 
-# ignore all .log files
-/**/*.log
+# ignore log files, but not log directory
+*.log
