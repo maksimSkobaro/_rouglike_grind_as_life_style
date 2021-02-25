@@ -3,6 +3,6 @@
 /Debug/
 /Release/
 /log/*
+!/log/.gitkeep
 *.sln
 *.vcxproj*
-
