@@ -7,7 +7,8 @@
 
 
 #ifdef DEBUG
-void printDebug(World &world)
+
+void printWorldDebug(World &world)
 {
 	for(int i = 0; i < world.entityAmount; i++)
 	{
@@ -19,6 +20,7 @@ void printDebug(World &world)
 		}
 		puts("\n");
 	}
+
 }
 #endif // DEBUG
 
@@ -204,7 +206,7 @@ int worldLoadLevel(World &world)
 	return ERR_NO_ERR;
 }
 
-int printLevel(const World &world)
+int printWorldLevel(const World &world)
 {
 	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++)
 	{

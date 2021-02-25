@@ -18,8 +18,8 @@ int main()
 	{
 		system("cls");
 		worldLogic(*pWorld);
-		printLevel(*pWorld);
-		printDebug(*pWorld);
+		printWorldLevel(*pWorld);
+		printWorldDebug(*pWorld);
 		worldInput(*pWorld);
 	}
 
