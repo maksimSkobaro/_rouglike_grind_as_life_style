@@ -55,8 +55,8 @@ struct World
 
 
 #ifdef DEBUG
-//	Выводит отладочную информацию под вывод orintLevel()
-void printDebug(World &world);
+//	Выводит отладочную информацию под вывод printWorldLevel()
+void printWorldDebug(World &world);
 #endif // DEBUG
 //	Загружает уровень из файла в массив[][] структур
 int worldLoadLevel(World &world);
@@ -65,7 +65,7 @@ int worldInit(World *&world, Point mainCharacterCoord = {3, 20}, const char *con
 //	Корретно удаляет World
 int worldDestruct(World *&world);
 //	Ф-я вывода уровня из **Cell в консоль.
-int printLevel(const World &world);
+int printWorldLevel(const World &world);
 //	Ф-ия обрабатывающая нажатия на кнопки.
 int worldInput(World &world);
 //	Ф-ия реализующая логику игры.
