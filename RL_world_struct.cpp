@@ -189,7 +189,8 @@ int worldLoadLevel(World &world)
 
 int printLevel(const World &world)
 {
-	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++)
+	int i;
+	for(i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++)
 	{
 		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
 		{
@@ -212,12 +213,34 @@ int printLevel(const World &world)
 				}
 			}
 		}
+		if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3)
+			printf("\t1");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 1)
+			printf("\t\t\t\t2");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 2)
+			printf("\t3");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 3)
+			printf("\t\t\t\t4");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 4)
+			printf("\t5");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 5)
+			printf("\t\t\t\t6");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 6)
+			printf("\t7");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 7)
+			printf("\t\t\t\t8");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 8)
+			printf("\t9");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 9)
+			printf("\t\t\t\t10");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 10)
+			printf("\t11");
+		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 11)
+			printf("\t\t\t\t12");
 
 
 		putchar('\n');
-
 	}
-
 	return ERR_NO_ERR;
 }
 
