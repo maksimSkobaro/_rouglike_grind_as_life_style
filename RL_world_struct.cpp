@@ -463,6 +463,7 @@ int worldLogic(World &world)
 			log("worldLogic(): Получено не существующее Direction");
 			break;
 		}
+		world.pEntity[i].direction = Direction::stay;
 
 		// Entity.Character - эвенты
 		if(world.pEntity[i].character != nullptr)
