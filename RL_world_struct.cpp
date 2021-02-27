@@ -696,6 +696,5 @@ int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1]
 			break;
 		}
 	}
-
 	return ERR_NO_ERR;
 }
