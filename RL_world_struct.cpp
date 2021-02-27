@@ -437,6 +437,5 @@ int worldLogic(World &world)
 			}
 		}
 	}
-
 	return ERR_NO_ERR;
 }
