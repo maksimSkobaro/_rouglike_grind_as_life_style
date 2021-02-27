@@ -13,7 +13,6 @@ int main()
 	entityCharacterDie(pWorld->pEntity[EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyDragon, {6,10})]);
 	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::store, {51,1});
 
-
 	while(true)
 	{
 		system("cls");

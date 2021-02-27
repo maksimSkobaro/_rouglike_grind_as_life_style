@@ -2,6 +2,7 @@
 
 
 
+
 ////////////////////////////////////////////////////////////
 ////////////////////FUNCTIONS_DEFINITION////////////////////
 ////////////////////////////////////////////////////////////
@@ -339,6 +340,9 @@ int worldInput(World &world)
 		case KBKey::keyA:
 			characterAttack(world, world.pEntity[world.mainCharacterID], isEOI);
 			break;
+		case KBKey::keyA:
+			characterAttack(world, world.pEntity[world.mainCharacterID], isEOI);
+			break;
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
 			break;
@@ -647,6 +651,62 @@ int characterAttack(const World &world, Entity &entity, bool &isEOI)
 			case KBKey::keyA:
 				system("cls");
 				printWorldLevel(world);
+				isEOI = false;
+				return ERR_NO_ERR;
+				break;
+			default:
+				break;
+			}
+
+		}
+	}
+	else
+	{
+
+	}
+
+	return ERR_NO_ERR;
+}
+
+int characterAttack(const World& world, Entity& entity, bool& isEOI)
+{
+	Point attackPoint = { entity.coords.x, entity.coords.y - 1 };
+	if (entity.ID == world.mainCharacterID)
+	{
+		while (true)
+		{
+			system("cls");
+			printWorldLevel(world);
+			switch ((KBKey)_getch())
+			{
+			case KBKey::keyUpArrow:
+				attackPoint = { entity.coords.x, entity.coords.y - 1 };
+				break;
+			case KBKey::keyDownArrow:
+				attackPoint = { entity.coords.x, entity.coords.y + 1 };
+				break;
+			case KBKey::keyRightArrow:
+				attackPoint = { entity.coords.x + 1, entity.coords.y };
+				break;
+			case KBKey::keyLeftArrow:
+				attackPoint = { entity.coords.x - 1, entity.coords.y };
+				break;
+			case KBKey::keyReturn:
+				for (int i = 0; i < world.entityAmount; i++)
+				{
+					if (world.pEntity[i].coords.x == attackPoint.x && world.pEntity[i].coords.y == attackPoint.y)
+					{
+						world.pEntity[i].character->healthCurrent -= entity.character->damageCurrent;
+						if (world.pEntity[i].character->healthCurrent <= 0)
+						{
+							entityCharacterDie(world.pEntity[i]);
+						}
+					}
+				}
+				isEOI = true;
+				return ERR_NO_ERR;
+				break;
+			case KBKey::keyA:
 				isEOI = false;
 				return ERR_NO_ERR;
 				break;
