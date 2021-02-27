@@ -39,7 +39,7 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 										   EntitySymb::mainCharacter, mainCharacterCoords);
 	pWorldNew->cameraID = EntityAdd(pWorldNew->pEntity, pWorldNew->entityAmount,
 									EntitySymb::camera, mainCharacterCoords);
-	pWorldNew->cameraRange = 18;
+	pWorldNew->cameraRange = 24;
 	pWorldNew->isMapMode = false;
 
 	pWorldNew->pCell = nullptr;
@@ -208,17 +208,53 @@ int worldLoadLevel(World &world)
 
 int printWorldLevel(const World &world)
 {
+	// Хэндл консоли ( если чтото не понятно - гуглите/забейте )
+	static HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+	int textAttr = NULL;
+
+
 	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++)
 	{
 		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
 		{
+			textAttr = NULL;
 			if(i < 0 || i >= world.cellsRowsAmount || j < 0 || j >= world.cellsColsAmount || !world.pCell[j][i].isReserched)
 			{
+				textAttr = FOREGROUND_INTENSITY & ~FOREGROUND_RED & ~FOREGROUND_GREEN & ~FOREGROUND_BLUE;
+				if(i >= -1 && i <= world.cellsRowsAmount && j >= -1 && j <= world.cellsColsAmount)
+				{
+					if(i > 0 && j != -1 && j != world.cellsColsAmount && world.pCell[j][i - 1].isReserched)
+					{
+						textAttr |= COMMON_LVB_GRID_HORIZONTAL;
+					}
+					if(i < world.cellsRowsAmount - 1 && j != -1 && j != world.cellsColsAmount && world.pCell[j][i + 1].isReserched)
+					{
+						textAttr |= COMMON_LVB_UNDERSCORE;
+					}
+					if(j > 0 && i != -1 && i != world.cellsRowsAmount && world.pCell[j - 1][i].isReserched)
+					{
+						textAttr |= COMMON_LVB_GRID_LVERTICAL;
+					}
+					if(j < world.cellsColsAmount - 1 && i != -1 && i != world.cellsRowsAmount && world.pCell[j + 1][i].isReserched)
+					{
+						textAttr |= COMMON_LVB_GRID_RVERTICAL;
+					}
+				}
+
+				SetConsoleTextAttribute(hStdout, textAttr);
 				putchar((char) CellSymb::empty);
 				continue;
 			}
 			else
 			{
+				if(world.pCell[j][i].isInRange)
+				{
+					SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+				}
+				else
+				{
+					SetConsoleTextAttribute(hStdout, FOREGROUND_BLUE);
+				}
 				putchar((char) world.pCell[j][i].cellSymb);
 			}
 
@@ -227,16 +263,35 @@ int printWorldLevel(const World &world)
 				if(world.pEntity[k].isInRange && world.pEntity[k].coords.x == j && world.pEntity[k].coords.y == i && world.pEntity[k].ID != world.pEntity[world.cameraID].ID)
 				{
 					putchar('\b');
+					switch(world.pEntity[k].entitySymb)
+					{
+					case EntitySymb::mainCharacter:
+						SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+						break;
+					case EntitySymb::store:
+						SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY | COMMON_LVB_UNDERSCORE);
+						break;
+					case EntitySymb::enemyWardenDrop:
+					case EntitySymb::enemyDragonDrop:
+						SetConsoleTextAttribute(hStdout, FOREGROUND_RED | COMMON_LVB_UNDERSCORE);
+						break;
+					case EntitySymb::enemyWarden:
+					case EntitySymb::enemyDragon:
+						SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_INTENSITY | COMMON_LVB_UNDERSCORE);
+						break;
+					default:
+						break;
+					}
 					putchar((char) world.pEntity[k].entitySymb);
 				}
 			}
 		}
 
-
 		putchar('\n');
 
 	}
 
+	SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
 	return ERR_NO_ERR;
 }
 
@@ -342,34 +397,50 @@ int worldLogic(World &world)
 		switch(world.pEntity[i].direction)
 		{
 		case Direction::up:
-			if(world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y - 1].isGhost)
+			if((world.pEntity[i].coords.x >= 0 && world.pEntity[i].coords.x < world.cellsColsAmount && world.pEntity[i].coords.y - 1 >= 0 && world.pEntity[i].coords.y - 1 < world.cellsRowsAmount) &&
+			   (world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y - 1].isGhost || world.pEntity[i].ID == world.cameraID))
 			{
-				world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y - 1].isGhost = false;
-				world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
+				if(world.pEntity[i].ID != world.cameraID)
+				{
+					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y - 1].isGhost = false;
+					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
+				}
 				world.pEntity[i].coords.y -= 1;
 			}
 			break;
 		case Direction::down:
-			if(world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y + 1].isGhost)
+			if((world.pEntity[i].coords.x >= 0 && world.pEntity[i].coords.x < world.cellsColsAmount && world.pEntity[i].coords.y + 1 >= 0 && world.pEntity[i].coords.y + 1 < world.cellsRowsAmount) &&
+			   (world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y + 1].isGhost || world.pEntity[i].ID == world.cameraID))
 			{
-				world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y + 1].isGhost = false;
-				world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
+				if(world.pEntity[i].ID != world.cameraID)
+				{
+					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y + 1].isGhost = false;
+					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
+				}
 				world.pEntity[i].coords.y += 1;
 			}
 			break;
 		case Direction::left:
-			if(world.pCell[world.pEntity[i].coords.x - 1][world.pEntity[i].coords.y].isGhost)
+			if((world.pEntity[i].coords.x - 1 >= 0 && world.pEntity[i].coords.x - 1 < world.cellsColsAmount && world.pEntity[i].coords.y >= 0 && world.pEntity[i].coords.y < world.cellsRowsAmount) &&
+			   (world.pCell[world.pEntity[i].coords.x - 1][world.pEntity[i].coords.y].isGhost || world.pEntity[i].ID == world.cameraID))
 			{
-				world.pCell[world.pEntity[i].coords.x - 1][world.pEntity[i].coords.y].isGhost = false;
-				world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
+				if(world.pEntity[i].ID != world.cameraID)
+				{
+					world.pCell[world.pEntity[i].coords.x - 1][world.pEntity[i].coords.y].isGhost = false;
+					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
+				}
 				world.pEntity[i].coords.x -= 1;
 			}
 			break;
 		case Direction::right:
-			if(world.pCell[world.pEntity[i].coords.x + 1][world.pEntity[i].coords.y].isGhost)
+			if((world.pEntity[i].coords.x + 1 >= 0 && world.pEntity[i].coords.x + 1 < world.cellsColsAmount && world.pEntity[i].coords.y >= 0 && world.pEntity[i].coords.y < world.cellsRowsAmount) &&
+			   (world.pCell[world.pEntity[i].coords.x + 1][world.pEntity[i].coords.y].isGhost || world.pEntity[i].ID == world.cameraID))
 			{
-				world.pCell[world.pEntity[i].coords.x + 1][world.pEntity[i].coords.y].isGhost = false;
-				world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
+				if(world.pEntity[i].ID != world.cameraID)
+				{
+					world.pCell[world.pEntity[i].coords.x + 1][world.pEntity[i].coords.y].isGhost = false;
+					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
+				}
 				world.pEntity[i].coords.x += 1;
 			}
 			break;
@@ -396,38 +467,70 @@ int worldLogic(World &world)
 					world.pEntity[q].isInRange = false;
 				}
 
+				for(int curY = world.pEntity[i].coords.y, _i = 0; curY <= world.pEntity[i].coords.y + world.pEntity[i].character->visionRangeCurrent + 1; curY++, _i++)
+				{
+					for(int curX = world.pEntity[i].coords.x; curX <= world.pEntity[i].coords.x + world.pEntity[i].character->visionRangeCurrent - _i + 1; curX++)
+					{
+						int reversedY = curY - 2 * abs(world.pEntity[i].coords.y - curY);
+						int reversedX = curX - 2 * abs(world.pEntity[i].coords.x - curX);
+
+						world.pCell[curX][curY].isInRange = false;
+
+
+						if(reversedX < world.cellsColsAmount && reversedX >= 0)
+						{
+							world.pCell[reversedX][curY].isInRange = false;
+
+							if(reversedY < world.cellsRowsAmount && reversedY >= 0)
+							{
+								world.pCell[reversedX][reversedY].isInRange = false;
+							}
+						}
+
+						if(reversedY < world.cellsRowsAmount && reversedY >= 0)
+						{
+							world.pCell[curX][reversedY].isInRange = false;
+						}
+					}
+				}
+
 				for(int curY = world.pEntity[i].coords.y, _i = 0; curY <= world.pEntity[i].coords.y + world.pEntity[i].character->visionRangeCurrent; curY++, _i++)
 				{
 					for(int curX = world.pEntity[i].coords.x; curX <= world.pEntity[i].coords.x + world.pEntity[i].character->visionRangeCurrent - _i; curX++)
 					{
-						int tmpY = curY - 2 * abs(world.pEntity[i].coords.y - curY);
-						int tmpX = curX - 2 * abs(world.pEntity[i].coords.x - curX);
-
-
+						int reversedY = curY - 2 * abs(world.pEntity[i].coords.y - curY);
+						int reversedX = curX - 2 * abs(world.pEntity[i].coords.x - curX);
 
 						for(int q = 0; q < world.entityAmount; q++)
 						{
-							if((world.pEntity[q].coords.x == curX && world.pEntity[q].coords.y == curY) || (world.pEntity[q].coords.x == tmpX && world.pEntity[q].coords.y == curY) ||
-							   (world.pEntity[q].coords.x == curX && world.pEntity[q].coords.y == tmpY) || (world.pEntity[q].coords.x == tmpX && world.pEntity[q].coords.y == tmpY))
+							if((world.pEntity[q].coords.x == curX && world.pEntity[q].coords.y == curY) || (world.pEntity[q].coords.x == reversedX && world.pEntity[q].coords.y == curY) ||
+							   (world.pEntity[q].coords.x == curX && world.pEntity[q].coords.y == reversedY) || (world.pEntity[q].coords.x == reversedX && world.pEntity[q].coords.y == reversedY))
 							{
 								world.pEntity[q].isInRange = true;
 							}
 						}
 
 						world.pCell[curX][curY].isReserched = true;
+						world.pCell[curX][curY].isInRange = true;
 
 
-						if(tmpX < world.cellsColsAmount && tmpX >= 0)
+						if(reversedX < world.cellsColsAmount && reversedX >= 0)
 						{
-							world.pCell[tmpX][curY].isReserched = true;
+							world.pCell[reversedX][curY].isReserched = true;
+							world.pCell[reversedX][curY].isInRange = true;
 
-							if(tmpY < world.cellsRowsAmount && tmpY >= 0)
+							if(reversedY < world.cellsRowsAmount && reversedY >= 0)
 							{
-								world.pCell[tmpX][tmpY].isReserched = true;
+								world.pCell[reversedX][reversedY].isReserched = true;
+								world.pCell[reversedX][reversedY].isInRange = true;
 							}
 						}
 
-						world.pCell[curX][tmpY].isReserched = true;
+						if(reversedY < world.cellsRowsAmount && reversedY >= 0)
+						{
+							world.pCell[curX][reversedY].isReserched = true;
+							world.pCell[curX][reversedY].isInRange = true;
+						}
 					}
 				}
 			}

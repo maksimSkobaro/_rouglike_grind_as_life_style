@@ -11,7 +11,8 @@ int main()
 
 	World *pWorld = nullptr;
 	worldInit(pWorld, {5, 10}, PATH_LEVEL_DEV);
-	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyDragon, {6,10});
+	entityCharacterDie(pWorld->pEntity[EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyDragon, {6,10})]);
+	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::store, {51,1});
 
 
 	while(true)
@@ -19,7 +20,9 @@ int main()
 		system("cls");
 		worldLogic(*pWorld);
 		printWorldLevel(*pWorld);
+#ifdef DEBUG
 		printWorldDebug(*pWorld);
+#endif // DEBUG
 		worldInput(*pWorld);
 	}
 
