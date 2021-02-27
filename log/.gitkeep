@@ -1,4 +1,0 @@
-# ignore files in this dir. , but not actually dir.
-*
-*/
-!.gitignore

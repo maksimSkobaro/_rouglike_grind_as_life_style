@@ -8,9 +8,9 @@
 
 
 #ifdef DEBUG
-
-void printWorldDebug(World &world)
+void printWorldDebug(const World &world)
 {
+	printf_s("Global Tick/BigTick: %i/%i\n", world.globTick, world.globBigTick);
 	for(int i = 0; i < world.entityAmount; i++)
 	{
 		printf_s("[%i] %12s [%i/%i]: ", world.pEntity[i].ID, world.pEntity[i].name, world.pEntity[i].coords.x, world.pEntity[i].coords.y);
@@ -21,7 +21,6 @@ void printWorldDebug(World &world)
 		}
 		puts("\n");
 	}
-
 }
 #endif // DEBUG
 
@@ -33,6 +32,9 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 		log("worldInit(): Ошибка выделения памяти. *pWorldNew = nullptr.");
 		exit(ERR_MEMORY);
 	}
+
+	pWorldNew->globTick = -1;
+	pWorldNew->globBigTick = 0;
 
 	pWorldNew->pEntity = nullptr;
 	pWorldNew->entityAmount = 0;
@@ -286,7 +288,7 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 					putchar((char) world.pEntity[k].entitySymb);
 				}
 			}
-			if (attackMode && attackPoint.y == i && attackPoint.x == j)
+			if(attackMode && attackPoint.y == i && attackPoint.x == j)
 			{
 				putchar('\b');
 				putchar('*');
@@ -296,8 +298,10 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 		putchar('\n');
 
 	}
-
+#ifdef DEBUG
 	SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+	printWorldDebug(world);
+#endif // DEBUG
 	return ERR_NO_ERR;
 }
 
@@ -401,185 +405,215 @@ int worldLogic(World &world)
 		{
 			world.pEntity[world.cameraID].coords = world.pEntity[world.mainCharacterID].coords;
 		}
-
-		// Передвижение Entity
-		switch(world.pEntity[i].direction)
+		else
 		{
-		case Direction::up:
-			if((world.pEntity[i].coords.x >= 0 && world.pEntity[i].coords.x < world.cellsColsAmount && world.pEntity[i].coords.y - 1 >= 0 && world.pEntity[i].coords.y - 1 < world.cellsRowsAmount) &&
-			   (world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y - 1].isGhost || world.pEntity[i].ID == world.cameraID))
-			{
-				if(world.pEntity[i].ID != world.cameraID)
-				{
-					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y - 1].isGhost = false;
-					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
-				}
-				world.pEntity[i].coords.y -= 1;
-			}
-			break;
-		case Direction::down:
-			if((world.pEntity[i].coords.x >= 0 && world.pEntity[i].coords.x < world.cellsColsAmount && world.pEntity[i].coords.y + 1 >= 0 && world.pEntity[i].coords.y + 1 < world.cellsRowsAmount) &&
-			   (world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y + 1].isGhost || world.pEntity[i].ID == world.cameraID))
-			{
-				if(world.pEntity[i].ID != world.cameraID)
-				{
-					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y + 1].isGhost = false;
-					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
-				}
-				world.pEntity[i].coords.y += 1;
-			}
-			break;
-		case Direction::left:
-			if((world.pEntity[i].coords.x - 1 >= 0 && world.pEntity[i].coords.x - 1 < world.cellsColsAmount && world.pEntity[i].coords.y >= 0 && world.pEntity[i].coords.y < world.cellsRowsAmount) &&
-			   (world.pCell[world.pEntity[i].coords.x - 1][world.pEntity[i].coords.y].isGhost || world.pEntity[i].ID == world.cameraID))
-			{
-				if(world.pEntity[i].ID != world.cameraID)
-				{
-					world.pCell[world.pEntity[i].coords.x - 1][world.pEntity[i].coords.y].isGhost = false;
-					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
-				}
-				world.pEntity[i].coords.x -= 1;
-			}
-			break;
-		case Direction::right:
-			if((world.pEntity[i].coords.x + 1 >= 0 && world.pEntity[i].coords.x + 1 < world.cellsColsAmount && world.pEntity[i].coords.y >= 0 && world.pEntity[i].coords.y < world.cellsRowsAmount) &&
-			   (world.pCell[world.pEntity[i].coords.x + 1][world.pEntity[i].coords.y].isGhost || world.pEntity[i].ID == world.cameraID))
-			{
-				if(world.pEntity[i].ID != world.cameraID)
-				{
-					world.pCell[world.pEntity[i].coords.x + 1][world.pEntity[i].coords.y].isGhost = false;
-					world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = true;
-				}
-				world.pEntity[i].coords.x += 1;
-			}
-			break;
-		case Direction::stay:
-			if(world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost)
-			{
-				world.pCell[world.pEntity[i].coords.x][world.pEntity[i].coords.y].isGhost = false;
-			}
-			break;
-		default:
-			log("worldLogic(): Получено не существующее Direction");
-			break;
+
 		}
-		world.pEntity[i].direction = Direction::stay;
+
+		worldDirectionLogic(world, world.pEntity[i]);
 
 		// Entity.Character - эвенты
 		if(world.pEntity[i].character != nullptr)
 		{
-			//	Entity.Character MainCharacter - эвенты
+			//	Entity.MainCharacter - эвенты
 			if(world.pEntity[i].ID == world.mainCharacterID)
 			{
-				//	Сис-ма изучения карты, вижн на Entity
-				for(int q = 0; q < world.entityAmount; q++)
-				{
-					world.pEntity[q].isInRange = false;
-				}
-
-				for(int curY = world.pEntity[i].coords.y, _i = 0; curY <= world.pEntity[i].coords.y + world.pEntity[i].character->visionRangeCurrent + 1; curY++, _i++)
-				{
-					for(int curX = world.pEntity[i].coords.x; curX <= world.pEntity[i].coords.x + world.pEntity[i].character->visionRangeCurrent - _i + 1; curX++)
-					{
-						int reversedY = curY - 2 * abs(world.pEntity[i].coords.y - curY);
-						int reversedX = curX - 2 * abs(world.pEntity[i].coords.x - curX);
-
-						world.pCell[curX][curY].isInRange = false;
-
-
-						if(reversedX < world.cellsColsAmount && reversedX >= 0)
-						{
-							world.pCell[reversedX][curY].isInRange = false;
-
-							if(reversedY < world.cellsRowsAmount && reversedY >= 0)
-							{
-								world.pCell[reversedX][reversedY].isInRange = false;
-							}
-						}
-
-						if(reversedY < world.cellsRowsAmount && reversedY >= 0)
-						{
-							world.pCell[curX][reversedY].isInRange = false;
-						}
-					}
-				}
-
-				for(int curY = world.pEntity[i].coords.y, _i = 0; curY <= world.pEntity[i].coords.y + world.pEntity[i].character->visionRangeCurrent; curY++, _i++)
-				{
-					for(int curX = world.pEntity[i].coords.x; curX <= world.pEntity[i].coords.x + world.pEntity[i].character->visionRangeCurrent - _i; curX++)
-					{
-						int reversedY = curY - 2 * abs(world.pEntity[i].coords.y - curY);
-						int reversedX = curX - 2 * abs(world.pEntity[i].coords.x - curX);
-
-						for(int q = 0; q < world.entityAmount; q++)
-						{
-							if((world.pEntity[q].coords.x == curX && world.pEntity[q].coords.y == curY) || (world.pEntity[q].coords.x == reversedX && world.pEntity[q].coords.y == curY) ||
-							   (world.pEntity[q].coords.x == curX && world.pEntity[q].coords.y == reversedY) || (world.pEntity[q].coords.x == reversedX && world.pEntity[q].coords.y == reversedY))
-							{
-								world.pEntity[q].isInRange = true;
-							}
-						}
-
-						world.pCell[curX][curY].isReserched = true;
-						world.pCell[curX][curY].isInRange = true;
-
-
-						if(reversedX < world.cellsColsAmount && reversedX >= 0)
-						{
-							world.pCell[reversedX][curY].isReserched = true;
-							world.pCell[reversedX][curY].isInRange = true;
-
-							if(reversedY < world.cellsRowsAmount && reversedY >= 0)
-							{
-								world.pCell[reversedX][reversedY].isReserched = true;
-								world.pCell[reversedX][reversedY].isInRange = true;
-							}
-						}
-
-						if(reversedY < world.cellsRowsAmount && reversedY >= 0)
-						{
-							world.pCell[curX][reversedY].isReserched = true;
-							world.pCell[curX][reversedY].isInRange = true;
-						}
-					}
-				}
 			}
 		}
 	}
 
+	worldVisionLogic(world);
+	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
+
 	return ERR_NO_ERR;
 }
 
-int characterAttack(const World& world, Entity& entity, bool& isEOI)
+void worldVisionLogic(World &world)
 {
-	Point attackPoint = { entity.coords.x, entity.coords.y - 1 };
-	if (entity.ID == world.mainCharacterID)
+	for(int q = 0; q < world.entityAmount; q++)
 	{
-		while (true)
+		world.pEntity[q].isInRange = false;
+	}
+
+	for(int curY = world.pEntity[world.mainCharacterID].coords.y, _i = 0; curY <= world.pEntity[world.mainCharacterID].coords.y + world.pEntity[world.mainCharacterID].character->visionRangeCurrent + 1; curY++, _i++)
+	{
+		for(int curX = world.pEntity[world.mainCharacterID].coords.x; curX <= world.pEntity[world.mainCharacterID].coords.x + world.pEntity[world.mainCharacterID].character->visionRangeCurrent - _i + 1; curX++)
+		{
+			int reversedY = curY - 2 * abs(world.pEntity[world.mainCharacterID].coords.y - curY);
+			int reversedX = curX - 2 * abs(world.pEntity[world.mainCharacterID].coords.x - curX);
+
+			world.pCell[curX][curY].isInRange = false;
+
+
+			if(reversedX < world.cellsColsAmount && reversedX >= 0)
+			{
+				world.pCell[reversedX][curY].isInRange = false;
+
+				if(reversedY < world.cellsRowsAmount && reversedY >= 0)
+				{
+					world.pCell[reversedX][reversedY].isInRange = false;
+				}
+			}
+
+			if(reversedY < world.cellsRowsAmount && reversedY >= 0)
+			{
+				world.pCell[curX][reversedY].isInRange = false;
+			}
+		}
+	}
+
+	for(int curY = world.pEntity[world.mainCharacterID].coords.y, _i = 0; curY <= world.pEntity[world.mainCharacterID].coords.y + world.pEntity[world.mainCharacterID].character->visionRangeCurrent; curY++, _i++)
+	{
+		for(int curX = world.pEntity[world.mainCharacterID].coords.x; curX <= world.pEntity[world.mainCharacterID].coords.x + world.pEntity[world.mainCharacterID].character->visionRangeCurrent - _i; curX++)
+		{
+			int reversedY = curY - 2 * abs(world.pEntity[world.mainCharacterID].coords.y - curY);
+			int reversedX = curX - 2 * abs(world.pEntity[world.mainCharacterID].coords.x - curX);
+
+			for(int q = 0; q < world.entityAmount; q++)
+			{
+				if((world.pEntity[q].coords.x == curX && world.pEntity[q].coords.y == curY) || (world.pEntity[q].coords.x == reversedX && world.pEntity[q].coords.y == curY) ||
+				   (world.pEntity[q].coords.x == curX && world.pEntity[q].coords.y == reversedY) || (world.pEntity[q].coords.x == reversedX && world.pEntity[q].coords.y == reversedY))
+				{
+					world.pEntity[q].isInRange = true;
+				}
+			}
+
+			world.pCell[curX][curY].isReserched = true;
+			world.pCell[curX][curY].isInRange = true;
+
+
+			if(reversedX < world.cellsColsAmount && reversedX >= 0)
+			{
+				world.pCell[reversedX][curY].isReserched = true;
+				world.pCell[reversedX][curY].isInRange = true;
+
+				if(reversedY < world.cellsRowsAmount && reversedY >= 0)
+				{
+					world.pCell[reversedX][reversedY].isReserched = true;
+					world.pCell[reversedX][reversedY].isInRange = true;
+				}
+			}
+
+			if(reversedY < world.cellsRowsAmount && reversedY >= 0)
+			{
+				world.pCell[curX][reversedY].isReserched = true;
+				world.pCell[curX][reversedY].isInRange = true;
+			}
+		}
+	}
+}
+
+void worldIncreaseHistoryTime(int &tick, int &bigTick)
+{
+	if(tick == 65535)
+	{
+		bigTick += 1;
+		tick = 0;
+	}
+	else
+	{
+		tick += 1;
+	}
+}
+
+int worldDirectionLogic(World &world, Entity &entity)
+{
+	switch(entity.direction)
+	{
+	case Direction::up:
+		if((entity.coords.x >= 0 && entity.coords.x < world.cellsColsAmount && entity.coords.y - 1 >= 0 && entity.coords.y - 1 < world.cellsRowsAmount) &&
+		   (world.pCell[entity.coords.x][entity.coords.y - 1].isGhost || entity.ID == world.cameraID))
+		{
+			if(entity.ID != world.cameraID)
+			{
+				world.pCell[entity.coords.x][entity.coords.y - 1].isGhost = false;
+				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+			}
+			entity.coords.y -= 1;
+		}
+		break;
+	case Direction::down:
+		if((entity.coords.x >= 0 && entity.coords.x < world.cellsColsAmount && entity.coords.y + 1 >= 0 && entity.coords.y + 1 < world.cellsRowsAmount) &&
+		   (world.pCell[entity.coords.x][entity.coords.y + 1].isGhost || entity.ID == world.cameraID))
+		{
+			if(entity.ID != world.cameraID)
+			{
+				world.pCell[entity.coords.x][entity.coords.y + 1].isGhost = false;
+				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+			}
+			entity.coords.y += 1;
+		}
+		break;
+	case Direction::left:
+		if((entity.coords.x - 1 >= 0 && entity.coords.x - 1 < world.cellsColsAmount && entity.coords.y >= 0 && entity.coords.y < world.cellsRowsAmount) &&
+		   (world.pCell[entity.coords.x - 1][entity.coords.y].isGhost || entity.ID == world.cameraID))
+		{
+			if(entity.ID != world.cameraID)
+			{
+				world.pCell[entity.coords.x - 1][entity.coords.y].isGhost = false;
+				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+			}
+			entity.coords.x -= 1;
+		}
+		break;
+	case Direction::right:
+		if((entity.coords.x + 1 >= 0 && entity.coords.x + 1 < world.cellsColsAmount && entity.coords.y >= 0 && entity.coords.y < world.cellsRowsAmount) &&
+		   (world.pCell[entity.coords.x + 1][entity.coords.y].isGhost || entity.ID == world.cameraID))
+		{
+			if(entity.ID != world.cameraID)
+			{
+				world.pCell[entity.coords.x + 1][entity.coords.y].isGhost = false;
+				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+			}
+			entity.coords.x += 1;
+		}
+		break;
+	case Direction::stay:
+		if(world.pCell[entity.coords.x][entity.coords.y].isGhost)
+		{
+			world.pCell[entity.coords.x][entity.coords.y].isGhost = false;
+		}
+		break;
+	default:
+		log("worldLogic(): Получено не существующее Direction");
+		break;
+	}
+
+	entity.direction = Direction::stay;
+
+	return ERR_NO_ERR;
+}
+
+int characterAttack(const World &world, Entity &entity, bool &isEOI)
+{
+	Point attackPoint = {entity.coords.x, entity.coords.y - 1};
+	if(entity.ID == world.mainCharacterID)
+	{
+		while(true)
 		{
 			system("cls");
 			printWorldLevel(world, true, attackPoint);
-			switch ((KBKey)_getch())
+			switch((KBKey) _getch())
 			{
 			case KBKey::keyUpArrow:
-				attackPoint = { entity.coords.x, entity.coords.y - 1 };
+				attackPoint = {entity.coords.x, entity.coords.y - 1};
 				break;
 			case KBKey::keyDownArrow:
-				attackPoint = { entity.coords.x, entity.coords.y + 1 };
+				attackPoint = {entity.coords.x, entity.coords.y + 1};
 				break;
 			case KBKey::keyRightArrow:
-				attackPoint = { entity.coords.x + 1, entity.coords.y };
+				attackPoint = {entity.coords.x + 1, entity.coords.y};
 				break;
 			case KBKey::keyLeftArrow:
-				attackPoint = { entity.coords.x - 1, entity.coords.y };
+				attackPoint = {entity.coords.x - 1, entity.coords.y};
 				break;
 			case KBKey::keyReturn:
-				for (int i = 0; i < world.entityAmount; i++)
+				for(int i = 0; i < world.entityAmount; i++)
 				{
-					if (world.pEntity[i].coords.x == attackPoint.x && world.pEntity[i].coords.y == attackPoint.y)
+					if(world.pEntity[i].coords.x == attackPoint.x && world.pEntity[i].coords.y == attackPoint.y)
 					{
 						world.pEntity[i].character->healthCurrent -= entity.character->damageCurrent;
-						if (world.pEntity[i].character->healthCurrent <= 0)
+						if(world.pEntity[i].character->healthCurrent <= 0)
 						{
 							entityCharacterDie(world.pEntity[i]);
 						}
