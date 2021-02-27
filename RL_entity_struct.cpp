@@ -1,4 +1,5 @@
 #include "RL_entity_struct.h"
+#include "RL_world_struct.h"
 
 
 ////////////////////////////////////////////////////////////
@@ -482,3 +483,4 @@ int getEntityMainCharacterID(const Entity *const worldEntity, int entityAmount)
 
 	return id;
 }
+
