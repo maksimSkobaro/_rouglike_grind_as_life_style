@@ -2,7 +2,6 @@
 #include "RL_world_struct.h"
 #include "RL_entity_struct.h"
 
-//	SetConsoleTextAttribute
 //	волновой алгоритм
 
 int main()
@@ -20,9 +19,6 @@ int main()
 		system("cls");
 		worldLogic(*pWorld);
 		printWorldLevel(*pWorld);
-#ifdef DEBUG
-		printWorldDebug(*pWorld);
-#endif // DEBUG
 		worldInput(*pWorld);
 	}
 

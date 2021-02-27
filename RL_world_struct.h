@@ -34,6 +34,9 @@ struct Cell
 
 struct World
 {
+	int globTick,
+		globBigTick;
+
 	int cellsRowsAmount,	//	максимальна y координата. задается worldLoadLevel()
 		cellsColsAmount;	//	максимальна x координата. задается worldLoadLevel()
 	Cell **pCell = nullptr;
@@ -55,7 +58,7 @@ struct World
 
 #ifdef DEBUG
 //	Выводит отладочную информацию под вывод printWorldLevel()
-void printWorldDebug(World &world);
+void printWorldDebug(const World &world);
 #endif // DEBUG
 //	Загружает уровень из файла в массив[][] структур
 int worldLoadLevel(World &world);
@@ -65,10 +68,16 @@ int worldInit(World *&world, Point mainCharacterCoord = {3, 20}, const char *con
 int worldDestruct(World *&world);
 //	Ф-я вывода уровня из **Cell в консоль.
 int printWorldLevel(const World &world, bool attackMode = false, Point attackPoint = {0,0});
-//	Ф-ия обрабатывающая нажатия на кнопки.
+//	Ф-я обрабатывающая нажатия на кнопки.
 int worldInput(World &world);
-//	Ф-ия реализующая логику игры.
+//	Ф-я реализующая логику игры.
 int worldLogic(World &world);
+//	Ф-я для изменения времени.
+void worldIncreaseHistoryTime(int &tick, int &bigTick);
+//	Ф-я реализующая логику передвижения Entity.
+int worldDirectionLogic(World &world, Entity &entity);
+//	Ф-я области видимости, изучения карты.
+void worldVisionLogic(World &world);
 //	Ф-я атаки
 int characterAttack(const World& world, Entity& entity, bool& isEOI);
 

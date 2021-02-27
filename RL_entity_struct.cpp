@@ -483,4 +483,3 @@ int getEntityMainCharacterID(const Entity *const worldEntity, int entityAmount)
 
 	return id;
 }
-
