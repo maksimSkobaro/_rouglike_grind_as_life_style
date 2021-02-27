@@ -29,10 +29,19 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 	strcpy_s(pWorldNew->levelName, PATH_NAME_LEN_MAX, worldName);
 	worldLoadLevel(*pWorldNew);
 
+	for(int i = 0; i < CAMERA_RANGE_MAX / 3 * 2 - 1; i++)
+	{
+		for(int j = 0; j < CONDITION_STR_ONELINE_MAX; j++)
+		{
+			pWorldNew->ConditionSting[i][j] = '\0';
+		}
+	}
+
+
 	worldDestruct(world);
 	world = pWorldNew;
 
-	return ERR_NO_ERR;
+	return ERR_UI_OUTPUT;
 }
 
 int worldDestruct(World *&world)
@@ -189,8 +198,7 @@ int worldLoadLevel(World &world)
 
 int printLevel(const World &world)
 {
-	int i;
-	for(i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++)
+	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3, curStr = 0; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++, curStr++)
 	{
 		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
 		{
@@ -213,31 +221,9 @@ int printLevel(const World &world)
 				}
 			}
 		}
-		if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3)
-			printf("\t1");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 1)
-			printf("\t\t\t\t2");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 2)
-			printf("\t3");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 3)
-			printf("\t\t\t\t4");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 4)
-			printf("\t5");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 5)
-			printf("\t\t\t\t6");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 6)
-			printf("\t7");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 7)
-			printf("\t\t\t\t8");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 8)
-			printf("\t9");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 9)
-			printf("\t\t\t\t10");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 10)
-			printf("\t11");
-		else if (i == world.pEntity[world.cameraID].coords.y - world.cameraRange / 3 + 11)
-			printf("\t\t\t\t12");
 
+		//	UI
+		printLevelUI(world.ConditionSting, world.cameraRange, curStr);
 
 		putchar('\n');
 	}
@@ -437,5 +423,36 @@ int worldLogic(World &world)
 			}
 		}
 	}
+
+	return ERR_NO_ERR;
+
+}
+
+int printLevelUI(const char(&conditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int cameraRange, int curY)
+{
+	if(curY > 3)
+	{
+		fputs(conditionString[curY - 2], stdout);
+	}
+	else if(curY < 2)
+	{
+		fputs(conditionString[curY], stdout);
+	}
+	else
+	{
+		switch(curY)
+		{
+		case 2:
+			break;
+		case 3:
+			fputs("\tСтрока состояния:", stdout);
+			break;
+		default:
+			log("printLevelUI(): неизвестный curY");
+			return ERR_NO_ERR;
+			break;
+		}
+	}
+
 	return ERR_NO_ERR;
 }
