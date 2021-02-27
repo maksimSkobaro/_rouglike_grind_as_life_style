@@ -1,4 +1,5 @@
-#include "RL_world_struct.h"
+п»ї#include "RL_world_struct.h"
+
 
 
 ////////////////////////////////////////////////////////////
@@ -29,7 +30,7 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 	World *pWorldNew = (World *) malloc(sizeof(*pWorldNew));
 	if(!pWorldNew)
 	{
-		log("worldInit(): Ошибка выделения памяти. *pWorldNew = nullptr.");
+		log("worldInit(): РћС€РёР±РєР° РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё. *pWorldNew = nullptr.");
 		exit(ERR_MEMORY);
 	}
 
@@ -84,7 +85,7 @@ int worldLoadLevel(World &world)
 
 	if(!world.pCell)
 	{
-		log("worldLoadLevel(): не получилось выделить память. **pCell = nullptr");
+		log("worldLoadLevel(): РЅРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ РІС‹РґРµР»РёС‚СЊ РїР°РјСЏС‚СЊ. **pCell = nullptr");
 		exit(ERR_MEMORY);
 	}
 
@@ -94,7 +95,7 @@ int worldLoadLevel(World &world)
 
 		if(!world.pCell)
 		{
-			log("worldLoadLevel(): не получилось выделить память. *pCell = nullptr");
+			log("worldLoadLevel(): РЅРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ РІС‹РґРµР»РёС‚СЊ РїР°РјСЏС‚СЊ. *pCell = nullptr");
 			exit(ERR_MEMORY);
 		}
 	}
@@ -104,7 +105,7 @@ int worldLoadLevel(World &world)
 	FILE *fLevel = nullptr;
 	if(fopen_s(&fLevel, world.levelName, "r"))
 	{
-		log("worldLoadLevel(): не получилось открыть файл с уровнем. *fLevel = nullptr");
+		log("worldLoadLevel(): РЅРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» СЃ СѓСЂРѕРІРЅРµРј. *fLevel = nullptr");
 		exit(ERR_FILE);
 	}
 
@@ -169,7 +170,7 @@ int worldLoadLevel(World &world)
 				world.pCell[col][row].isGhost = true;
 				break;
 			default:
-				log("worldLoadLevel(): Получен неизвестный CellSymb");
+				log("worldLoadLevel(): РџРѕР»СѓС‡РµРЅ РЅРµРёР·РІРµСЃС‚РЅС‹Р№ CellSymb");
 				world.pCell[col][row].isGhost = true;
 				break;
 			}
@@ -206,9 +207,9 @@ int worldLoadLevel(World &world)
 	return ERR_NO_ERR;
 }
 
-int printWorldLevel(const World &world)
+int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 {
-	// Хэндл консоли ( если чтото не понятно - гуглите/забейте )
+	// РҐСЌРЅРґР» РєРѕРЅСЃРѕР»Рё ( РµСЃР»Рё С‡С‚РѕС‚Рѕ РЅРµ РїРѕРЅСЏС‚РЅРѕ - РіСѓРіР»РёС‚Рµ/Р·Р°Р±РµР№С‚Рµ )
 	static HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 	int textAttr = NULL;
 
@@ -285,6 +286,11 @@ int printWorldLevel(const World &world)
 					putchar((char) world.pEntity[k].entitySymb);
 				}
 			}
+			if (attackMode && attackPoint.y == i && attackPoint.x == j)
+			{
+				putchar('\b');
+				putchar('*');
+			}
 		}
 
 		putchar('\n');
@@ -297,7 +303,7 @@ int printWorldLevel(const World &world)
 
 int worldInput(World &world)
 {
-	bool isEOI = false;	//	isEOI демонстрирует закончен ли ввод. (EOI - End of input)
+	bool isEOI = false;	//	isEOI РґРµРјРѕРЅСЃС‚СЂРёСЂСѓРµС‚ Р·Р°РєРѕРЅС‡РµРЅ Р»Рё РІРІРѕРґ. (EOI - End of input)
 
 	do
 	{
@@ -371,11 +377,14 @@ int worldInput(World &world)
 		case KBKey::keyM:
 			world.isMapMode = !world.isMapMode;
 			break;
+		case KBKey::keyA:
+			characterAttack(world, world.pEntity[world.mainCharacterID], isEOI);
+			break;
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
 			break;
 		default:
-			break;	//	сообщение в UI : нет такой кнопки
+			break;	//	СЃРѕРѕР±С‰РµРЅРёРµ РІ UI : РЅРµС‚ С‚Р°РєРѕР№ РєРЅРѕРїРєРё
 		}
 	} while(!isEOI);
 
@@ -384,16 +393,16 @@ int worldInput(World &world)
 
 int worldLogic(World &world)
 {
-	// Entity - эвенты
+	// Entity - СЌРІРµРЅС‚С‹
 	for(int i = 0; i < world.entityAmount; i++)
 	{
-		// Привязка камеры к основному персонажу. Режим карты.
+		// РџСЂРёРІСЏР·РєР° РєР°РјРµСЂС‹ Рє РѕСЃРЅРѕРІРЅРѕРјСѓ РїРµСЂСЃРѕРЅР°Р¶Сѓ. Р РµР¶РёРј РєР°СЂС‚С‹.
 		if(!world.isMapMode)
 		{
 			world.pEntity[world.cameraID].coords = world.pEntity[world.mainCharacterID].coords;
 		}
 
-		// Передвижение Entity
+		// РџРµСЂРµРґРІРёР¶РµРЅРёРµ Entity
 		switch(world.pEntity[i].direction)
 		{
 		case Direction::up:
@@ -451,17 +460,17 @@ int worldLogic(World &world)
 			}
 			break;
 		default:
-			log("worldLogic(): Получено не существующее Direction");
+			log("worldLogic(): РџРѕР»СѓС‡РµРЅРѕ РЅРµ СЃСѓС‰РµСЃС‚РІСѓСЋС‰РµРµ Direction");
 			break;
 		}
 
-		// Entity.Character - эвенты
+		// Entity.Character - СЌРІРµРЅС‚С‹
 		if(world.pEntity[i].character != nullptr)
 		{
-			//	Entity.Character MainCharacter - эвенты
+			//	Entity.Character MainCharacter - СЌРІРµРЅС‚С‹
 			if(world.pEntity[i].ID == world.mainCharacterID)
 			{
-				//	Сис-ма изучения карты, вижн на Entity
+				//	РЎРёСЃ-РјР° РёР·СѓС‡РµРЅРёСЏ РєР°СЂС‚С‹, РІРёР¶РЅ РЅР° Entity
 				for(int q = 0; q < world.entityAmount; q++)
 				{
 					world.pEntity[q].isInRange = false;
@@ -535,6 +544,64 @@ int worldLogic(World &world)
 				}
 			}
 		}
+	}
+
+	return ERR_NO_ERR;
+}
+
+int characterAttack(const World& world, Entity& entity, bool& isEOI)
+{
+	Point attackPoint = { entity.coords.x, entity.coords.y - 1 };
+	if (entity.ID == world.mainCharacterID)
+	{
+		while (true)
+		{
+			system("cls");
+			printWorldLevel(world, true, attackPoint);
+			switch ((KBKey)_getch())
+			{
+			case KBKey::keyUpArrow:
+				attackPoint = { entity.coords.x, entity.coords.y - 1 };
+				break;
+			case KBKey::keyDownArrow:
+				attackPoint = { entity.coords.x, entity.coords.y + 1 };
+				break;
+			case KBKey::keyRightArrow:
+				attackPoint = { entity.coords.x + 1, entity.coords.y };
+				break;
+			case KBKey::keyLeftArrow:
+				attackPoint = { entity.coords.x - 1, entity.coords.y };
+				break;
+			case KBKey::keyReturn:
+				for (int i = 0; i < world.entityAmount; i++)
+				{
+					if (world.pEntity[i].coords.x == attackPoint.x && world.pEntity[i].coords.y == attackPoint.y)
+					{
+						world.pEntity[i].character->healthCurrent -= entity.character->damageCurrent;
+						if (world.pEntity[i].character->healthCurrent <= 0)
+						{
+							entityCharacterDie(world.pEntity[i]);
+						}
+					}
+				}
+				isEOI = true;
+				return ERR_NO_ERR;
+				break;
+			case KBKey::keyA:
+				system("cls");
+				printWorldLevel(world);
+				isEOI = false;
+				return ERR_NO_ERR;
+				break;
+			default:
+				break;
+			}
+
+		}
+	}
+	else
+	{
+
 	}
 
 	return ERR_NO_ERR;

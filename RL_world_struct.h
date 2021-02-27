@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #ifndef _RL_WORLD_STRUCT_H_
 #define _RL_WORLD_STRUCT_H_
 #include "RL_global.h"
@@ -34,8 +34,8 @@ struct Cell
 
 struct World
 {
-	int cellsRowsAmount,	//	максимальна y координата. задается worldLoadLevel()
-		cellsColsAmount;	//	максимальна x координата. задается worldLoadLevel()
+	int cellsRowsAmount,	//	РјР°РєСЃРёРјР°Р»СЊРЅР° y РєРѕРѕСЂРґРёРЅР°С‚Р°. Р·Р°РґР°РµС‚СЃСЏ worldLoadLevel()
+		cellsColsAmount;	//	РјР°РєСЃРёРјР°Р»СЊРЅР° x РєРѕРѕСЂРґРёРЅР°С‚Р°. Р·Р°РґР°РµС‚СЃСЏ worldLoadLevel()
 	Cell **pCell = nullptr;
 
 	int	mainCharacterID,
@@ -53,23 +53,24 @@ struct World
 ////////////////////FUNCTIONS_DECLARATION///////////////////
 ////////////////////////////////////////////////////////////
 
-
 #ifdef DEBUG
-//	Выводит отладочную информацию под вывод printWorldLevel()
+//	Р’С‹РІРѕРґРёС‚ РѕС‚Р»Р°РґРѕС‡РЅСѓСЋ РёРЅС„РѕСЂРјР°С†РёСЋ РїРѕРґ РІС‹РІРѕРґ printWorldLevel()
 void printWorldDebug(World &world);
 #endif // DEBUG
-//	Загружает уровень из файла в массив[][] структур
+//	Р—Р°РіСЂСѓР¶Р°РµС‚ СѓСЂРѕРІРµРЅСЊ РёР· С„Р°Р№Р»Р° РІ РјР°СЃСЃРёРІ[][] СЃС‚СЂСѓРєС‚СѓСЂ
 int worldLoadLevel(World &world);
-//	Инициализирует стандартными значениями World
+//	РРЅРёС†РёР°Р»РёР·РёСЂСѓРµС‚ СЃС‚Р°РЅРґР°СЂС‚РЅС‹РјРё Р·РЅР°С‡РµРЅРёСЏРјРё World
 int worldInit(World *&world, Point mainCharacterCoord = {3, 20}, const char *const worldName = PATH_LEVEL_1);
-//	Корретно удаляет World
+//	РљРѕСЂСЂРµС‚РЅРѕ СѓРґР°Р»СЏРµС‚ World
 int worldDestruct(World *&world);
-//	Ф-я вывода уровня из **Cell в консоль.
-int printWorldLevel(const World &world);
-//	Ф-ия обрабатывающая нажатия на кнопки.
+//	Р¤-СЏ РІС‹РІРѕРґР° СѓСЂРѕРІРЅСЏ РёР· **Cell РІ РєРѕРЅСЃРѕР»СЊ.
+int printWorldLevel(const World &world, bool attackMode = false, Point attackPoint = {0,0});
+//	Р¤-РёСЏ РѕР±СЂР°Р±Р°С‚С‹РІР°СЋС‰Р°СЏ РЅР°Р¶Р°С‚РёСЏ РЅР° РєРЅРѕРїРєРё.
 int worldInput(World &world);
-//	Ф-ия реализующая логику игры.
+//	Р¤-РёСЏ СЂРµР°Р»РёР·СѓСЋС‰Р°СЏ Р»РѕРіРёРєСѓ РёРіСЂС‹.
 int worldLogic(World &world);
+//	Р¤-СЏ Р°С‚Р°РєРё
+int characterAttack(const World& world, Entity& entity, bool& isEOI);
 
 
 #endif // !_RL_WORLD_STRUCT_H_

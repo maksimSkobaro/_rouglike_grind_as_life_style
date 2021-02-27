@@ -1,9 +1,9 @@
-#include "RL_global.h"
+п»ї#include "RL_global.h"
 #include "RL_world_struct.h"
 #include "RL_entity_struct.h"
 
 //	SetConsoleTextAttribute
-//	Волновой алгоритм
+//	РІРѕР»РЅРѕРІРѕР№ Р°Р»РіРѕСЂРёС‚Рј
 
 int main()
 {
