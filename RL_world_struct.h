@@ -44,7 +44,6 @@ struct World
 	int	mainCharacterID,
 		cameraID,
 		cameraRange;
-	bool isMapMode;
 
 	int entityAmount;
 	Entity *pEntity = nullptr;
@@ -80,6 +79,8 @@ int worldDirectionLogic(World &world, Entity &entity);
 void worldVisionLogic(World &world);
 //	Ф-я атаки
 int characterAttack(const World& world, Entity& entity, bool& isEOI);
+//	Ф-я реализует механизм прокрутки камеры
+void worldMapMode(World &world);
 
 
 #endif // !_RL_WORLD_STRUCT_H_
