@@ -43,7 +43,6 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 	pWorldNew->cameraID = EntityAdd(pWorldNew->pEntity, pWorldNew->entityAmount,
 									EntitySymb::camera, mainCharacterCoords);
 	pWorldNew->cameraRange = 24;
-	pWorldNew->isMapMode = false;
 
 	pWorldNew->pCell = nullptr;
 	pWorldNew->cellsColsAmount = 0;
@@ -314,72 +313,28 @@ int worldInput(World &world)
 		switch((KBKey) _getch())
 		{
 		case KBKey::keyUpArrow:
-			if(!world.isMapMode)
-			{
-				world.pEntity[world.mainCharacterID].direction = Direction::up;
-				world.pEntity[world.cameraID].direction = Direction::stay;
-			}
-			else
-			{
-				world.pEntity[world.mainCharacterID].direction = Direction::stay;
-				world.pEntity[world.cameraID].direction = Direction::up;
-			}
+			world.pEntity[world.mainCharacterID].direction = Direction::up;
 			isEOI = true;
 			break;
 		case KBKey::keyDownArrow:
-			if(!world.isMapMode)
-			{
-				world.pEntity[world.mainCharacterID].direction = Direction::down;
-				world.pEntity[world.cameraID].direction = Direction::stay;
-			}
-			else
-			{
-				world.pEntity[world.mainCharacterID].direction = Direction::stay;
-				world.pEntity[world.cameraID].direction = Direction::down;
-			}
+
+			world.pEntity[world.mainCharacterID].direction = Direction::down;
 			isEOI = true;
 			break;
 		case KBKey::keyLeftArrow:
-			if(!world.isMapMode)
-			{
-				world.pEntity[world.mainCharacterID].direction = Direction::left;
-				world.pEntity[world.cameraID].direction = Direction::stay;
-			}
-			else
-			{
-				world.pEntity[world.mainCharacterID].direction = Direction::stay;
-				world.pEntity[world.cameraID].direction = Direction::left;
-			}
+			world.pEntity[world.mainCharacterID].direction = Direction::left;
 			isEOI = true;
 			break;
 		case KBKey::keyRightArrow:
-			if(!world.isMapMode)
-			{
-				world.pEntity[world.mainCharacterID].direction = Direction::right;
-				world.pEntity[world.cameraID].direction = Direction::stay;
-			}
-			else
-			{
-				world.pEntity[world.mainCharacterID].direction = Direction::stay;
-				world.pEntity[world.cameraID].direction = Direction::right;
-			}
+			world.pEntity[world.mainCharacterID].direction = Direction::right;
 			isEOI = true;
 			break;
 		case KBKey::keyReturn:
-			if(!world.isMapMode)
-			{
-				world.pEntity[world.mainCharacterID].direction = Direction::stay;
-				world.pEntity[world.cameraID].direction = Direction::stay;
-			}
-			else
-			{
-				world.pEntity[world.mainCharacterID].direction = Direction::stay;
-				world.pEntity[world.cameraID].direction = Direction::stay;
-			}
+			world.pEntity[world.mainCharacterID].direction = Direction::stay;
 			isEOI = true;
 			break;
 		case KBKey::keyM:
-			world.isMapMode = !world.isMapMode;
+			worldMapMode(world);
 			break;
 		case KBKey::keyA:
 			characterAttack(world, world.pEntity[world.mainCharacterID], isEOI);
@@ -400,17 +355,10 @@ int worldLogic(World &world)
 	// Entity - эвенты
 	for(int i = 0; i < world.entityAmount; i++)
 	{
-		// Привязка камеры к основному персонажу. Режим карты.
-		if(!world.isMapMode)
-		{
-			world.pEntity[world.cameraID].coords = world.pEntity[world.mainCharacterID].coords;
-		}
-		else
-		{
-
-		}
+		world.pEntity[world.cameraID].coords = world.pEntity[world.mainCharacterID].coords;
 
 		worldDirectionLogic(world, world.pEntity[i]);
+
 
 		// Entity.Character - эвенты
 		if(world.pEntity[i].character != nullptr)
@@ -528,8 +476,16 @@ int worldDirectionLogic(World &world, Entity &entity)
 			{
 				world.pCell[entity.coords.x][entity.coords.y - 1].isGhost = false;
 				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+				entity.coords.y -= 1;
 			}
-			entity.coords.y -= 1;
+			else
+			{
+				entity.coords.y -= 5;
+				if(entity.coords.y < 0)
+				{
+					entity.coords.y = 0;
+				}
+			}
 		}
 		break;
 	case Direction::down:
@@ -540,8 +496,16 @@ int worldDirectionLogic(World &world, Entity &entity)
 			{
 				world.pCell[entity.coords.x][entity.coords.y + 1].isGhost = false;
 				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+				entity.coords.y += 1;
 			}
-			entity.coords.y += 1;
+			else
+			{
+				entity.coords.y += 5;
+				if(entity.coords.y >= world.cellsRowsAmount)
+				{
+					entity.coords.y = world.cellsRowsAmount - 1;
+				}
+			}
 		}
 		break;
 	case Direction::left:
@@ -552,8 +516,16 @@ int worldDirectionLogic(World &world, Entity &entity)
 			{
 				world.pCell[entity.coords.x - 1][entity.coords.y].isGhost = false;
 				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+				entity.coords.x -= 1;
 			}
-			entity.coords.x -= 1;
+			else
+			{
+				entity.coords.x -= 5;
+				if(entity.coords.x < 0)
+				{
+					entity.coords.x = 0;
+				}
+			}
 		}
 		break;
 	case Direction::right:
@@ -564,12 +536,21 @@ int worldDirectionLogic(World &world, Entity &entity)
 			{
 				world.pCell[entity.coords.x + 1][entity.coords.y].isGhost = false;
 				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+				entity.coords.x += 1;
 			}
-			entity.coords.x += 1;
+			else
+			{
+				entity.coords.x += 5;
+				if(entity.coords.x >= world.cellsRowsAmount)
+				{
+					entity.coords.x = world.cellsRowsAmount - 1;
+				}
+			}
+
 		}
 		break;
 	case Direction::stay:
-		if(world.pCell[entity.coords.x][entity.coords.y].isGhost)
+		if(entity.ID != world.cameraID && world.pCell[entity.coords.x][entity.coords.y].isGhost)
 		{
 			world.pCell[entity.coords.x][entity.coords.y].isGhost = false;
 		}
@@ -582,6 +563,46 @@ int worldDirectionLogic(World &world, Entity &entity)
 	entity.direction = Direction::stay;
 
 	return ERR_NO_ERR;
+}
+
+void worldMapMode(World &world)
+{
+	bool isMapMode = true;
+
+	while(isMapMode)
+	{
+		switch((KBKey) _getch())
+		{
+		case KBKey::keyUpArrow:
+			world.pEntity[world.cameraID].direction = Direction::up;
+			break;
+		case KBKey::keyDownArrow:
+			world.pEntity[world.cameraID].direction = Direction::down;
+			break;
+		case KBKey::keyLeftArrow:
+			world.pEntity[world.cameraID].direction = Direction::left;
+			break;
+		case KBKey::keyRightArrow:
+			world.pEntity[world.cameraID].direction = Direction::right;
+			break;
+		case KBKey::keyM:
+			isMapMode = false;
+			break;
+		case KBKey::key9:
+			exit(ERR_NO_ERR);
+			break;
+		default:
+			break;	//	сообщение в UI : нет такой кнопки
+		}
+
+		worldDirectionLogic(world, world.pEntity[world.cameraID]);
+		system("cls");
+		printWorldLevel(world);
+	}
+
+	system("cls");
+	printWorldLevel(world);
+	world.pEntity[world.cameraID].direction = Direction::stay;
 }
 
 int characterAttack(const World &world, Entity &entity, bool &isEOI)
