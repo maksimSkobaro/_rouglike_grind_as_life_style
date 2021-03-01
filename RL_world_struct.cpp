@@ -600,6 +600,7 @@ void worldMapMode(World &world)
 		printWorldLevel(world);
 	}
 
+	world.pEntity[world.cameraID].coords = world.pEntity[world.mainCharacterID].coords;
 	system("cls");
 	printWorldLevel(world);
 	world.pEntity[world.cameraID].direction = Direction::stay;
