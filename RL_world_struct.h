@@ -11,6 +11,12 @@
 #define MAP_WIDTH_MAX 512
 #define MAP_HEIGTH_MAX 512
 
+#define CAMERA_RANGE_MAX 24
+#define CONDITION_STR_ONELINE_MAX 64
+
+#define ERR_UI_OUTPUT 300
+#define ERR_UI_INPUT 301
+
 
 ///////////////////////////////////////////////////////
 ////////////////////DATA_STRUCTURES////////////////////
@@ -48,6 +54,7 @@ struct World
 	int entityAmount;
 	Entity *pEntity = nullptr;
 	char levelName[64];
+	char ConditionString[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX];
 };
 
 
@@ -67,6 +74,8 @@ int worldInit(World *&world, Point mainCharacterCoord = {3, 20}, const char *con
 int worldDestruct(World *&world);
 //	Ф-я вывода уровня из **Cell в консоль.
 int printWorldLevel(const World &world, bool attackMode = false, Point attackPoint = {0,0});
+//	обработка UI и строки сотояния
+int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int cameraRange, int curY);
 //	Ф-я обрабатывающая нажатия на кнопки.
 int worldInput(World &world);
 //	Ф-я реализующая логику игры.

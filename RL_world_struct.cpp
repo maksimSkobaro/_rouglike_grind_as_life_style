@@ -50,6 +50,14 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 	strcpy_s(pWorldNew->levelName, PATH_NAME_LEN_MAX, worldName);
 	worldLoadLevel(*pWorldNew);
 
+	for (int i = 0; i < CAMERA_RANGE_MAX / 3 * 2 - 1; i++)
+	{
+		for (int j = 0; j < CONDITION_STR_ONELINE_MAX; j++)
+		{
+			pWorldNew->ConditionString[i][j] = '\0';
+		}
+	}
+
 	worldDestruct(world);
 	world = pWorldNew;
 
@@ -215,7 +223,7 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 	int textAttr = NULL;
 
 
-	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++)
+	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3, curStr = 0; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++, curStr++)
 	{
 		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
 		{
@@ -294,6 +302,7 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 			}
 		}
 
+		worldPrintLevelUI(world.ConditionString, world.cameraRange, curStr);
 		putchar('\n');
 
 	}
@@ -658,6 +667,34 @@ int characterAttack(const World &world, Entity &entity, bool &isEOI)
 	else
 	{
 
+	}
+
+	return ERR_NO_ERR;
+}
+int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int cameraRange, int curY)
+{
+	if (curY > 3)
+	{
+		fputs(ConditionString[curY - 2], stdout);
+	}
+	else if (curY < 2)
+	{
+		fputs(ConditionString[curY], stdout);
+	}
+	else
+	{
+		switch (curY)
+		{
+		case 2:
+			break;
+		case 3:
+			fputs("\tСтрока состояния:", stdout);
+			break;
+		default:
+			log("printLevelUI(): неизвестный curY");
+			return ERR_NO_ERR;
+			break;
+		}
 	}
 
 	return ERR_NO_ERR;
