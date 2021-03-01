@@ -57,10 +57,11 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 			pWorldNew->ConditionString[i][j] = '\0';
 		}
 	}
+
 	worldDestruct(world);
 	world = pWorldNew;
 
-	return ERR_UI_OUTPUT;
+	return ERR_NO_ERR;
 }
 
 int worldDestruct(World *&world)
@@ -298,8 +299,8 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 				putchar('*');
 			}
 		}
-
-		worldPrintLevelUI(world.ConditionString, world.cameraRange, curStr);
+		SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+		worldPrintLevelUI(world.ConditionString, curStr);
 		putchar('\n');
 	}
 #ifdef DEBUG
@@ -375,10 +376,46 @@ int worldLogic(World &world)
 		}
 	}
 
+	worldUILogic(world);
 	worldVisionLogic(world);
 	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
-
+	char tmp[16];
+	_itoa_s(world.globTick, tmp, 16, 10);
+	worldUIStrAdd(world.ConditionString, tmp);
 	return ERR_NO_ERR;
+}
+
+void worldUILogic(World& world)
+{
+	char tmpLevel[16];
+	_itoa_s(world.pEntity[world.mainCharacterID].character->level, tmpLevel, 16, 10);
+	strcpy_s(world.ConditionString[0], ENTITY_NAME_LEN_MAX, world.pEntity[world.mainCharacterID].name);
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, ", LVL: ");
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, tmpLevel);
+
+	char tmpHealth[16], tmpDamage[16], tmpMana[16], tmpVisionRange[16];
+	_itoa_s(world.pEntity[world.mainCharacterID].character->healthCurrent, tmpHealth, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->damageCurrent, tmpDamage, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->manaCurrent, tmpMana, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->visionRangeCurrent, tmpVisionRange, 16, 10);
+	strcpy_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, "HP: ");
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpHealth);
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", DMG: ");
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpDamage);
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", MNA: ");
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpMana);
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", VSN: ");
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpVisionRange);
+
+}
+
+void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], const char* newString)
+{
+	for (int  i = CAMERA_RANGE_MAX / 3 * 2 - 2; i > 2; i--)
+	{
+		strcpy_s(ConditionString[i], CONDITION_STR_ONELINE_MAX, ConditionString[i - 1]);
+	}
+	strcpy_s(ConditionString[2], CONDITION_STR_ONELINE_MAX, newString);
 }
 
 void worldVisionLogic(World &world)
@@ -667,8 +704,9 @@ int characterAttack(const World &world, Entity &entity, bool &isEOI)
 
 	return ERR_NO_ERR;
 }
-int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int cameraRange, int curY)
+int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int curY)
 {
+	
 	if (curY > 3)
 	{
 		fputs(ConditionString[curY - 2], stdout);

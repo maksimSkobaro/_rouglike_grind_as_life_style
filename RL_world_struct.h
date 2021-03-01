@@ -75,7 +75,7 @@ int worldDestruct(World *&world);
 //	Ф-я вывода уровня из **Cell в консоль.
 int printWorldLevel(const World &world, bool attackMode = false, Point attackPoint = {0,0});
 //	обработка UI и строки сотояния
-int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int cameraRange, int curY);
+int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int curY);
 //	Ф-я обрабатывающая нажатия на кнопки.
 int worldInput(World &world);
 //	Ф-я реализующая логику игры.
@@ -90,6 +90,10 @@ void worldVisionLogic(World &world);
 int characterAttack(const World& world, Entity& entity, bool& isEOI);
 //	Ф-я реализует механизм прокрутки камеры
 void worldMapMode(World &world);
+//	Ф-я обновления UI
+void worldUILogic(World& world);
+//	Ф-я добавление новой строки состояние в UI
+void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], const char* newString);
 
 
 #endif // !_RL_WORLD_STRUCT_H_

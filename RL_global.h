@@ -10,7 +10,7 @@
 #include <conio.h>
 #include <cstring>
 #include <Windows.h>
-#include <time.h>
+#include <ctime>
 
 ///////////////////////////////////////////////
 ////////////////////DEFINES////////////////////
