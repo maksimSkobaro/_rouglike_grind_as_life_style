@@ -75,7 +75,6 @@ int worldDestruct(World *&world)
 	{
 		EntityRemove(world->pEntity, world->entityAmount, world->pEntity[i].ID);
 	}
-
 	for(int i = 0; i < world->cellsColsAmount; i++)
 	{
 		free(world->pCell[i]);
