@@ -57,11 +57,10 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 			pWorldNew->ConditionString[i][j] = '\0';
 		}
 	}
-
 	worldDestruct(world);
 	world = pWorldNew;
 
-	return ERR_NO_ERR;
+	return ERR_UI_OUTPUT;
 }
 
 int worldDestruct(World *&world)
@@ -221,7 +220,6 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 	static HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 	int textAttr = NULL;
 
-
 	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3, curStr = 0; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++, curStr++)
 	{
 		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
@@ -303,7 +301,6 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 
 		worldPrintLevelUI(world.ConditionString, world.cameraRange, curStr);
 		putchar('\n');
-
 	}
 #ifdef DEBUG
 	SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
