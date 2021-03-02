@@ -541,9 +541,9 @@ int worldDirectionLogic(World &world, Entity &entity)
 			else
 			{
 				entity.coords.x += 5;
-				if(entity.coords.x >= world.cellsRowsAmount)
+				if(entity.coords.x >= world.cellsColsAmount)
 				{
-					entity.coords.x = world.cellsRowsAmount - 1;
+					entity.coords.x = world.cellsColsAmount - 1;
 				}
 			}
 
