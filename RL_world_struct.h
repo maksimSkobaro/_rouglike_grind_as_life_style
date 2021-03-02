@@ -81,6 +81,8 @@ void worldVisionLogic(World &world);
 int characterAttack(const World& world, Entity& entity, bool& isEOI);
 //	Ф-я реализует механизм прокрутки камеры
 void worldMapMode(World &world);
+//
+int worldEntitySpawnerLogic(World& world, int spawnerID);
 
 
 #endif // !_RL_WORLD_STRUCT_H_
