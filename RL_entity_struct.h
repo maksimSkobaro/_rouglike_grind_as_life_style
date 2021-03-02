@@ -57,7 +57,8 @@ enum class EntitySymb : char
 	enemyDragonDrop = 'd',
 	enemyDragon = 'D',
 	camera = '?',
-	empty = ' '
+	empty = ' ',
+	entitySpawn = '!'
 };
 
 struct Item
