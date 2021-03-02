@@ -12,7 +12,7 @@ int main()
 	worldInit(pWorld, {5, 10}, PATH_LEVEL_DEV);
 	entityCharacterDie(pWorld->pEntity[EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyDragon, {6,10})]);
 	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::store, {51,1});
-	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyWarden, { 15,10 }, true, 10);
+	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyWarden, { 15,10 }, true, 3);
 
 	while(true)
 	{
