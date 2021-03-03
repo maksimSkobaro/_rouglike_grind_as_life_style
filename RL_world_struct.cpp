@@ -214,7 +214,6 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 	static HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 	int textAttr = NULL;
 
-
 	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++)
 	{
 		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
@@ -337,7 +336,7 @@ int worldInput(World &world)
 			worldMapMode(world);
 			break;
 		case KBKey::keyA:
-			characterAttack(world, world.pEntity[world.mainCharacterID], isEOI);
+			worldCharacterAttack(world, world.pEntity[world.mainCharacterID], isEOI);
 			break;
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
@@ -376,6 +375,7 @@ int worldLogic(World &world)
 	return ERR_NO_ERR;
 }
 
+// FIX TP ISVISION
 void worldVisionLogic(World &world)
 {
 	for(int q = 0; q < world.entityAmount; q++)
@@ -466,94 +466,25 @@ void worldIncreaseHistoryTime(int &tick, int &bigTick)
 
 int worldDirectionLogic(World &world, Entity &entity)
 {
+	Point toGoPoint{0, 0};
+	int stepSize = entity.ID == world.cameraID ? 10 : 1;
+
 	switch(entity.direction)
 	{
 	case Direction::up:
-		if((entity.coords.x >= 0 && entity.coords.x < world.cellsColsAmount && entity.coords.y - 1 >= 0 && entity.coords.y - 1 < world.cellsRowsAmount) &&
-		   (world.pCell[entity.coords.x][entity.coords.y - 1].isGhost || entity.ID == world.cameraID))
-		{
-			if(entity.ID != world.cameraID)
-			{
-				world.pCell[entity.coords.x][entity.coords.y - 1].isGhost = false;
-				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
-				entity.coords.y -= 1;
-			}
-			else
-			{
-				entity.coords.y -= 5;
-				if(entity.coords.y < 0)
-				{
-					entity.coords.y = 0;
-				}
-			}
-		}
+		toGoPoint = {entity.coords.x, entity.coords.y - stepSize};
 		break;
 	case Direction::down:
-		if((entity.coords.x >= 0 && entity.coords.x < world.cellsColsAmount && entity.coords.y + 1 >= 0 && entity.coords.y + 1 < world.cellsRowsAmount) &&
-		   (world.pCell[entity.coords.x][entity.coords.y + 1].isGhost || entity.ID == world.cameraID))
-		{
-			if(entity.ID != world.cameraID)
-			{
-				world.pCell[entity.coords.x][entity.coords.y + 1].isGhost = false;
-				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
-				entity.coords.y += 1;
-			}
-			else
-			{
-				entity.coords.y += 5;
-				if(entity.coords.y >= world.cellsRowsAmount)
-				{
-					entity.coords.y = world.cellsRowsAmount - 1;
-				}
-			}
-		}
+		toGoPoint = {entity.coords.x, entity.coords.y + stepSize};
 		break;
 	case Direction::left:
-		if((entity.coords.x - 1 >= 0 && entity.coords.x - 1 < world.cellsColsAmount && entity.coords.y >= 0 && entity.coords.y < world.cellsRowsAmount) &&
-		   (world.pCell[entity.coords.x - 1][entity.coords.y].isGhost || entity.ID == world.cameraID))
-		{
-			if(entity.ID != world.cameraID)
-			{
-				world.pCell[entity.coords.x - 1][entity.coords.y].isGhost = false;
-				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
-				entity.coords.x -= 1;
-			}
-			else
-			{
-				entity.coords.x -= 5;
-				if(entity.coords.x < 0)
-				{
-					entity.coords.x = 0;
-				}
-			}
-		}
+		toGoPoint = {entity.coords.x - stepSize, entity.coords.y};
 		break;
 	case Direction::right:
-		if((entity.coords.x + 1 >= 0 && entity.coords.x + 1 < world.cellsColsAmount && entity.coords.y >= 0 && entity.coords.y < world.cellsRowsAmount) &&
-		   (world.pCell[entity.coords.x + 1][entity.coords.y].isGhost || entity.ID == world.cameraID))
-		{
-			if(entity.ID != world.cameraID)
-			{
-				world.pCell[entity.coords.x + 1][entity.coords.y].isGhost = false;
-				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
-				entity.coords.x += 1;
-			}
-			else
-			{
-				entity.coords.x += 5;
-				if(entity.coords.x >= world.cellsColsAmount)
-				{
-					entity.coords.x = world.cellsColsAmount - 1;
-				}
-			}
-
-		}
+		toGoPoint = {entity.coords.x + stepSize, entity.coords.y};
 		break;
 	case Direction::stay:
-		if(entity.ID != world.cameraID && world.pCell[entity.coords.x][entity.coords.y].isGhost)
-		{
-			world.pCell[entity.coords.x][entity.coords.y].isGhost = false;
-		}
+		toGoPoint = {entity.coords.x, entity.coords.y};
 		break;
 	default:
 		log("worldLogic(): Получено не существующее Direction");
@@ -561,6 +492,15 @@ int worldDirectionLogic(World &world, Entity &entity)
 	}
 
 	entity.direction = Direction::stay;
+
+	if(world.cameraID == entity.ID)
+	{
+		worldEntityGoto(world, entity, toGoPoint, true);
+	}
+	else
+	{
+		worldEntityGoto(world, entity, toGoPoint);
+	}
 
 	return ERR_NO_ERR;
 }
@@ -588,6 +528,12 @@ void worldMapMode(World &world)
 		case KBKey::keyM:
 			isMapMode = false;
 			break;
+#ifdef DEBUG
+		case KBKey::keyReturn:
+			isMapMode = false;
+			worldEntityGoto(world, world.pEntity[world.mainCharacterID], world.pEntity[world.cameraID].coords, true);
+			break;
+#endif // DEBUG
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
 			break;
@@ -606,7 +552,7 @@ void worldMapMode(World &world)
 	world.pEntity[world.cameraID].direction = Direction::stay;
 }
 
-int characterAttack(const World &world, Entity &entity, bool &isEOI)
+int worldCharacterAttack(const World &world, Entity &entity, bool &isEOI)
 {
 	Point attackPoint = {entity.coords.x, entity.coords.y - 1};
 	if(entity.ID == world.mainCharacterID)
@@ -615,6 +561,7 @@ int characterAttack(const World &world, Entity &entity, bool &isEOI)
 		{
 			system("cls");
 			printWorldLevel(world, true, attackPoint);
+
 			switch((KBKey) _getch())
 			{
 			case KBKey::keyUpArrow:
@@ -653,7 +600,6 @@ int characterAttack(const World &world, Entity &entity, bool &isEOI)
 			default:
 				break;
 			}
-
 		}
 	}
 	else
@@ -662,4 +608,20 @@ int characterAttack(const World &world, Entity &entity, bool &isEOI)
 	}
 
 	return ERR_NO_ERR;
+}
+
+void worldEntityGoto(World &world, Entity &entity, Point toGoPoint, bool isGhost)
+{
+	toGoPoint.x = toGoPoint.x < 0 ? 0 : toGoPoint.x >= world.cellsColsAmount ? world.cellsColsAmount - 1 : toGoPoint.x;
+	toGoPoint.y = toGoPoint.y < 0 ? 0 : toGoPoint.y >= world.cellsRowsAmount ? world.cellsRowsAmount - 1 : toGoPoint.y;
+
+	if(isGhost || world.pCell[toGoPoint.x][toGoPoint.y].isGhost)
+	{
+		if(!isGhost)
+		{
+			world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+			world.pCell[toGoPoint.x][toGoPoint.y].isGhost = false;
+		}
+		entity.coords = toGoPoint;
+	}
 }
