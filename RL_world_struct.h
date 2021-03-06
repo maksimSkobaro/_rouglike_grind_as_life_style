@@ -78,9 +78,12 @@ int worldDirectionLogic(World &world, Entity &entity);
 //	Ф-я области видимости, изучения карты.
 void worldVisionLogic(World &world);
 //	Ф-я атаки
-int characterAttack(const World& world, Entity& entity, bool& isEOI);
+int worldCharacterAttack(const World& world, Entity& entity, bool& isEOI);
 //	Ф-я реализует механизм прокрутки камеры
 void worldMapMode(World &world);
+//	Ф-я корректного измененния положения Entity в пространстве. 
+//	При телепортации на занятую клетку в isGhost моде, клетка перестает быть isGhost навсегда.
+void worldEntityGoto(World &world, Entity &entity, Point toGoPoint, bool isGhost = false);
 
 
 #endif // !_RL_WORLD_STRUCT_H_
