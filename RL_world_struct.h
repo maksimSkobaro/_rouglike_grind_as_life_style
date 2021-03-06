@@ -84,6 +84,8 @@ void worldMapMode(World &world);
 //	Ф-я корректного измененния положения Entity в пространстве. 
 //	При телепортации на занятую клетку в isGhost моде, клетка перестает быть isGhost навсегда.
 void worldEntityGoto(World &world, Entity &entity, Point toGoPoint, bool isGhost = false);
+//
+int worldEntitySpawnerLogic(World& world, int spawnerID);
 
 
 #endif // !_RL_WORLD_STRUCT_H_

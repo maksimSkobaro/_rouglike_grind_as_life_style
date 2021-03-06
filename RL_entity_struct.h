@@ -10,6 +10,7 @@
 #define ENTITY_NAME_LEN_MAX 32
 #define ITEM_NAME_LEN_MAX 32
 #define INVENTORY_CAPACITY_MAX 32
+#define SPAWN_AMOUNT_MAX 16
 
 #define ERR_INVENTORY_ADD 100
 #define ERR_INVENTORY_REMOVE 101
@@ -57,6 +58,7 @@ enum class EntitySymb : char
 	enemyDragonDrop = 'd',
 	enemyDragon = 'D',
 	camera = '?',
+	spawner = '!',
 	empty = ' '
 };
 
@@ -99,10 +101,19 @@ struct Character
 	Inventory inventory;
 };
 
+struct Spawner
+{
+	int IDs[SPAWN_AMOUNT_MAX];
+	int maxIDs,
+		curIDs;
+	EntitySymb entityToSpawn;
+};
+
 struct Entity
 {
 	bool isInRange;
 	int ID;
+	Spawner* spawner;
 	EntitySymb entitySymb;
 	Character *character;
 	Direction direction;
@@ -129,12 +140,18 @@ int entityCharacterDie(Entity &worldEntity);
 //	Ф-я высвобаждает память под *Character в Entity, присваивая *Character nullptr.
 int entityCharacterRemove(Entity &worldEntity);
 //	Ф-я создает объект Entity, так же создает Character, если того требует описание передоваемого типа.
-int EntityAdd(Entity *&entity, int &entityAmount, EntitySymb entitySymb, Point coords = {0, 0});
+int EntityAdd(Entity *&entity, int &entityAmount, EntitySymb entitySymb, Point coords = {0, 0}, bool isSpawner = false, int toSpawnCount = 0);
 //	Ф-я корректно удаляет Entity
 int EntityRemove(Entity *&entity, int &entityAmount, int ID);
 //	depricated!
 //	Ф-я возвращает ID первого найденого MainCharacter среди всех Entity
 int getEntityMainCharacterID(const Entity *const worldEntity, int entityAmount);
+//
+//
+int entitySpawnerRemove(Entity& entity);
+//
+//
+int entitySpawnerCreate(Entity& entity, EntitySymb characterToSpawn, int toSpawnCount);
 
 
 #endif // !_RL_ENTITY_STRUCT_H
