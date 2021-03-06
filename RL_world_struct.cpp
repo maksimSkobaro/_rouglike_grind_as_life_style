@@ -54,6 +54,14 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 	strcpy_s(pWorldNew->levelName, PATH_NAME_LEN_MAX, worldName);
 	worldLoadLevel(*pWorldNew);
 
+	for(int i = 0; i < CAMERA_RANGE_MAX / 3 * 2 - 1; i++)
+	{
+		for(int j = 0; j < CONDITION_STR_ONELINE_MAX; j++)
+		{
+			pWorldNew->ConditionString[i][j] = '\0';
+		}
+	}
+
 	worldDestruct(world);
 	world = pWorldNew;
 
@@ -71,7 +79,6 @@ int worldDestruct(World *&world)
 	{
 		EntityRemove(world->pEntity, world->entityAmount, world->pEntity[i].ID);
 	}
-
 	for(int i = 0; i < world->cellsColsAmount; i++)
 	{
 		free(world->pCell[i]);
@@ -218,7 +225,7 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 	static HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 	int textAttr = NULL;
 
-	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++)
+	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3, curStr = 0; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++, curStr++)
 	{
 		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
 		{
@@ -296,6 +303,8 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 				putchar('*');
 			}
 		}
+		SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY);
+		worldPrintLevelUI(world.ConditionString, curStr);
 		putchar('\n');
 	}
 #ifdef DEBUG
@@ -375,10 +384,46 @@ int worldLogic(World &world)
 			}
 		}
 	}
+
+	worldUILogic(world);
 	worldVisionLogic(world);
 	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
-
+	char tmp[16];
+	_itoa_s(world.globTick, tmp, 16, 10);
+	worldUIStrAdd(world.ConditionString, tmp);
 	return ERR_NO_ERR;
+}
+
+void worldUILogic(World &world)
+{
+	char tmpLevel[16];
+	_itoa_s(world.pEntity[world.mainCharacterID].character->level, tmpLevel, 16, 10);
+	strcpy_s(world.ConditionString[0], ENTITY_NAME_LEN_MAX, world.pEntity[world.mainCharacterID].name);
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, ", LVL: ");
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, tmpLevel);
+
+	char tmpHealth[16], tmpDamage[16], tmpMana[16], tmpVisionRange[16];
+	_itoa_s(world.pEntity[world.mainCharacterID].character->healthCurrent, tmpHealth, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->damageCurrent, tmpDamage, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->manaCurrent, tmpMana, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->visionRangeCurrent, tmpVisionRange, 16, 10);
+	strcpy_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, "HP: ");
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpHealth);
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", DMG: ");
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpDamage);
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", MNA: ");
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpMana);
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", VSN: ");
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpVisionRange);
+}
+
+void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], const char *newString)
+{
+	for(int i = CAMERA_RANGE_MAX / 3 * 2 - 2; i > 2; i--)
+	{
+		strcpy_s(ConditionString[i], CONDITION_STR_ONELINE_MAX, ConditionString[i - 1]);
+	}
+	strcpy_s(ConditionString[2], CONDITION_STR_ONELINE_MAX, newString);
 }
 
 // FIX TP ISVISION
@@ -675,4 +720,33 @@ void worldEntityGoto(World &world, Entity &entity, Point toGoPoint, bool isGhost
 		}
 		entity.coords = toGoPoint;
 	}
+}
+
+int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int curY)
+{
+
+	if(curY > 3)
+	{
+		fputs(ConditionString[curY - 2], stdout);
+	}
+	else if(curY < 2)
+	{
+		fputs(ConditionString[curY], stdout);
+	}
+	else
+	{
+		switch(curY)
+		{
+		case 2:
+			break;
+		case 3:
+			fputs("\tСтрока состояния:", stdout);
+			break;
+		default:
+			log("printLevelUI(): неизвестный curY");
+			return ERR_NO_ERR;
+			break;
+		}
+	}
+	return ERR_NO_ERR;
 }
