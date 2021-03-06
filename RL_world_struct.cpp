@@ -626,14 +626,17 @@ int worldEntitySpawnerLogic(World &world, int spawnerID)
 
 	bool needSpawn = world.pEntity[spawnerIndex].spawner->maxIDs > world.pEntity[spawnerIndex].spawner->curIDs;
 
-	for(int i = (world.pEntity[spawnerIndex].coords.x - 3); i <= (world.pEntity[spawnerIndex].coords.x + 3) && needSpawn; i++)
+	for(int i = (world.pEntity[spawnerIndex].coords.x - 2); i <= (world.pEntity[spawnerIndex].coords.x + 2) && needSpawn; i++)
 	{
-		for(int j = (world.pEntity[spawnerIndex].coords.y - 3); j <= (world.pEntity[spawnerIndex].coords.y + 3) && needSpawn; j++)
+		for(int j = (world.pEntity[spawnerIndex].coords.y - 2); j <= (world.pEntity[spawnerIndex].coords.y + 2) && needSpawn; j++)
 		{
 			if(i >= 0 && j >= 0 && i < world.cellsColsAmount && j < world.cellsRowsAmount && world.pCell[i][j].isGhost == true)
 			{
-				world.pEntity[spawnerIndex].spawner->IDs[world.pEntity[spawnerIndex].spawner->curIDs++] = EntityAdd(world.pEntity, world.entityAmount, world.pEntity[spawnerIndex].spawner->entityToSpawn, {i,j});
-				needSpawn = false;
+				if(rand() % 100 == 0)
+				{
+					world.pEntity[spawnerIndex].spawner->IDs[world.pEntity[spawnerIndex].spawner->curIDs++] = EntityAdd(world.pEntity, world.entityAmount, world.pEntity[spawnerIndex].spawner->entityToSpawn, {i,j});
+					needSpawn = false;
+				}
 			}
 		}
 	}
