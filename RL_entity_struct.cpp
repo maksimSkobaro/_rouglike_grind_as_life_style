@@ -6,28 +6,28 @@
 ////////////////////FUNCTIONS_DEFINITION////////////////////
 ////////////////////////////////////////////////////////////
 
-int inventoryItemAdd(Inventory& inventory, ItemID itemID, int amount)
+int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 {
-	while (amount != 0)
+	while(amount != 0)
 	{
 		bool wasInNotFull = false;
 
 		int i = 0;
-		for (; i < inventory.itemsAmount; i++)
+		for(; i < inventory.itemsAmount; i++)
 		{
-			if (itemID == inventory.items[i].itemID && inventory.items[i].stackMax - inventory.items[i].amount > 0)
+			if(itemID == inventory.items[i].itemID && inventory.items[i].stackMax - inventory.items[i].amount > 0)
 			{
 				wasInNotFull = true;
 				break;
 			}
 		}
 
-		if (wasInNotFull)
+		if(wasInNotFull)
 		{
 			int tmpAmount = inventory.items[i].stackMax - (amount + inventory.items[i].amount);
 			inventory.items[i].amount += tmpAmount >= 0 ? amount : amount - abs(tmpAmount);
 			amount = tmpAmount >= 0 ? 0 : abs(tmpAmount);
-			if (amount < 0)
+			if(amount < 0)
 			{
 				log("inventoryItemAdd(): amount < 0 (в 1 блоке)");
 			}
@@ -35,93 +35,93 @@ int inventoryItemAdd(Inventory& inventory, ItemID itemID, int amount)
 		else
 		{
 
-			switch (itemID)
+			switch(itemID)
 			{
 			case ItemID::gold:
-			{
-				char name[] = "Золото";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 50000;
-			}
-			break;
+				{
+					char name[] = "Золото";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 50000;
+				}
+				break;
 			case ItemID::oldSword:
-			{
-				char name[] = "Поношенный старый меч";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 1;
-			}
-			break;
+				{
+					char name[] = "Поношенный старый меч";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+				}
+				break;
 			case ItemID::oldArmor:
-			{
-				char name[] = "Поношенная старая броня";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 1;
-			}
-			break;
+				{
+					char name[] = "Поношенная старая броня";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+				}
+				break;
 			case ItemID::weakRingOfHealth:
-			{
-				char name[] = "Слабое кольцо добавочного здоровья";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 1;
-			}
-			break;
+				{
+					char name[] = "Слабое кольцо добавочного здоровья";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+				}
+				break;
 			case ItemID::weakRingOfDamage:
-			{
-				char name[] = "Слабое кольцо добавочного урона";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 1;
-			}
-			break;
+				{
+					char name[] = "Слабое кольцо добавочного урона";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+				}
+				break;
 			case ItemID::healFlaskLittle:
-			{
-				char name[] = "Малое зелье регенерации";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 120;
-			}
-			break;
+				{
+					char name[] = "Малое зелье регенерации";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 120;
+				}
+				break;
 			case ItemID::healFlaskMedium:
-			{
-				char name[] = "Среднее зелье регенерации";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 100;
-			}
-			break;
+				{
+					char name[] = "Среднее зелье регенерации";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 100;
+				}
+				break;
 			case ItemID::healFlaskLarge:
-			{
-				char name[] = "Большое зелье регенерации";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 60;
-			}
-			break;
+				{
+					char name[] = "Большое зелье регенерации";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 60;
+				}
+				break;
 			case ItemID::manaFlaskLittle:
-			{
-				char name[] = "Малое зелье маны";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 120;
-			}
-			break;
+				{
+					char name[] = "Малое зелье маны";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 120;
+				}
+				break;
 			case ItemID::manaFlaskMedium:
-			{
-				char name[] = "Среднее зелье маны";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 100;
-			}
-			break;
+				{
+					char name[] = "Среднее зелье маны";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 100;
+				}
+				break;
 			case ItemID::manaFlaskLarge:
-			{
-				char name[] = "Большое зелье регенерации";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 60;
-			}
-			break;
+				{
+					char name[] = "Большое зелье регенерации";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 60;
+				}
+				break;
 			default:
-			{
-				log("inventoryItemAdd(): Неизвестный ItemID");
-				char name[] = "?_Пусто";
-				strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-				inventory.items[inventory.itemsAmount].stackMax = 100;
-			}
-			break;
+				{
+					log("inventoryItemAdd(): Неизвестный ItemID");
+					char name[] = "?_Пусто";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 100;
+				}
+				break;
 			}
 
 			int tmpAmount = inventory.items[inventory.itemsAmount].stackMax - (amount + inventory.items[inventory.itemsAmount].amount);
@@ -129,7 +129,7 @@ int inventoryItemAdd(Inventory& inventory, ItemID itemID, int amount)
 			amount = tmpAmount >= 0 ? 0 : abs(tmpAmount);
 			inventory.items[inventory.itemsAmount].itemID = itemID;
 
-			if (amount < 0)
+			if(amount < 0)
 			{
 				log("inventoryItemAdd(): amount < 0 (во 2 блоке)");
 			}
@@ -141,35 +141,35 @@ int inventoryItemAdd(Inventory& inventory, ItemID itemID, int amount)
 	return ERR_NO_ERR;
 }
 
-int inventoryItemRemove(Inventory& inventory, ItemID itemID, int amount, bool fullRemove)
+int inventoryItemRemove(Inventory &inventory, ItemID itemID, int amount, bool fullRemove)
 {
-	if (fullRemove)
+	if(fullRemove)
 	{
 		amount = 1;
 	}
 
 	bool wasIn = true;
 
-	while (amount != 0 && wasIn)
+	while(amount != 0 && wasIn)
 	{
 		wasIn = false;
 
 		int i = 0;
-		for (; i < inventory.itemsAmount; i++)
+		for(; i < inventory.itemsAmount; i++)
 		{
-			if (itemID == inventory.items[i].itemID)
+			if(itemID == inventory.items[i].itemID)
 			{
 				wasIn = true;
 
 				int tmpAmount = inventory.items[i].amount - amount;
-				if (fullRemove)
+				if(fullRemove)
 				{
 					tmpAmount = 1;
 				}
 
-				if (tmpAmount <= 0 || fullRemove)
+				if(tmpAmount <= 0 || fullRemove)
 				{
-					for (int j = i; j < inventory.itemsAmount - 1; j++)
+					for(int j = i; j < inventory.itemsAmount - 1; j++)
 					{
 						inventory.items[j] = inventory.items[j + 1];
 					}
@@ -193,13 +193,13 @@ int inventoryItemRemove(Inventory& inventory, ItemID itemID, int amount, bool fu
 	return ERR_NO_ERR;
 }
 
-int entityCharacterCreate(Entity& worldEntity, EntitySymb characterToCreateSymbol)
+int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbol)
 {
-	Character*& pCharacter = worldEntity.character;
+	Character *&pCharacter = worldEntity.character;
 
-	pCharacter = (Character*)malloc(sizeof(*pCharacter));
+	pCharacter = (Character *) malloc(sizeof(*pCharacter));
 
-	if (!pCharacter)
+	if(!pCharacter)
 	{
 		log("entityCharacterCreate(): ошибка выделения памяти. *pCharacter = nullptr.");
 		exit(ERR_MEMORY);
@@ -207,7 +207,7 @@ int entityCharacterCreate(Entity& worldEntity, EntitySymb characterToCreateSymbo
 
 
 	//	Присваивание стнадартных значений при создании персонажей
-	switch (characterToCreateSymbol)
+	switch(characterToCreateSymbol)
 	{
 	case EntitySymb::mainCharacter:
 		pCharacter->level = 1;
@@ -286,30 +286,29 @@ int entityCharacterCreate(Entity& worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
 	default:
-		free(worldEntity.character);
-		worldEntity.character = nullptr;
+		entityCharacterRemove(worldEntity);
 		break;
 	}
 
 	return ERR_NO_ERR;
 }
 
-int entityCharacterDie(Entity& worldEntity)
+int entityCharacterDie(Entity &worldEntity)
 {
-	//	Сценарии смерти персонажа:
 	worldEntity.direction = Direction::stay;
 	worldEntity.character->isAlive = false;
 	worldEntity.character->inventory.itemsAmount = 0;
 
-	switch (worldEntity.entitySymb)
+	//	Сценарии смерти персонажа:
+	switch(worldEntity.entitySymb)
 	{
 	case EntitySymb::mainCharacter:
 		break;
 	case EntitySymb::enemyWarden:
 		worldEntity.entitySymb = EntitySymb::enemyWardenDrop;
-		if (rand() % 2)
+		if(rand() % 2)
 		{
-			switch (rand() % 8)
+			switch(rand() % 8)
 			{
 			case 0:
 			case 1:
@@ -333,7 +332,6 @@ int entityCharacterDie(Entity& worldEntity)
 		}
 		break;
 	case EntitySymb::enemyDragon:
-
 		worldEntity.entitySymb = EntitySymb::enemyDragonDrop;
 		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 2000 + abs(rand() * rand()) % 1000);
 		break;
@@ -343,86 +341,92 @@ int entityCharacterDie(Entity& worldEntity)
 
 }
 
-int entityCharacterRemove(Entity& worldEntity)
+int entityCharacterRemove(Entity &worldEntity)
 {
 	free(worldEntity.character);
 	worldEntity.character = nullptr;
 	return ERR_NO_ERR;
 }
 
-int EntityAdd(Entity*& entity, int& entityAmount, EntitySymb entitySymb, Point coords, bool isSpawner, int toSpawnCount)
+int EntityAdd(Entity *&entity, int &entityAmount, EntitySymb entitySymb, Point coords, bool isSpawner, int toSpawnCount)
 {
 	static int entityID = 0;
 
-	Entity* pEntityNew = (Entity*)malloc(sizeof(*pEntityNew) * ++entityAmount);
+	Entity *pEntityNew = (Entity *) malloc(sizeof(*pEntityNew) * ++entityAmount);
 
-	if (!pEntityNew)
+	if(!pEntityNew)
 	{
 		log("worldEntityAdd(): Не удалось выделить память. pEntityNew = nullptr");
 		exit(ERR_MEMORY);
 	}
 
-	for (int i = 0; i < entityAmount - 1; i++)
+	for(int i = 0; i < entityAmount - 1; i++)
 	{
 		pEntityNew[i] = entity[i];
 	}
 
-	entityCharacterCreate(pEntityNew[entityAmount - 1], entitySymb);
 
-	pEntityNew[entityAmount - 1].spawner = nullptr;
-	pEntityNew[entityAmount - 1].entitySymb = entitySymb;
-	pEntityNew[entityAmount - 1].isInRange = false;
+	pEntityNew[entityAmount - 1].character = nullptr;
 	pEntityNew[entityAmount - 1].ID = entityID++;
+	pEntityNew[entityAmount - 1].spawner = nullptr;
+	pEntityNew[entityAmount - 1].isInRange = false;
+	pEntityNew[entityAmount - 1].entitySymb = entitySymb;
 	pEntityNew[entityAmount - 1].coords = coords;
 	pEntityNew[entityAmount - 1].direction = Direction::stay;
-
-	if (isSpawner)
+	
+	if(!isSpawner)
 	{
-		char name[ENTITY_NAME_LEN_MAX] = "_Spawner";	
+		entityCharacterCreate(pEntityNew[entityAmount - 1], entitySymb);
+	}
+
+	if(isSpawner)
+	{
+		pEntityNew[entityAmount - 1].entitySymb = EntitySymb::spawner;
+		char name[ENTITY_NAME_LEN_MAX] = "Лагерь";
 		strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
 		entitySpawnerCreate(pEntityNew[entityAmount - 1], entitySymb, toSpawnCount);
 	}
 	else
 	{
-		switch (entitySymb)
+		switch(entitySymb)
 		{
 		case EntitySymb::mainCharacter:
-		{
-			char name[ENTITY_NAME_LEN_MAX] = "М'айк лжец";	//	Да, это рофл мы его переназавем.
-			strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
-		}
-		break;
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "М'айк лжец";	//	Да, это рофл мы его переназавем.
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+			}
+			break;
 		case EntitySymb::store:
-		{
-			char name[ENTITY_NAME_LEN_MAX] = "Странствующий торговец";
-			strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
-		}
-		break;
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Странствующий торговец";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+			}
+			break;
 		case EntitySymb::enemyWarden:
-		{
-			char name[ENTITY_NAME_LEN_MAX] = "Защитник подземелия";
-			strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
-		}
-		break;
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Защитник подземелия";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+			}
+			break;
 		case EntitySymb::enemyDragon:
-		{
-			char name[ENTITY_NAME_LEN_MAX] = "Дракон";
-			strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
-		}
-		break;
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Дракон";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+			}
+			break;
 		case EntitySymb::camera:
-		{
-			char name[ENTITY_NAME_LEN_MAX] = "_Camera";
-			strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
-		}
-		break;
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "_Camera";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+			}
+			break;
 		default:
-		{
-			log("worldEntityAdd(): Неизветсный тип добавляемого Entity.");
-			char name[ENTITY_NAME_LEN_MAX] = "_?_Entity";
-			strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
-		}
-		break;
+			{
+				log("worldEntityAdd(): Неизветсный тип добавляемого Entity.");
+				char name[ENTITY_NAME_LEN_MAX] = "_?_Entity";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+			}
+			break;
 		}
 	}
 
@@ -432,25 +436,25 @@ int EntityAdd(Entity*& entity, int& entityAmount, EntitySymb entitySymb, Point c
 	return entityID - 1;
 }
 
-int EntityRemove(Entity*& entity, int& entityAmount, int ID)
+int EntityRemove(Entity *&entity, int &entityAmount, int ID)
 {
 	bool wasIn = false;
 
 	int i = 0;
-	for (; i < entityAmount; i++)
+	for(; i < entityAmount; i++)
 	{
-		if (entity[i].ID == ID)
+		if(entity[i].ID == ID)
 		{
 			wasIn = true;
 			break;
 		}
 	}
 
-	if (wasIn)
+	if(wasIn)
 	{
 		entityCharacterRemove(entity[i]);
 		entitySpawnerRemove(entity[i]);
-		for (int j = i; j < entityAmount - 1; j++)
+		for(int j = i; j < entityAmount - 1; j++)
 		{
 			entity[j] = entity[j + 1];
 		}
@@ -460,7 +464,7 @@ int EntityRemove(Entity*& entity, int& entityAmount, int ID)
 		entity[entityAmount].entitySymb = EntitySymb::empty;
 		entity[entityAmount].direction = Direction::stay;
 		entity[entityAmount].name[0] = '\0';
-		entity[entityAmount].coords = { 0,0 };
+		entity[entityAmount].coords = {0,0};
 		entity[entityAmount].isInRange = false;
 	}
 	else
@@ -472,25 +476,25 @@ int EntityRemove(Entity*& entity, int& entityAmount, int ID)
 		return ERR_ENTITY_REMOVE;
 #endif // DEBUG
 
-}
+	}
 
 	return ERR_NO_ERR;
 }
 
 //	DEPRICATED
-int getEntityMainCharacterID(const Entity* const worldEntity, int entityAmount)
+int getEntityMainCharacterID(const Entity *const worldEntity, int entityAmount)
 {
 	int id = -1;
-	for (int i = 0; i < entityAmount; i++)
+	for(int i = 0; i < entityAmount; i++)
 	{
-		if (worldEntity[i].entitySymb == EntitySymb::mainCharacter)
+		if(worldEntity[i].entitySymb == EntitySymb::mainCharacter)
 		{
 			id = worldEntity[i].ID;
 		}
 		break;
 	}
 
-	if (id == -1)
+	if(id == -1)
 	{
 		log("getWorldMainCharacterID(): Идентификатор MainCharacter не был найден среди существующих Entity.");
 	}
@@ -500,15 +504,15 @@ int getEntityMainCharacterID(const Entity* const worldEntity, int entityAmount)
 
 int entitySpawnerCreate(Entity &entity, EntitySymb characterToSpawn, int toSpawnCount)
 {
-	Spawner* pNewSpawner = nullptr;
-	pNewSpawner = (Spawner*)malloc(sizeof(*pNewSpawner));
-	if (!pNewSpawner)
+	Spawner *pNewSpawner = nullptr;
+	pNewSpawner = (Spawner *) malloc(sizeof(*pNewSpawner));
+	if(!pNewSpawner)
 	{
 		log("entitySpawnerCreate(): Не удалось выделить память. pNewSpawner = nullptr.");
 		exit(ERR_MEMORY);
 	}
 
-	for (int i = 0; i < SPAWN_AMOUNT_MAX; i++)
+	for(int i = 0; i < SPAWN_AMOUNT_MAX; i++)
 	{
 		pNewSpawner->IDs[i] = -1;
 	}
@@ -520,7 +524,7 @@ int entitySpawnerCreate(Entity &entity, EntitySymb characterToSpawn, int toSpawn
 	return ERR_NO_ERR;
 }
 
-int entitySpawnerRemove(Entity& entity)
+int entitySpawnerRemove(Entity &entity)
 {
 	free(entity.spawner);
 	entity.spawner = nullptr;
