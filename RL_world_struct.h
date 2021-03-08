@@ -12,6 +12,7 @@
 #define MAP_HEIGTH_MAX 512
 
 #define CAMERA_RANGE_MAX 24
+#define CAMERA_RANGE_Y_DEVIDER 2
 #define CONDITION_STR_ONELINE_MAX 64
 
 #define ERR_UI_OUTPUT 300
@@ -54,7 +55,7 @@ struct World
 	int entityAmount;
 	Entity *pEntity = nullptr;
 	char levelName[64];
-	char ConditionString[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX];
+	char ConditionString[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX];
 };
 
 
@@ -75,7 +76,7 @@ int worldDestruct(World *&world);
 //	Ф-я вывода уровня из **Cell в консоль.
 int printWorldLevel(const World &world, bool attackMode = false, Point attackPoint = {0,0});
 //	обработка UI и строки сотояния
-int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int curY);
+int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX], int curY);
 //	Ф-я обрабатывающая нажатия на кнопки.
 int worldInput(World &world);
 //	Ф-я реализующая логику игры.
@@ -98,7 +99,7 @@ int worldEntitySpawnerLogic(World& world, int spawnerID);
 //	Ф-я обновления UI
 void worldUILogic(World& world);
 //	Ф-я добавление новой строки состояние в UI
-void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], const char* newString);
+void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX], const char* newString);
 
 
 #endif // !_RL_WORLD_STRUCT_H_
