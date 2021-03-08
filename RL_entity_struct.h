@@ -62,6 +62,13 @@ enum class EntitySymb : char
 	empty = ' '
 };
 
+enum class Team
+{
+	ally,
+	neutral,
+	enemy,
+};
+
 struct Item
 {
 	int amount;	//	Количество предмета одного типа, если он стакается.
@@ -94,6 +101,8 @@ struct Character
 		visionRangeBase,
 		visionRangeModification,
 		visionRangeCurrent;
+
+	Team team;
 
 	bool isAlive;
 

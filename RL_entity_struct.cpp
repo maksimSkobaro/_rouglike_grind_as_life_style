@@ -210,6 +210,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 	switch(characterToCreateSymbol)
 	{
 	case EntitySymb::mainCharacter:
+		pCharacter->team = Team::ally;
 		pCharacter->level = 1;
 		pCharacter->inventory.itemsAmount = 0;
 		pCharacter->inventory.capacityBase = 4;
@@ -229,6 +230,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
 	case EntitySymb::store:
+		pCharacter->team = Team::neutral;
 		pCharacter->level = 100;
 		pCharacter->inventory.itemsAmount = 0;
 		pCharacter->inventory.capacityBase = 0;
@@ -248,6 +250,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
 	case EntitySymb::enemyWarden:
+		pCharacter->team = Team::enemy;
 		pCharacter->level = 1;
 		pCharacter->inventory.itemsAmount = 0;
 		pCharacter->inventory.capacityBase = 2;
@@ -267,6 +270,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
 	case EntitySymb::enemyDragon:
+		pCharacter->team = Team::enemy;
 		pCharacter->level = 10;
 		pCharacter->inventory.itemsAmount = 0;
 		pCharacter->inventory.capacityBase = 1;

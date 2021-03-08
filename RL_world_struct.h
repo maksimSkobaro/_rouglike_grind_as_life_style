@@ -90,7 +90,7 @@ int worldDirectionLogic(World &world, Entity &entity);
 //	Ф-я области видимости, изучения карты.
 void worldVisionLogic(World &world);
 //	Ф-я атаки
-int worldCharacterAttack(const World& world, Entity& entity, bool& isEOI);
+int worldCharacterAttack(World &world, Entity& entity, bool& isEOI);
 //	Ф-я реализует механизм прокрутки камеры
 void worldMapMode(World &world);
 //	Ф-я корректного измененния положения Entity в пространстве. 
@@ -102,6 +102,8 @@ int worldEntitySpawnerLogic(World& world, int spawnerID);
 void worldUILogic(World& world);
 //	Ф-я добавление новой строки состояние в UI
 void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX], const char* newString);
+//	Ф-я Обработки ИИ (пожалуйста не смотрите ф-ию, тут слишком сложные алгоритмы, серьезный ии короче).
+void worldAiLogic(World &world, Entity &entity);
 
 
 #endif // !_RL_WORLD_STRUCT_H_

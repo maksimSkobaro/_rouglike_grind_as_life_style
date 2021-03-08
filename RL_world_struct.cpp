@@ -20,7 +20,8 @@ void printWorldDebug(const World &world)
 		}
 		if(world.pEntity[i].character != nullptr)
 		{
-			printf_s(": %s|DMG:%i|HLTH:%i|MNA:%i|LVL:%i|INV:%i/%i|isVisn:%c", world.pEntity[i].character->isAlive ? "ALIVE" : "DEAD", world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthCurrent,
+			printf_s(": %s|TEAM:%i|DMG:%i|HLTH:%i|MNA:%i|LVL:%i|INV:%i/%i|isVisn:%c",
+					 world.pEntity[i].character->isAlive ? "ALIVE" : "DEAD", world.pEntity[i].character->team, world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthCurrent,
 					 world.pEntity[i].character->manaCurrent, world.pEntity[i].character->level, world.pEntity[i].character->inventory.itemsAmount, world.pEntity[i].character->inventory.capacityCurrent, world.pEntity[i].isInRange ? 'T' : 'F');
 		}
 		putchar('\n');
@@ -372,15 +373,22 @@ int worldLogic(World &world)
 			worldEntitySpawnerLogic(world, world.pEntity[i].ID);
 		}
 
+
 		worldDirectionLogic(world, world.pEntity[i]);
 
 
 		// Entity.Character - эвенты
 		if(world.pEntity[i].character != nullptr)
 		{
+
 			//	Entity.MainCharacter - эвенты
 			if(world.pEntity[i].ID == world.mainCharacterID)
 			{
+			}
+			//	Entity.!MainCharacter - эвенты
+			else
+			{
+				worldAiLogic(world, world.pEntity[i]);
 			}
 		}
 	}
@@ -388,10 +396,17 @@ int worldLogic(World &world)
 	worldUILogic(world);
 	worldVisionLogic(world);
 	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
-	char tmp[16];
-	_itoa_s(world.globTick, tmp, 16, 10);
-	worldUIStrAdd(world.ConditionString, tmp);
+
+	//char tmp[16];
+	//_itoa_s(world.globTick, tmp, 16, 10);
+	//worldUIStrAdd(world.ConditionString, tmp);
+
 	return ERR_NO_ERR;
+}
+
+void worldAiLogic(World &world, Entity &entity)
+{
+
 }
 
 void worldUILogic(World &world)
@@ -426,7 +441,6 @@ void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_ST
 	strcpy_s(ConditionString[2], CONDITION_STR_ONELINE_MAX, newString);
 }
 
-// FIX TP ISVISION
 void worldVisionLogic(World &world)
 {
 	for(int q = 0; q < world.entityAmount; q++)
@@ -434,29 +448,15 @@ void worldVisionLogic(World &world)
 		world.pEntity[q].isInRange = false;
 	}
 
-	for(int curY = world.pEntity[world.mainCharacterID].coords.y, _i = 0; curY <= world.pEntity[world.mainCharacterID].coords.y + world.pEntity[world.mainCharacterID].character->visionRangeCurrent + 1; curY++, _i++)
+	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / CAMERA_RANGE_Y_DEVIDER; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / CAMERA_RANGE_Y_DEVIDER) + 1; i++)
 	{
-		for(int curX = world.pEntity[world.mainCharacterID].coords.x; curX <= world.pEntity[world.mainCharacterID].coords.x + world.pEntity[world.mainCharacterID].character->visionRangeCurrent - _i + 1; curX++)
+		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
 		{
-			int reversedY = curY - 2 * abs(world.pEntity[world.mainCharacterID].coords.y - curY);
-			int reversedX = curX - 2 * abs(world.pEntity[world.mainCharacterID].coords.x - curX);
-
-			world.pCell[curX][curY].isInRange = false;
-
-
-			if(reversedX < world.cellsColsAmount && reversedX >= 0)
+			if(i < 0 || i >= world.cellsRowsAmount || j < 0 || j>= world.cellsColsAmount)
 			{
-				world.pCell[reversedX][curY].isInRange = false;
-
-				if(reversedY < world.cellsRowsAmount && reversedY >= 0)
-				{
-					world.pCell[reversedX][reversedY].isInRange = false;
-				}
+				continue;
 			}
-			if(reversedY < world.cellsRowsAmount && reversedY >= 0)
-			{
-				world.pCell[curX][reversedY].isInRange = false;
-			}
+			world.pCell[j][i].isInRange = false;
 		}
 	}
 
@@ -600,7 +600,7 @@ void worldMapMode(World &world)
 	world.pEntity[world.cameraID].direction = Direction::stay;
 }
 
-int worldCharacterAttack(const World &world, Entity &entity, bool &isEOI)
+int worldCharacterAttack(World &world, Entity &entity, bool &isEOI)
 {
 	Point attackPoint = {entity.coords.x, entity.coords.y - 1};
 	if(entity.ID == world.mainCharacterID)
@@ -628,10 +628,17 @@ int worldCharacterAttack(const World &world, Entity &entity, bool &isEOI)
 				{
 					if(world.pEntity[i].character != nullptr && world.pEntity[i].coords.x == attackPoint.x && world.pEntity[i].coords.y == attackPoint.y)
 					{
-						world.pEntity[i].character->healthCurrent -= entity.character->damageCurrent;
-						if(world.pEntity[i].character->healthCurrent <= 0)
+						if(world.pEntity[i].character->team != Team::enemy)
 						{
-							entityCharacterDie(world.pEntity[i]);
+							worldUIStrAdd(world.ConditionString, "Невозможно атаковать!");
+						}
+						else
+						{
+							world.pEntity[i].character->healthCurrent -= entity.character->damageCurrent;
+							if(world.pEntity[i].character->healthCurrent <= 0)
+							{
+								entityCharacterDie(world.pEntity[i]);
+							}
 						}
 					}
 				}
