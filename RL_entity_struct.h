@@ -135,7 +135,7 @@ int inventoryItemRemove(Inventory &inventory, ItemID itemID, int amount = 1, boo
 //	Создает объект Character, в Entity.
 //	Если вы переприсваиваете Character * !почистите память с помощью EntityCharacterRemove()
 int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbol);
-//	Ф-я убивает персонажа
+//	Ф-я убивает Character
 int entityCharacterDie(Entity &worldEntity);
 //	Ф-я высвобаждает память под *Character в Entity, присваивая *Character nullptr.
 int entityCharacterRemove(Entity &worldEntity);

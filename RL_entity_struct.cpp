@@ -295,9 +295,12 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 
 int entityCharacterDie(Entity &worldEntity)
 {
-	worldEntity.direction = Direction::stay;
-	worldEntity.character->isAlive = false;
-	worldEntity.character->inventory.itemsAmount = 0;
+	if(worldEntity.character->isAlive)
+	{
+		worldEntity.direction = Direction::stay;
+		worldEntity.character->isAlive = false;
+		worldEntity.character->inventory.itemsAmount = 0;
+	}
 
 	//	Сценарии смерти персонажа:
 	switch(worldEntity.entitySymb)
@@ -312,19 +315,17 @@ int entityCharacterDie(Entity &worldEntity)
 			{
 			case 0:
 			case 1:
-			case 6:
+			case 2:
 				inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 15 + rand() % 11);
 				break;
-			case 2:
+			case 3:
+			case 4:
+			case 5:
 				inventoryItemAdd(worldEntity.character->inventory, ItemID::healFlaskLittle, 1 + rand() % 2);
 				break;
-			case 3:
-				inventoryItemAdd(worldEntity.character->inventory, ItemID::manaFlaskLittle, 1);
-				break;
-			case 4:
+			case 6:
 				inventoryItemAdd(worldEntity.character->inventory, ItemID::oldArmor, 1);
 				break;
-			case 5:
 			case 7:
 				inventoryItemAdd(worldEntity.character->inventory, ItemID::oldSword, 1);
 				break;
@@ -338,7 +339,6 @@ int entityCharacterDie(Entity &worldEntity)
 	}
 
 	return ERR_NO_ERR;
-
 }
 
 int entityCharacterRemove(Entity &worldEntity)
@@ -373,7 +373,7 @@ int EntityAdd(Entity *&entity, int &entityAmount, EntitySymb entitySymb, Point c
 	pEntityNew[entityAmount - 1].entitySymb = entitySymb;
 	pEntityNew[entityAmount - 1].coords = coords;
 	pEntityNew[entityAmount - 1].direction = Direction::stay;
-	
+
 	if(!isSpawner)
 	{
 		entityCharacterCreate(pEntityNew[entityAmount - 1], entitySymb);
