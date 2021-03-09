@@ -15,6 +15,8 @@
 #define ERR_INVENTORY_ADD 100
 #define ERR_INVENTORY_REMOVE 101
 #define ERR_ENTITY_CREATION 200
+//#define ERR_ENTITY_ADD 202
+//#define ERR_ENTITY_ADD_OVERFLOW 203
 #define ERR_ENTITY_REMOVE 201
 
 
@@ -161,6 +163,8 @@ int entitySpawnerRemove(Entity& entity);
 //
 //
 int entitySpawnerCreate(Entity& entity, EntitySymb characterToSpawn, int toSpawnCount);
+//	Ф-я отрисовки и взаимодействия с инвентарем
+void entityInventoryMode(Inventory &inventory);
 
 
 #endif // !_RL_ENTITY_STRUCT_H

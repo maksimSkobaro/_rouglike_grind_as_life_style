@@ -222,6 +222,7 @@ int worldLoadLevel(World &world)
 
 int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 {
+	system("cls");
 	// Хэндл консоли ( если не понятно - гуглите/забейте )
 	static HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 	int textAttr = NULL;
@@ -345,9 +346,15 @@ int worldInput(World &world)
 			break;
 		case KBKey::keyM:
 			worldMapMode(world);
+			printWorldLevel(world);
 			break;
 		case KBKey::keyA:
 			worldCharacterAttack(world, world.pEntity[world.mainCharacterID], isEOI);
+			printWorldLevel(world);
+			break;
+		case KBKey::keyI:
+			entityInventoryMode(world.pEntity[world.mainCharacterID].character->inventory);
+			printWorldLevel(world);
 			break;
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
@@ -452,7 +459,7 @@ void worldVisionLogic(World &world)
 	{
 		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
 		{
-			if(i < 0 || i >= world.cellsRowsAmount || j < 0 || j>= world.cellsColsAmount)
+			if(i < 0 || i >= world.cellsRowsAmount || j < 0 || j >= world.cellsColsAmount)
 			{
 				continue;
 			}
@@ -595,8 +602,6 @@ void worldMapMode(World &world)
 	}
 
 	world.pEntity[world.cameraID].coords = world.pEntity[world.mainCharacterID].coords;
-	system("cls");
-	printWorldLevel(world);
 	world.pEntity[world.cameraID].direction = Direction::stay;
 }
 
@@ -646,8 +651,6 @@ int worldCharacterAttack(World &world, Entity &entity, bool &isEOI)
 				return ERR_NO_ERR;
 				break;
 			case KBKey::keyA:
-				system("cls");
-				printWorldLevel(world);
 				isEOI = false;
 				return ERR_NO_ERR;
 				break;
@@ -724,6 +727,13 @@ void worldEntityGoto(World &world, Entity &entity, Point toGoPoint, bool isGhost
 		{
 			world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
 			world.pCell[toGoPoint.x][toGoPoint.y].isGhost = false;
+		}
+		else
+		{
+			if(entity.ID != world.cameraID)
+			{
+				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+			}
 		}
 		entity.coords = toGoPoint;
 	}

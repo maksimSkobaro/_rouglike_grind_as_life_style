@@ -1,5 +1,4 @@
 #include "RL_entity_struct.h"
-#include "RL_world_struct.h"
 
 
 ////////////////////////////////////////////////////////////
@@ -8,6 +7,7 @@
 
 int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 {
+
 	while(amount != 0)
 	{
 		bool wasInNotFull = false;
@@ -34,6 +34,10 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 		}
 		else
 		{
+			if(inventory.capacityCurrent >= INVENTORY_CAPACITY_MAX)
+			{
+				return amount;	//ERR_ENTITY_ADD_OVERFLOW + amount;
+			}
 
 			switch(itemID)
 			{
@@ -76,21 +80,21 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 				{
 					char name[] = "Малое зелье регенерации";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-					inventory.items[inventory.itemsAmount].stackMax = 120;
+					inventory.items[inventory.itemsAmount].stackMax = 30;
 				}
 				break;
 			case ItemID::healFlaskMedium:
 				{
 					char name[] = "Среднее зелье регенерации";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-					inventory.items[inventory.itemsAmount].stackMax = 100;
+					inventory.items[inventory.itemsAmount].stackMax = 30;
 				}
 				break;
 			case ItemID::healFlaskLarge:
 				{
 					char name[] = "Большое зелье регенерации";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-					inventory.items[inventory.itemsAmount].stackMax = 60;
+					inventory.items[inventory.itemsAmount].stackMax = 30;
 				}
 				break;
 			case ItemID::manaFlaskLittle:
@@ -123,6 +127,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 				}
 				break;
 			}
+			inventory.items[inventory.itemsAmount].amount = 0;
 
 			int tmpAmount = inventory.items[inventory.itemsAmount].stackMax - (amount + inventory.items[inventory.itemsAmount].amount);
 			inventory.items[inventory.itemsAmount].amount += tmpAmount >= 0 ? amount : amount - abs(tmpAmount);
@@ -191,6 +196,53 @@ int inventoryItemRemove(Inventory &inventory, ItemID itemID, int amount, bool fu
 	}
 
 	return ERR_NO_ERR;
+}
+
+void entityInventoryMode(Inventory &inventory)
+{
+	bool isLocalEOI = false;
+	int chosenItemIndex = 0;
+
+	do
+	{
+		system("cls");
+		printf_s("Занято слотов/Всего слотов: %i/%i\n", inventory.itemsAmount, inventory.capacityCurrent);
+		printf_s("Инвентарь: \n");
+		if(inventory.itemsAmount > 0)
+		{
+			for(int itemIndex = 0; itemIndex < inventory.itemsAmount; itemIndex++)
+			{
+				if(itemIndex == chosenItemIndex)
+				{
+					putchar('\t');
+				}
+				printf_s("\t[%i] %s(%i/%i)\n", itemIndex + 1, inventory.items[itemIndex].name, inventory.items[itemIndex].amount, inventory.items[itemIndex].stackMax);
+			}
+			printf_s("\nУправление: \n\t[T]: Выбросить предмет\n\t[E]: Использовать/Одеть/Снять предмет");
+		}
+		else
+		{
+			printf_s("\tПусто.\n");
+		}
+
+		switch((KBKey) _getch())
+		{
+		case KBKey::keyUpArrow:
+			chosenItemIndex -= chosenItemIndex > 0 ? 1 : 0;
+			break;
+		case KBKey::keyDownArrow:
+			chosenItemIndex += chosenItemIndex < inventory.itemsAmount - 1 ? 1 : 0;
+			break;
+		case KBKey::keyI:
+			isLocalEOI = true;
+			break;
+		case KBKey::key9:
+			exit(ERR_NO_ERR);
+			break;
+		default:
+			break;
+		}
+	} while(!isLocalEOI);
 }
 
 int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbol)

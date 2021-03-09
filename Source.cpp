@@ -16,10 +16,14 @@ int main()
 
 	while(true)
 	{
-		system("cls");
 		worldLogic(*pWorld);
 		printWorldLevel(*pWorld);
 		worldInput(*pWorld);
+		if(pWorld->globTick % 3 == 0)
+		{
+			inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::gold, 300);
+			inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::healFlaskLarge, 45);
+		}
 	}
 
 
