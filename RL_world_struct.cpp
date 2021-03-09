@@ -750,3 +750,13 @@ int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1]
 	}
 	return ERR_NO_ERR;
 }
+
+void worldEntityListLogic(char array[LIST_LEN_MAX][LIST_ROWS_MAX], int rowsCount)
+{
+	system("cls");
+
+	for (int i = 0; i < rowsCount; i++)
+	{
+		printf("%s", array[i]);
+	}
+}

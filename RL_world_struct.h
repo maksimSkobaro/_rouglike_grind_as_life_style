@@ -10,6 +10,8 @@
 
 #define MAP_WIDTH_MAX 512
 #define MAP_HEIGTH_MAX 512
+#define LIST_LEN_MAX 128
+#define LIST_ROWS_MAX 64
 
 #define CAMERA_RANGE_MAX 24
 #define CONDITION_STR_ONELINE_MAX 64
@@ -99,6 +101,7 @@ int worldEntitySpawnerLogic(World& world, int spawnerID);
 void worldUILogic(World& world);
 //	Ф-я добавление новой строки состояние в UI
 void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], const char* newString);
-
+//	Ф-я вывода текста
+void worldEntityListLogic(char array[LIST_LEN_MAX][LIST_ROWS_MAX], int rowsCount);
 
 #endif // !_RL_WORLD_STRUCT_H_
