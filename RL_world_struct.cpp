@@ -404,10 +404,6 @@ int worldLogic(World &world)
 	worldVisionLogic(world);
 	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
 
-	//char tmp[16];
-	//_itoa_s(world.globTick, tmp, 16, 10);
-	//worldUIStrAdd(world.ConditionString, tmp);
-
 	return ERR_NO_ERR;
 }
 

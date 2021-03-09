@@ -34,7 +34,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 		}
 		else
 		{
-			if(inventory.capacityCurrent >= INVENTORY_CAPACITY_MAX)
+			if(inventory.capacityCurrent <= inventory.itemsAmount)
 			{
 				return amount;	//ERR_ENTITY_ADD_OVERFLOW + amount;
 			}

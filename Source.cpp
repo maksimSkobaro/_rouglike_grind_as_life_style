@@ -2,8 +2,6 @@
 #include "RL_world_struct.h"
 #include "RL_entity_struct.h"
 
-//	волновой алгоритм
-
 int main()
 {
 	system("chcp 1251");
@@ -19,11 +17,6 @@ int main()
 		worldLogic(*pWorld);
 		printWorldLevel(*pWorld);
 		worldInput(*pWorld);
-		if(pWorld->globTick % 3 == 0)
-		{
-			inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::gold, 300);
-			inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::healFlaskLarge, 45);
-		}
 	}
 
 
