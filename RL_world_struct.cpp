@@ -387,10 +387,15 @@ int worldLogic(World &world)
 		// Entity.Character - эвенты
 		if(world.pEntity[i].character != nullptr)
 		{
-
+			world.pEntity[i].character->damageCurrent = world.pEntity[i].character->damageBase + world.pEntity[i].character->damageModification;
+			world.pEntity[i].character->healthCurrent = world.pEntity[i].character->healthBase + world.pEntity[i].character->healthModification;
+			world.pEntity[i].character->manaCurrent = world.pEntity[i].character->manaBase + world.pEntity[i].character->manaModifitaion;
+			world.pEntity[i].character->visionRangeCurrent = world.pEntity[i].character->visionRangeBase + world.pEntity[i].character->visionRangeModification;
+			world.pEntity[i].character->inventory.capacityCurrent = world.pEntity[i].character->inventory.capacityBase + world.pEntity[i].character->inventory.capacityModiffication;
 			//	Entity.MainCharacter - эвенты
 			if(world.pEntity[i].ID == world.mainCharacterID)
 			{
+				entityLevelUp(world.pEntity[i]);
 			}
 			//	Entity.!MainCharacter - эвенты
 			else
@@ -403,7 +408,6 @@ int worldLogic(World &world)
 	worldUILogic(world);
 	worldVisionLogic(world);
 	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
-
 	return ERR_NO_ERR;
 }
 
@@ -763,3 +767,4 @@ int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CON
 	}
 	return ERR_NO_ERR;
 }
+

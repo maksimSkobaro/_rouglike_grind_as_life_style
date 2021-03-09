@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #ifndef _RL_ENTITY_STRUCT_H
 #define _RL_ENTITY_STRUCT_H
 #include "RL_global.h"
@@ -73,8 +73,8 @@ enum class Team
 
 struct Item
 {
-	int amount;	//	Количество предмета одного типа, если он стакается.
-	int stackMax;	//	Максимальное кол-во предмета в 1 клетке.
+	int amount;	//	РљРѕР»РёС‡РµСЃС‚РІРѕ РїСЂРµРґРјРµС‚Р° РѕРґРЅРѕРіРѕ С‚РёРїР°, РµСЃР»Рё РѕРЅ СЃС‚Р°РєР°РµС‚СЃСЏ.
+	int stackMax;	//	РњР°РєСЃРёРјР°Р»СЊРЅРѕРµ РєРѕР»-РІРѕ РїСЂРµРґРјРµС‚Р° РІ 1 РєР»РµС‚РєРµ.
 	ItemID itemID;
 	char name[ITEM_NAME_LEN_MAX]{};
 };
@@ -84,13 +84,14 @@ struct Inventory
 	int capacityBase,
 		capacityModiffication,
 		capacityCurrent;
-	int itemsAmount;	//	Кол-во заполненых ячеек инвентаря
+	int itemsAmount;	//	РљРѕР»-РІРѕ Р·Р°РїРѕР»РЅРµРЅС‹С… СЏС‡РµРµРє РёРЅРІРµРЅС‚Р°СЂСЏ
 	Item items[INVENTORY_CAPACITY_MAX]{};
 };
 
 struct Character
 {
 	int level,
+		expa,
 		damageBase,
 		damageModification,
 		damageCurrent,
@@ -137,25 +138,25 @@ struct Entity
 ////////////////////FUNCTIONS_DECLARATION///////////////////
 ////////////////////////////////////////////////////////////
 
-//	Увеличивает кол-во предмета, или если его небыло то добавляет
-//	Работайте с инвентарем только через эти ф-и
+//	РЈРІРµР»РёС‡РёРІР°РµС‚ РєРѕР»-РІРѕ РїСЂРµРґРјРµС‚Р°, РёР»Рё РµСЃР»Рё РµРіРѕ РЅРµР±С‹Р»Рѕ С‚Рѕ РґРѕР±Р°РІР»СЏРµС‚
+//	Р Р°Р±РѕС‚Р°Р№С‚Рµ СЃ РёРЅРІРµРЅС‚Р°СЂРµРј С‚РѕР»СЊРєРѕ С‡РµСЂРµР· СЌС‚Рё С„-Рё
 int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount = 1);
-//	Уменьшает кол-во предмета, или если его кол-во <= 0 удаляет его.
-//	Работайте с инвентарем только через эти ф-ии
+//	РЈРјРµРЅСЊС€Р°РµС‚ РєРѕР»-РІРѕ РїСЂРµРґРјРµС‚Р°, РёР»Рё РµСЃР»Рё РµРіРѕ РєРѕР»-РІРѕ <= 0 СѓРґР°Р»СЏРµС‚ РµРіРѕ.
+//	Р Р°Р±РѕС‚Р°Р№С‚Рµ СЃ РёРЅРІРµРЅС‚Р°СЂРµРј С‚РѕР»СЊРєРѕ С‡РµСЂРµР· СЌС‚Рё С„-РёРё
 int inventoryItemRemove(Inventory &inventory, ItemID itemID, int amount = 1, bool fullRemove = false);
-//	Создает объект Character, в Entity.
-//	Если вы переприсваиваете Character * !почистите память с помощью EntityCharacterRemove()
+//	РЎРѕР·РґР°РµС‚ РѕР±СЉРµРєС‚ Character, РІ Entity.
+//	Р•СЃР»Рё РІС‹ РїРµСЂРµРїСЂРёСЃРІР°РёРІР°РµС‚Рµ Character * !РїРѕС‡РёСЃС‚РёС‚Рµ РїР°РјСЏС‚СЊ СЃ РїРѕРјРѕС‰СЊСЋ EntityCharacterRemove()
 int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbol);
-//	Ф-я убивает Character
+//	Р¤-СЏ СѓР±РёРІР°РµС‚ Character
 int entityCharacterDie(Entity &worldEntity);
-//	Ф-я высвобаждает память под *Character в Entity, присваивая *Character nullptr.
+//	Р¤-СЏ РІС‹СЃРІРѕР±Р°Р¶РґР°РµС‚ РїР°РјСЏС‚СЊ РїРѕРґ *Character РІ Entity, РїСЂРёСЃРІР°РёРІР°СЏ *Character nullptr.
 int entityCharacterRemove(Entity &worldEntity);
-//	Ф-я создает объект Entity, так же создает Character, если того требует описание передоваемого типа.
+//	Р¤-СЏ СЃРѕР·РґР°РµС‚ РѕР±СЉРµРєС‚ Entity, С‚Р°Рє Р¶Рµ СЃРѕР·РґР°РµС‚ Character, РµСЃР»Рё С‚РѕРіРѕ С‚СЂРµР±СѓРµС‚ РѕРїРёСЃР°РЅРёРµ РїРµСЂРµРґРѕРІР°РµРјРѕРіРѕ С‚РёРїР°.
 int EntityAdd(Entity *&entity, int &entityAmount, EntitySymb entitySymb, Point coords = {0, 0}, bool isSpawner = false, int toSpawnCount = 0);
-//	Ф-я корректно удаляет Entity
+//	Р¤-СЏ РєРѕСЂСЂРµРєС‚РЅРѕ СѓРґР°Р»СЏРµС‚ Entity
 int EntityRemove(Entity *&entity, int &entityAmount, int ID);
 //	depricated!
-//	Ф-я возвращает ID первого найденого MainCharacter среди всех Entity
+//	Р¤-СЏ РІРѕР·РІСЂР°С‰Р°РµС‚ ID РїРµСЂРІРѕРіРѕ РЅР°Р№РґРµРЅРѕРіРѕ MainCharacter СЃСЂРµРґРё РІСЃРµС… Entity
 int getEntityMainCharacterID(const Entity *const worldEntity, int entityAmount);
 //
 //
@@ -163,7 +164,10 @@ int entitySpawnerRemove(Entity& entity);
 //
 //
 int entitySpawnerCreate(Entity& entity, EntitySymb characterToSpawn, int toSpawnCount);
-//	Ф-я отрисовки и взаимодействия с инвентарем
+//
+//
+int entityLevelUp(Entity& entity);
+//	Р¤-СЏ РѕС‚СЂРёСЃРѕРІРєРё Рё РІР·Р°РёРјРѕРґРµР№СЃС‚РІРёСЏ СЃ РёРЅРІРµРЅС‚Р°СЂРµРј
 void entityInventoryMode(Inventory &inventory);
 
 
