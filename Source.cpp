@@ -16,6 +16,12 @@ int main()
 
 	while(true)
 	{
+		pWorld->pEntity[pWorld->mainCharacterID].character->expa += 10;
+		char temp[32]{};
+		char temp2[32]{};
+		_itoa_s(pWorld->pEntity[pWorld->mainCharacterID].character->expa, temp2, 16, 10 );
+		strcpy_s(temp, 8, temp2);
+		worldUIStrAdd(pWorld->ConditionString, temp);
 		system("cls");
 		worldLogic(*pWorld);
 		printWorldLevel(*pWorld);

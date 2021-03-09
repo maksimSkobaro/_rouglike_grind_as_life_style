@@ -82,6 +82,7 @@ struct Inventory
 struct Character
 {
 	int level,
+		expa,
 		damageBase,
 		damageModification,
 		damageCurrent,
@@ -152,6 +153,9 @@ int entitySpawnerRemove(Entity& entity);
 //
 //
 int entitySpawnerCreate(Entity& entity, EntitySymb characterToSpawn, int toSpawnCount);
+//
+//
+int entityLevelUp(Entity& entity);
 
 
 #endif // !_RL_ENTITY_STRUCT_H

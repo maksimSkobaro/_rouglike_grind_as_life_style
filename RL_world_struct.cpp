@@ -378,9 +378,15 @@ int worldLogic(World &world)
 		// Entity.Character - эвенты
 		if(world.pEntity[i].character != nullptr)
 		{
+			world.pEntity[i].character->damageCurrent = world.pEntity[i].character->damageBase + world.pEntity[i].character->damageModification;
+			world.pEntity[i].character->healthCurrent = world.pEntity[i].character->healthBase + world.pEntity[i].character->healthModification;
+			world.pEntity[i].character->manaCurrent = world.pEntity[i].character->manaBase + world.pEntity[i].character->manaModifitaion;
+			world.pEntity[i].character->visionRangeCurrent = world.pEntity[i].character->visionRangeBase + world.pEntity[i].character->visionRangeModification;
+			world.pEntity[i].character->inventory.capacityCurrent = world.pEntity[i].character->inventory.capacityBase + world.pEntity[i].character->inventory.capacityModiffication;
 			//	Entity.MainCharacter - эвенты
 			if(world.pEntity[i].ID == world.mainCharacterID)
 			{
+				entityLevelUp(world.pEntity[i]);
 			}
 		}
 	}
@@ -388,9 +394,6 @@ int worldLogic(World &world)
 	worldUILogic(world);
 	worldVisionLogic(world);
 	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
-	char tmp[16];
-	_itoa_s(world.globTick, tmp, 16, 10);
-	worldUIStrAdd(world.ConditionString, tmp);
 	return ERR_NO_ERR;
 }
 
@@ -750,3 +753,71 @@ int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1]
 	}
 	return ERR_NO_ERR;
 }
+
+/*int systemUpMainCharacter(World& world, Entity& entity, EntitySymb nameCharacter)
+{
+	int exp = 0;
+	if (entity.ID == world.mainCharacterID)
+	{
+		for (int i = 1; i <= 1000; i++)
+		{
+			if (i == 1)
+			{
+				continue;
+			}
+			else
+			{
+				int num;
+				world.pEntity[world.mainCharacterID].character->level = i;
+				do
+				{
+					printf("Выберетите что бы вы хотели прокачать \n\
+							[1] - Прокачать урон на 5 едениц\n\
+							[2] - Прокачать здоровье на 10 едениц\n\
+							[3] - Прокачать диапазон видимости на 1 еденицу\n\
+							[4] - Прокачать инвентарь на 1 еденицу\n");
+						scanf_s("%i", &num);
+				} while (num <= 0 || num > 4);
+				switch (num)
+				{
+				case 1:
+					world.pEntity[world.mainCharacterID].character->damageModification += 5;
+					break;
+				case 2:
+					world.pEntity[world.mainCharacterID].character->healthModification += 10;
+					break;
+				case 3:
+					world.pEntity[world.mainCharacterID].character->visionRangeModification += 1;
+					break;
+				case 4:
+					world.pEntity[world.mainCharacterID].character->inventory.capacityModiffication += 1;
+					break;
+				default:
+					break;
+				}
+				exp += 50;
+			}
+			for (int j = 0; j <= exp;)
+			{
+				for (int _i = 0; _i < world.entityAmount; _i++)
+				{
+					if (world.pEntity[_i].character->isAlive == false)
+					{
+						switch (nameCharacter)
+						{
+						case EntitySymb::enemyWarden:
+							j += 25;
+							break;
+						case EntitySymb::enemyDragon:
+							j += 250;
+							break;
+						default:
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+	return ERR_NO_ERR;
+}*/

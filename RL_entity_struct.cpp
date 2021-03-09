@@ -1,5 +1,4 @@
 #include "RL_entity_struct.h"
-#include "RL_world_struct.h"
 
 
 ////////////////////////////////////////////////////////////
@@ -211,8 +210,9 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 	{
 	case EntitySymb::mainCharacter:
 		pCharacter->level = 1;
+		pCharacter->expa = 0;
 		pCharacter->inventory.itemsAmount = 0;
-		pCharacter->inventory.capacityBase = 4;
+		pCharacter->inventory.capacityBase = 32;
 		pCharacter->inventory.capacityModiffication = 0;
 		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
 		pCharacter->damageBase = 50;
@@ -528,5 +528,54 @@ int entitySpawnerRemove(Entity &entity)
 {
 	free(entity.spawner);
 	entity.spawner = nullptr;
+	return ERR_NO_ERR;
+}
+
+int entityLevelUp(Entity &entity)
+{
+	int levelUpExp = sqrt(entity.character->level) * 100;
+	if (levelUpExp <= entity.character->expa)
+	{
+		entity.character->level++;
+		entity.character->expa -= levelUpExp;
+		bool updateInventory = entity.character->inventory.capacityCurrent < INVENTORY_CAPACITY_MAX;
+		system("cls");
+		int rightBorder = 4;
+		int num;
+		do
+		{
+			printf("Выберетите что бы вы хотели прокачать \n"
+		"\t[1] Прокачать урон на 5 едениц\n"
+		"\t[2] Прокачать здоровье на 10 едениц\n"
+		"\t[3] Прокачать диапазон видимости на 1 еденицу\n");
+			if (updateInventory)
+			{
+				printf("\t[4] Прокачать вместимость инвентаря на 1 еденицу\n");
+			}
+			scanf_s("%i", &num);
+			if (!updateInventory)
+			{
+				rightBorder = 3;
+			}
+		} while (num <= 0 || num > rightBorder);
+		switch (num)
+		{
+		case 1:
+			entity.character->damageModification += 30;
+			break;
+		case 2:
+			entity.character->healthModification += 60;
+			break;
+		case 3:
+			entity.character->visionRangeModification += 1;
+			break;
+		case 4:
+			entity.character->inventory.capacityModiffication += 1;
+			break;
+		default:
+			break;
+		}
+	}
+	
 	return ERR_NO_ERR;
 }

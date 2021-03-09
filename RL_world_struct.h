@@ -99,6 +99,8 @@ int worldEntitySpawnerLogic(World& world, int spawnerID);
 void worldUILogic(World& world);
 //	Ф-я добавление новой строки состояние в UI
 void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], const char* newString);
-
+//
+//
+//int systemUpMainCharacter(World& world, Entity& entity, EntitySymb nameCharacter);
 
 #endif // !_RL_WORLD_STRUCT_H_
