@@ -588,7 +588,7 @@ int entitySpawnerRemove(Entity &entity)
 	return ERR_NO_ERR;
 }
 
-int entityLevelUp(Entity &entity)
+int entityLevelUpLogic(Entity &entity)
 {
 	int levelUpExp = sqrt(entity.character->level) * 100;
 	if (levelUpExp <= entity.character->expa)

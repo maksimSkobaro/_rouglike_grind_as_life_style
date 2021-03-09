@@ -395,7 +395,7 @@ int worldLogic(World &world)
 			//	Entity.MainCharacter - эвенты
 			if(world.pEntity[i].ID == world.mainCharacterID)
 			{
-				entityLevelUp(world.pEntity[i]);
+				entityLevelUpLogic(world.pEntity[i]);
 			}
 			//	Entity.!MainCharacter - эвенты
 			else

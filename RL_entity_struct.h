@@ -166,7 +166,7 @@ int entitySpawnerRemove(Entity& entity);
 int entitySpawnerCreate(Entity& entity, EntitySymb characterToSpawn, int toSpawnCount);
 //
 //
-int entityLevelUp(Entity& entity);
+int entityLevelUpLogic(Entity& entity);
 //	Ф-я отрисовки и взаимодействия с инвентарем
 void entityInventoryMode(Inventory &inventory);
 

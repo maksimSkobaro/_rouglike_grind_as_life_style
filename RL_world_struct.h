@@ -105,6 +105,4 @@ void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_ST
 //	Ф-я Обработки ИИ (пожалуйста не смотрите ф-ию, тут слишком сложные алгоритмы, серьезный ии короче).
 void worldAiLogic(World &world, Entity &entity);
 
-//int systemUpMainCharacter(World& world, Entity& entity, EntitySymb nameCharacter);
-
 #endif // !_RL_WORLD_STRUCT_H_
