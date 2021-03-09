@@ -12,7 +12,6 @@ int log(const char *logString, const char *const logFileName)
 
 	if(fopen_s(&logfile, logFileName, "a"))
 	{
-		//log("log(): Не получилось открыть файл-лог.");	:-]
 		exit(ERR_FILE);
 	}
 
