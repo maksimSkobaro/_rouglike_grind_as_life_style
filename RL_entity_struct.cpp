@@ -212,7 +212,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->level = 1;
 		pCharacter->expa = 0;
 		pCharacter->inventory.itemsAmount = 0;
-		pCharacter->inventory.capacityBase = 32;
+		pCharacter->inventory.capacityBase = 4;
 		pCharacter->inventory.capacityModiffication = 0;
 		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
 		pCharacter->damageBase = 50;
