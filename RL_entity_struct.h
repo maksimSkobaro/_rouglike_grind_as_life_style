@@ -15,10 +15,9 @@
 #define ERR_INVENTORY_ADD 100
 #define ERR_INVENTORY_REMOVE 101
 #define ERR_INVENTORY_USE_OUT_OF_RANGE 401
+#define ERR_INVENTORY_USE_EQUIP_INDEX_FAIL 402
 #define ERR_INVENTORY_USE 400
 #define ERR_ENTITY_CREATION 200
-//#define ERR_ENTITY_ADD 202
-//#define ERR_ENTITY_ADD_OVERFLOW 203
 #define ERR_ENTITY_REMOVE 201
 
 
@@ -76,6 +75,7 @@ enum class Team
 struct Item
 {
 	bool isEquiped;
+	bool isEquipable;
 	int amount;	//	Количество предмета одного типа, если он стакается.
 	int stackMax;	//	Максимальное кол-во предмета в 1 клетке.
 	ItemID itemID;
@@ -102,6 +102,7 @@ struct Character
 		healthBase,
 		healthModification,
 		healthCurrent,
+		healthReal,
 		manaBase,
 		manaModifitaion,
 		manaCurrent,
@@ -175,16 +176,19 @@ int entitySpawnerCreate(Entity& entity, EntitySymb characterToSpawn, int toSpawn
 //
 int entityLevelUpLogic(Entity& entity);
 //	Ф-я отрисовки и взаимодействия с инвентарем
-void entityInventoryMode(Character &character);
+void entityInventoryMode(Entity &entity);
 //	Ф-я реализует корректное добавление опыта пероснажу
 void characterExpIncrease(Character &character, int additionExp);
-//	Ф-я реализующая использование предметов
-int inventoryItemUseByID(Character &character, int itemIndex);
+//	Ф-ии реализующие использование предметов
+int inventoryItemUseByID(Entity &entity, int itemIndex);
+int inventiryModeEquipMode(Character &character, int itemIndex);
 //	Ф-ии-сеттеры для модификаций.
 void characterModifDamageSet(Character &character, int newState);
 void characterModifVisionSet(Character &character, int newState);
 void characterModifHealthSet(Character &character, int newState);
-
+//	Ф-ии для обработки урона/хила
+void entityCharacterGetDamage(Entity &entity, int damageAmount, bool fullKill = false);
+void entityCharacterGetHeal(Entity &entity, int healAmount, bool fullHeal = false);
 
 #endif // !_RL_ENTITY_STRUCT_H
 

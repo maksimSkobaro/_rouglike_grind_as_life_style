@@ -7,7 +7,7 @@
 
 int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 {
-	
+
 	while(amount != 0)
 	{
 		bool wasInNotFull = false;
@@ -39,6 +39,8 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 				return amount;	//ERR_ENTITY_ADD_OVERFLOW + amount;
 			}
 
+			inventory.items[inventory.itemsAmount].isEquipable = false;
+
 			switch(itemID)
 			{
 			case ItemID::gold:
@@ -53,6 +55,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					char name[] = "Поношенный старый меч";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
 				}
 				break;
 			case ItemID::oldArmor:
@@ -60,6 +63,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					char name[] = "Поношенная старая броня";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
 				}
 				break;
 			case ItemID::weakRingOfHealth:
@@ -67,6 +71,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					char name[] = "Слабое кольцо добавочного здоровья";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
 				}
 				break;
 			case ItemID::weakRingOfDamage:
@@ -74,6 +79,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					char name[] = "Слабое кольцо добавочного урона";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
 				}
 				break;
 			case ItemID::healFlaskLittle:
@@ -103,6 +109,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					char name[] = "?_Пусто";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 100;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
 				}
 				break;
 			}
@@ -198,13 +205,15 @@ int inventoryItemRemoveByID(Inventory &inventory, int itemIndex, int amount, boo
 		char name[] = "Пусто";
 		strcpy_s(inventory.items[inventory.itemsAmount--].name, ITEM_NAME_LEN_MAX, name);
 	}
-	
+
 
 	return ERR_NO_ERR;
 }
 
-void entityInventoryMode(Character &character)
+void entityInventoryMode(Entity &entity)
 {
+	Character &character = *entity.character;
+
 	bool isLocalEOI = false;
 	int chosenItemIndex = 0;
 
@@ -221,7 +230,12 @@ void entityInventoryMode(Character &character)
 				{
 					putchar('\t');
 				}
-				printf_s("\t[%i] %s(%i/%i)\n", itemIndex + 1, character.inventory.items[itemIndex].name, character.inventory.items[itemIndex].amount, character.inventory.items[itemIndex].stackMax);
+				printf_s("\t[%i] %s(%i/%i)", itemIndex + 1, character.inventory.items[itemIndex].name, character.inventory.items[itemIndex].amount, character.inventory.items[itemIndex].stackMax);
+				if(character.inventory.items[itemIndex].isEquipable)
+				{
+					printf_s("%s", character.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
+				}
+				putchar('\n');
 			}
 			printf_s("\nУправление: \n\t[t/T] Выбросить [1/ВСЕ] единиц предмета\n\t[e] [Использовать/Одеть/Снять] предмет\n\t[Стрелки] Перемещение курсора\n\t[i] Закрыть инвентарь");
 		}
@@ -239,7 +253,7 @@ void entityInventoryMode(Character &character)
 			inventoryItemRemoveByID(character.inventory, chosenItemIndex, 1, true);
 			break;
 		case KBKey::keyE:
-			inventoryItemUseByID(character, chosenItemIndex);
+			inventoryItemUseByID(entity, chosenItemIndex);
 			break;
 		case KBKey::keyUpArrow:
 			chosenItemIndex -= chosenItemIndex > 0 ? 1 : 0;
@@ -259,25 +273,115 @@ void entityInventoryMode(Character &character)
 	} while(!isLocalEOI);
 }
 
-int inventoryItemUseByID(Character &character, int itemIndex)
+int inventiryModeEquipMode(Character &character, int itemIndex)
 {
+	Inventory &inventory = character.inventory;
+
+	bool isMele = false;
+	bool isArmor = false;
+	bool isOther = false;
+
+	switch(inventory.items[itemIndex].itemID)
+	{
+	case ItemID::oldSword:
+		isMele = true;
+		break;
+	case ItemID::oldArmor:
+		isArmor = true;
+		break;
+	case ItemID::weakRingOfHealth:
+	case ItemID::weakRingOfDamage:
+		isOther = true;
+		break;
+	default:
+		return ERR_INVENTORY_USE_EQUIP_INDEX_FAIL;
+		break;
+	}
+
+	bool workMode = inventory.items[itemIndex].isEquiped;
+	for(int i = 0; i < inventory.itemsAmount; i++)
+	{
+		if(!workMode)
+		{
+			switch(inventory.items[i].itemID)
+			{
+			case ItemID::oldSword:
+			case ItemID::oldKnife:
+				if(isMele)
+				{
+					inventory.items[i].isEquiped = i == itemIndex ? true : false;
+				}
+				break;
+			case ItemID::oldArmor:
+				if(isArmor)
+				{
+					inventory.items[i].isEquiped = i == itemIndex ? true : false;
+				}
+				break;
+			case ItemID::weakRingOfHealth:
+			case ItemID::weakRingOfDamage:
+				if(isOther)
+				{
+					inventory.items[i].isEquiped = i == itemIndex ? true : false;
+				}
+				break;
+			}
+		}
+		else
+		{
+			inventory.items[itemIndex].isEquiped = false;
+			break;
+		}
+	}
+
+	characterModifDamageSet(character, 0);
+	characterModifHealthSet(character, 0);
+	characterModifVisionSet(character, 0);
+	for(int i = 0; i < inventory.itemsAmount; i++)
+	{
+		if(inventory.items[i].isEquiped)
+		{
+			switch(inventory.items[i].itemID)
+			{
+			case ItemID::oldSword:
+				characterModifDamageSet(character, 30);
+				break;
+			case ItemID::oldArmor:
+				characterModifHealthSet(character, 60);
+				break;
+			case ItemID::weakRingOfHealth:
+				break;
+			case ItemID::weakRingOfDamage:
+				break;
+			}
+		}
+	}
+
+	if(character.healthReal > character.healthCurrent)
+	{
+		character.healthReal = character.healthCurrent;
+	}
+}
+
+int inventoryItemUseByID(Entity &entity, int itemIndex)
+{
+	Character &character = *entity.character;
+
 	if(itemIndex >= character.inventory.itemsAmount || itemIndex < 0)
 	{
 		return ERR_INVENTORY_USE_OUT_OF_RANGE;
 	}
-	
-	bool isNewEquip = false;
 
 	switch(character.inventory.items[itemIndex].itemID)
 	{
 	case ItemID::oldSword:
-		characterModifDamageSet(character, 20);
+		inventiryModeEquipMode(*entity.character, itemIndex);
 		break;
 	case ItemID::oldKnife:
-		characterModifDamageSet(character, 20);
+		inventiryModeEquipMode(*entity.character, itemIndex);
 		break;
 	case ItemID::oldArmor:
-		characterModifHealthSet(character, 30);
+		inventiryModeEquipMode(*entity.character, itemIndex);
 		break;
 	case ItemID::healFlaskLittle:
 		break;
@@ -288,6 +392,8 @@ int inventoryItemUseByID(Character &character, int itemIndex)
 	default:
 		break;
 	}
+
+	return ERR_NO_ERR;
 }
 
 int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbol)
@@ -322,6 +428,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->healthBase = 300;
 		pCharacter->healthModification = 0;
 		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
 		pCharacter->manaBase = 100;
 		pCharacter->manaModifitaion = 0;
 		pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
@@ -343,6 +450,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->healthBase = 5;
 		pCharacter->healthModification = 50000;
 		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
 		pCharacter->manaBase = 0;
 		pCharacter->manaModifitaion = 15000;
 		pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
@@ -364,6 +472,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->healthBase = 80;
 		pCharacter->healthModification = 0;
 		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
 		pCharacter->manaBase = 10;
 		pCharacter->manaModifitaion = 0;
 		pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
@@ -385,6 +494,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->healthBase = 1200;
 		pCharacter->healthModification = 0;
 		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
 		pCharacter->manaBase = 400;
 		pCharacter->manaModifitaion = 0;
 		pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
@@ -584,7 +694,7 @@ int EntityRemove(Entity *&entity, int &entityAmount, int ID)
 		return ERR_ENTITY_REMOVE;
 #endif // DEBUG
 
-	}
+}
 
 	return ERR_NO_ERR;
 }
@@ -641,7 +751,7 @@ int entitySpawnerRemove(Entity &entity)
 
 int entityLevelUpLogic(Entity &entity)
 {
-	if (entity.character->nextLevelExp <= entity.character->expa)
+	if(entity.character->nextLevelExp <= entity.character->expa)
 	{
 		entity.character->level++;
 		entity.character->expa -= entity.character->nextLevelExp;
@@ -653,20 +763,20 @@ int entityLevelUpLogic(Entity &entity)
 		do
 		{
 			printf("Выберетите что бы вы хотели прокачать \n"
-		"\t[1] Прокачать урон на 30 едениц\n"
-		"\t[2] Прокачать здоровье на 60 едениц\n"
-		"\t[3] Прокачать диапазон видимости на 1 еденицу\n");
-			if (isUpdateInventory)
+				   "\t[1] Прокачать урон на 30 едениц\n"
+				   "\t[2] Прокачать здоровье на 60 едениц\n"
+				   "\t[3] Прокачать диапазон видимости на 1 еденицу\n");
+			if(isUpdateInventory)
 			{
 				printf("\t[4] Прокачать вместимость инвентаря на 1 еденицу\n");
 			}
 			scanf_s("%i", &num);
-			if (!isUpdateInventory)
+			if(!isUpdateInventory)
 			{
 				rightBorder = 3;
 			}
-		} while (num <= 0 || num > rightBorder);
-		switch (num)
+		} while(num <= 0 || num > rightBorder);
+		switch(num)
 		{
 		case 1:
 			entity.character->damageModification += 30;
@@ -684,7 +794,7 @@ int entityLevelUpLogic(Entity &entity)
 			break;
 		}
 	}
-	
+
 	return ERR_NO_ERR;
 }
 
@@ -706,4 +816,48 @@ void characterModifVisionSet(Character &character, int newState)
 void characterModifHealthSet(Character &character, int newState)
 {
 	character.healthModification = newState;
+}
+
+void entityCharacterGetDamage(Entity &entity, int damageAmount, bool fullKill)
+{
+	if(fullKill)
+	{
+		damageAmount = entity.character->healthCurrent;
+	}
+
+	if(damageAmount > 0)
+	{
+		entity.character->healthReal -= damageAmount;
+		if(entity.character->healthReal < 0)
+		{
+			entityCharacterDie(entity);
+		}
+	}
+	else
+	{
+		log("characterGetDamage(): получено отрицательное значение damageAmount");
+	}
+
+}
+
+void entityCharacterGetHeal(Entity &entity, int healAmount, bool fullHeal)
+{
+	if(fullHeal)
+	{
+		healAmount = entity.character->healthCurrent;
+	}
+
+	if(healAmount > 0)
+	{
+		entity.character->healthReal += healAmount;
+		if(entity.character->healthReal > entity.character->healthCurrent)
+		{
+			entity.character->healthReal = entity.character->healthCurrent;
+		}
+	}
+	else
+	{
+		log("characterGetHeal(): получено отрицательное значение healAmount");
+	}
+
 }

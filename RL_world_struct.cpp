@@ -20,8 +20,8 @@ void printWorldDebug(const World &world)
 		}
 		if(world.pEntity[i].character != nullptr)
 		{
-			printf_s(": %s|TEAM:%i|DMG:%i|HLTH:%i|MNA:%i|LVL:%i|INV:%i/%i|isVisn:%c",
-					 world.pEntity[i].character->isAlive ? "ALIVE" : "DEAD", world.pEntity[i].character->team, world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthCurrent,
+			printf_s(": %s|TEAM:%i|DMG:%i|HLTH:%i/%i|MNA:%i|LVL:%i|INV:%i/%i|isVisn:%c",
+					 world.pEntity[i].character->isAlive ? "ALIVE" : "DEAD", world.pEntity[i].character->team, world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthReal ,world.pEntity[i].character->healthCurrent,
 					 world.pEntity[i].character->manaCurrent, world.pEntity[i].character->level, world.pEntity[i].character->inventory.itemsAmount, world.pEntity[i].character->inventory.capacityCurrent, world.pEntity[i].isInRange ? 'T' : 'F');
 		}
 		putchar('\n');
@@ -353,14 +353,14 @@ int worldInput(World &world)
 			printWorldLevel(world);
 			break;
 		case KBKey::keyI:
-			entityInventoryMode(*world.pEntity[world.mainCharacterID].character);
+			entityInventoryMode(world.pEntity[world.mainCharacterID]);
 			printWorldLevel(world);
 			break;
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
 			break;
 		default:
-			break;	//	сообщение в UI : нет такой кнопки
+			break;
 		}
 	} while(!isEOI);
 
@@ -430,17 +430,17 @@ void worldUILogic(World &world)
 	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, "/");
 	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, tmpNextLevelExp);
 
-	char tmpHealth[16], tmpDamage[16], tmpMana[16], tmpVisionRange[16];
+	char tmpHealth[16], tmpHealthReal[16],tmpDamage[16], tmpVisionRange[16];
 	_itoa_s(world.pEntity[world.mainCharacterID].character->healthCurrent, tmpHealth, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->healthReal, tmpHealthReal, 16, 10);
 	_itoa_s(world.pEntity[world.mainCharacterID].character->damageCurrent, tmpDamage, 16, 10);
-	_itoa_s(world.pEntity[world.mainCharacterID].character->manaCurrent, tmpMana, 16, 10);
 	_itoa_s(world.pEntity[world.mainCharacterID].character->visionRangeCurrent, tmpVisionRange, 16, 10);
 	strcpy_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, "HP: ");
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpHealthReal);
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, "/");
 	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpHealth);
 	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", DMG: ");
 	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpDamage);
-	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", MNA: ");
-	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpMana);
 	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", VSN: ");
 	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpVisionRange);
 }
@@ -619,8 +619,8 @@ void worldCharacterHit(World &world, Entity &attacker, Entity &victim)
 	}
 	else
 	{
-		victim.character->healthCurrent -= attacker.character->damageCurrent;
-		if(victim.character->healthCurrent <= 0)
+		victim.character->healthReal -= attacker.character->damageCurrent;
+		if(victim.character->healthReal <= 0)
 		{
 			entityCharacterDie(victim);
 			characterExpIncrease(*attacker.character, victim.character->killExpReward);
