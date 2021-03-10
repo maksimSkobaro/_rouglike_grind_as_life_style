@@ -104,5 +104,8 @@ void worldUILogic(World& world);
 void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX], const char* newString);
 //	Ф-я Обработки ИИ (пожалуйста не смотрите ф-ию, тут слишком сложные алгоритмы, серьезный ии короче).
 void worldAiLogic(World &world, Entity &entity);
+//	Ф-я обработки удара
+void worldCharacterHit(World &world, Entity &attacker, Entity &victim);
+
 
 #endif // !_RL_WORLD_STRUCT_H_

@@ -353,7 +353,7 @@ int worldInput(World &world)
 			printWorldLevel(world);
 			break;
 		case KBKey::keyI:
-			entityInventoryMode(world.pEntity[world.mainCharacterID].character->inventory);
+			entityInventoryMode(*world.pEntity[world.mainCharacterID].character);
 			printWorldLevel(world);
 			break;
 		case KBKey::key9:
@@ -418,11 +418,17 @@ void worldAiLogic(World &world, Entity &entity)
 
 void worldUILogic(World &world)
 {
-	char tmpLevel[16];
+	char tmpLevel[16], tmpExp[16], tmpNextLevelExp[16];
 	_itoa_s(world.pEntity[world.mainCharacterID].character->level, tmpLevel, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->expa, tmpExp, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->nextLevelExp, tmpNextLevelExp, 16, 10);
 	strcpy_s(world.ConditionString[0], ENTITY_NAME_LEN_MAX, world.pEntity[world.mainCharacterID].name);
 	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, ", LVL: ");
 	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, tmpLevel);
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, ", EXP: ");
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, tmpExp);
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, "/");
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, tmpNextLevelExp);
 
 	char tmpHealth[16], tmpDamage[16], tmpMana[16], tmpVisionRange[16];
 	_itoa_s(world.pEntity[world.mainCharacterID].character->healthCurrent, tmpHealth, 16, 10);
@@ -605,6 +611,23 @@ void worldMapMode(World &world)
 	world.pEntity[world.cameraID].direction = Direction::stay;
 }
 
+void worldCharacterHit(World &world, Entity &attacker, Entity &victim)
+{
+	if(victim.character->team != Team::enemy)
+	{
+		worldUIStrAdd(world.ConditionString, "Атаковать возможно только вражеские войска!");
+	}
+	else
+	{
+		victim.character->healthCurrent -= attacker.character->damageCurrent;
+		if(victim.character->healthCurrent <= 0)
+		{
+			entityCharacterDie(victim);
+			characterExpIncrease(*attacker.character, victim.character->killExpReward);
+		}
+	}
+}
+
 int worldCharacterAttack(World &world, Entity &entity, bool &isEOI)
 {
 	Point attackPoint = {entity.coords.x, entity.coords.y - 1};
@@ -633,18 +656,7 @@ int worldCharacterAttack(World &world, Entity &entity, bool &isEOI)
 				{
 					if(world.pEntity[i].character != nullptr && world.pEntity[i].coords.x == attackPoint.x && world.pEntity[i].coords.y == attackPoint.y)
 					{
-						if(world.pEntity[i].character->team != Team::enemy)
-						{
-							worldUIStrAdd(world.ConditionString, "Невозможно атаковать!");
-						}
-						else
-						{
-							world.pEntity[i].character->healthCurrent -= entity.character->damageCurrent;
-							if(world.pEntity[i].character->healthCurrent <= 0)
-							{
-								entityCharacterDie(world.pEntity[i]);
-							}
-						}
+						worldCharacterHit(world, entity, world.pEntity[i]);
 					}
 				}
 				isEOI = true;
@@ -767,4 +779,3 @@ int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CON
 	}
 	return ERR_NO_ERR;
 }
-

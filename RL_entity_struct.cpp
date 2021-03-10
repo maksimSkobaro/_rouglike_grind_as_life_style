@@ -7,7 +7,7 @@
 
 int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 {
-
+	
 	while(amount != 0)
 	{
 		bool wasInNotFull = false;
@@ -97,27 +97,6 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					inventory.items[inventory.itemsAmount].stackMax = 30;
 				}
 				break;
-			case ItemID::manaFlaskLittle:
-				{
-					char name[] = "Малое зелье маны";
-					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-					inventory.items[inventory.itemsAmount].stackMax = 120;
-				}
-				break;
-			case ItemID::manaFlaskMedium:
-				{
-					char name[] = "Среднее зелье маны";
-					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-					inventory.items[inventory.itemsAmount].stackMax = 100;
-				}
-				break;
-			case ItemID::manaFlaskLarge:
-				{
-					char name[] = "Большое зелье регенерации";
-					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-					inventory.items[inventory.itemsAmount].stackMax = 60;
-				}
-				break;
 			default:
 				{
 					log("inventoryItemAdd(): Неизвестный ItemID");
@@ -128,6 +107,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 				break;
 			}
 			inventory.items[inventory.itemsAmount].amount = 0;
+			inventory.items[inventory.itemsAmount].isEquiped = false;
 
 			int tmpAmount = inventory.items[inventory.itemsAmount].stackMax - (amount + inventory.items[inventory.itemsAmount].amount);
 			inventory.items[inventory.itemsAmount].amount += tmpAmount >= 0 ? amount : amount - abs(tmpAmount);
@@ -178,10 +158,10 @@ int inventoryItemRemove(Inventory &inventory, ItemID itemID, int amount, bool fu
 					{
 						inventory.items[j] = inventory.items[j + 1];
 					}
-					inventory.items[inventory.itemsAmount].amount = 0;
-					inventory.items[inventory.itemsAmount].itemID = ItemID::empty;
-					inventory.items[inventory.itemsAmount].stackMax = 0;
-					char name[] = "";
+					inventory.items[inventory.itemsAmount - 1].amount = 0;
+					inventory.items[inventory.itemsAmount - 1].itemID = ItemID::empty;
+					inventory.items[inventory.itemsAmount - 1].stackMax = 0;
+					char name[] = "Пусто";
 					strcpy_s(inventory.items[inventory.itemsAmount--].name, ITEM_NAME_LEN_MAX, name);
 					amount = abs(tmpAmount);
 				}
@@ -198,7 +178,32 @@ int inventoryItemRemove(Inventory &inventory, ItemID itemID, int amount, bool fu
 	return ERR_NO_ERR;
 }
 
-void entityInventoryMode(Inventory &inventory)
+int inventoryItemRemoveByID(Inventory &inventory, int itemIndex, int amount, bool fullRemove)
+{
+	if(itemIndex >= inventory.itemsAmount || itemIndex < 0)
+	{
+		return ERR_INVENTORY_REMOVE;
+	}
+
+	inventory.items[itemIndex].amount -= fullRemove ? inventory.items[itemIndex].amount : amount;
+	if(inventory.items[itemIndex].amount <= 0)
+	{
+		for(int i = itemIndex; i < inventory.itemsAmount - 1; i++)
+		{
+			inventory.items[i] = inventory.items[i + 1];
+		}
+		inventory.items[inventory.itemsAmount - 1].amount = 0;
+		inventory.items[inventory.itemsAmount - 1].itemID = ItemID::empty;
+		inventory.items[inventory.itemsAmount - 1].stackMax = 0;
+		char name[] = "Пусто";
+		strcpy_s(inventory.items[inventory.itemsAmount--].name, ITEM_NAME_LEN_MAX, name);
+	}
+	
+
+	return ERR_NO_ERR;
+}
+
+void entityInventoryMode(Character &character)
 {
 	bool isLocalEOI = false;
 	int chosenItemIndex = 0;
@@ -206,19 +211,19 @@ void entityInventoryMode(Inventory &inventory)
 	do
 	{
 		system("cls");
-		printf_s("Занято слотов/Всего слотов: %i/%i\n", inventory.itemsAmount, inventory.capacityCurrent);
+		printf_s("Занято слотов/Всего слотов: %i/%i\n", character.inventory.itemsAmount, character.inventory.capacityCurrent);
 		printf_s("Инвентарь: \n");
-		if(inventory.itemsAmount > 0)
+		if(character.inventory.itemsAmount > 0)
 		{
-			for(int itemIndex = 0; itemIndex < inventory.itemsAmount; itemIndex++)
+			for(int itemIndex = 0; itemIndex < character.inventory.itemsAmount; itemIndex++)
 			{
 				if(itemIndex == chosenItemIndex)
 				{
 					putchar('\t');
 				}
-				printf_s("\t[%i] %s(%i/%i)\n", itemIndex + 1, inventory.items[itemIndex].name, inventory.items[itemIndex].amount, inventory.items[itemIndex].stackMax);
+				printf_s("\t[%i] %s(%i/%i)\n", itemIndex + 1, character.inventory.items[itemIndex].name, character.inventory.items[itemIndex].amount, character.inventory.items[itemIndex].stackMax);
 			}
-			printf_s("\nУправление: \n\t[T]: Выбросить предмет\n\t[E]: Использовать/Одеть/Снять предмет");
+			printf_s("\nУправление: \n\t[t/T] Выбросить [1/ВСЕ] единиц предмета\n\t[e] [Использовать/Одеть/Снять] предмет\n\t[Стрелки] Перемещение курсора\n\t[i] Закрыть инвентарь");
 		}
 		else
 		{
@@ -227,11 +232,20 @@ void entityInventoryMode(Inventory &inventory)
 
 		switch((KBKey) _getch())
 		{
+		case KBKey::keyT:
+			inventoryItemRemoveByID(character.inventory, chosenItemIndex, 1);
+			break;
+		case KBKey::keyTU:
+			inventoryItemRemoveByID(character.inventory, chosenItemIndex, 1, true);
+			break;
+		case KBKey::keyE:
+			inventoryItemUseByID(character, chosenItemIndex);
+			break;
 		case KBKey::keyUpArrow:
 			chosenItemIndex -= chosenItemIndex > 0 ? 1 : 0;
 			break;
 		case KBKey::keyDownArrow:
-			chosenItemIndex += chosenItemIndex < inventory.itemsAmount - 1 ? 1 : 0;
+			chosenItemIndex += chosenItemIndex < character.inventory.itemsAmount - 1 ? 1 : 0;
 			break;
 		case KBKey::keyI:
 			isLocalEOI = true;
@@ -243,6 +257,37 @@ void entityInventoryMode(Inventory &inventory)
 			break;
 		}
 	} while(!isLocalEOI);
+}
+
+int inventoryItemUseByID(Character &character, int itemIndex)
+{
+	if(itemIndex >= character.inventory.itemsAmount || itemIndex < 0)
+	{
+		return ERR_INVENTORY_USE_OUT_OF_RANGE;
+	}
+	
+	bool isNewEquip = false;
+
+	switch(character.inventory.items[itemIndex].itemID)
+	{
+	case ItemID::oldSword:
+		characterModifDamageSet(character, 20);
+		break;
+	case ItemID::oldKnife:
+		characterModifDamageSet(character, 20);
+		break;
+	case ItemID::oldArmor:
+		characterModifHealthSet(character, 30);
+		break;
+	case ItemID::healFlaskLittle:
+		break;
+	case ItemID::healFlaskMedium:
+		break;
+	case ItemID::healFlaskLarge:
+		break;
+	default:
+		break;
+	}
 }
 
 int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbol)
@@ -262,8 +307,10 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 	switch(characterToCreateSymbol)
 	{
 	case EntitySymb::mainCharacter:
+		pCharacter->killExpReward = 0;
 		pCharacter->team = Team::ally;
 		pCharacter->level = 1;
+		pCharacter->nextLevelExp = sqrt(pCharacter->level) * 100;
 		pCharacter->expa = 0;
 		pCharacter->inventory.itemsAmount = 0;
 		pCharacter->inventory.capacityBase = 4;
@@ -283,6 +330,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
 	case EntitySymb::store:
+		pCharacter->killExpReward = -100;
 		pCharacter->team = Team::neutral;
 		pCharacter->level = 100;
 		pCharacter->inventory.itemsAmount = 0;
@@ -303,16 +351,17 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
 	case EntitySymb::enemyWarden:
+		pCharacter->killExpReward = 5;
 		pCharacter->team = Team::enemy;
 		pCharacter->level = 1;
 		pCharacter->inventory.itemsAmount = 0;
 		pCharacter->inventory.capacityBase = 2;
 		pCharacter->inventory.capacityModiffication = 0;
 		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
-		pCharacter->damageBase = 10;
+		pCharacter->damageBase = 20;
 		pCharacter->damageModification = 0;
 		pCharacter->damageCurrent = pCharacter->damageBase + pCharacter->damageModification;
-		pCharacter->healthBase = 30;
+		pCharacter->healthBase = 80;
 		pCharacter->healthModification = 0;
 		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
 		pCharacter->manaBase = 10;
@@ -323,6 +372,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
 	case EntitySymb::enemyDragon:
+		pCharacter->killExpReward = 250;
 		pCharacter->team = Team::enemy;
 		pCharacter->level = 10;
 		pCharacter->inventory.itemsAmount = 0;
@@ -357,6 +407,7 @@ int entityCharacterDie(Entity &worldEntity)
 		worldEntity.direction = Direction::stay;
 		worldEntity.character->isAlive = false;
 		worldEntity.character->inventory.itemsAmount = 0;
+		worldEntity.character->killExpReward = 0;
 	}
 
 	//	Сценарии смерти персонажа:
@@ -590,27 +641,27 @@ int entitySpawnerRemove(Entity &entity)
 
 int entityLevelUpLogic(Entity &entity)
 {
-	int levelUpExp = sqrt(entity.character->level) * 100;
-	if (levelUpExp <= entity.character->expa)
+	if (entity.character->nextLevelExp <= entity.character->expa)
 	{
 		entity.character->level++;
-		entity.character->expa -= levelUpExp;
-		bool updateInventory = entity.character->inventory.capacityCurrent < INVENTORY_CAPACITY_MAX;
+		entity.character->expa -= entity.character->nextLevelExp;
+		entity.character->nextLevelExp = sqrt(entity.character->level) * 100;
 		system("cls");
+		bool isUpdateInventory = entity.character->inventory.capacityCurrent < INVENTORY_CAPACITY_MAX;
 		int rightBorder = 4;
 		int num;
 		do
 		{
 			printf("Выберетите что бы вы хотели прокачать \n"
-		"\t[1] Прокачать урон на 5 едениц\n"
-		"\t[2] Прокачать здоровье на 10 едениц\n"
+		"\t[1] Прокачать урон на 30 едениц\n"
+		"\t[2] Прокачать здоровье на 60 едениц\n"
 		"\t[3] Прокачать диапазон видимости на 1 еденицу\n");
-			if (updateInventory)
+			if (isUpdateInventory)
 			{
 				printf("\t[4] Прокачать вместимость инвентаря на 1 еденицу\n");
 			}
 			scanf_s("%i", &num);
-			if (!updateInventory)
+			if (!isUpdateInventory)
 			{
 				rightBorder = 3;
 			}
@@ -635,4 +686,24 @@ int entityLevelUpLogic(Entity &entity)
 	}
 	
 	return ERR_NO_ERR;
+}
+
+void characterExpIncrease(Character &character, int additionExp)
+{
+	character.expa += additionExp;
+}
+
+void characterModifDamageSet(Character &character, int newState)
+{
+	character.damageModification = newState;
+}
+
+void characterModifVisionSet(Character &character, int newState)
+{
+	character.visionRangeModification = newState;
+}
+
+void characterModifHealthSet(Character &character, int newState)
+{
+	character.healthModification = newState;
 }

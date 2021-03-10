@@ -12,6 +12,10 @@ int main()
 	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::store, {51,1});
 	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyWarden, { 15,10 }, true, 3);
 
+	inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::healFlaskLarge, 2);
+	inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::oldSword);
+	inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::oldArmor);
+
 	while(true)
 	{
 		worldLogic(*pWorld);

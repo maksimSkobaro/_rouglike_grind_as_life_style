@@ -14,6 +14,8 @@
 
 #define ERR_INVENTORY_ADD 100
 #define ERR_INVENTORY_REMOVE 101
+#define ERR_INVENTORY_USE_OUT_OF_RANGE 401
+#define ERR_INVENTORY_USE 400
 #define ERR_ENTITY_CREATION 200
 //#define ERR_ENTITY_ADD 202
 //#define ERR_ENTITY_ADD_OVERFLOW 203
@@ -73,6 +75,7 @@ enum class Team
 
 struct Item
 {
+	bool isEquiped;
 	int amount;	//	Количество предмета одного типа, если он стакается.
 	int stackMax;	//	Максимальное кол-во предмета в 1 клетке.
 	ItemID itemID;
@@ -92,6 +95,7 @@ struct Character
 {
 	int level,
 		expa,
+		nextLevelExp,
 		damageBase,
 		damageModification,
 		damageCurrent,
@@ -104,6 +108,8 @@ struct Character
 		visionRangeBase,
 		visionRangeModification,
 		visionRangeCurrent;
+
+	int killExpReward;
 
 	Team team;
 
@@ -144,6 +150,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount = 1);
 //	Уменьшает кол-во предмета, или если его кол-во <= 0 удаляет его.
 //	Работайте с инвентарем только через эти ф-ии
 int inventoryItemRemove(Inventory &inventory, ItemID itemID, int amount = 1, bool fullRemove = false);
+int inventoryItemRemoveByID(Inventory &inventory, int itemIndex, int amount = 1, bool fullRemove = false);
 //	Создает объект Character, в Entity.
 //	Если вы переприсваиваете Character * !почистите память с помощью EntityCharacterRemove()
 int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbol);
@@ -168,7 +175,15 @@ int entitySpawnerCreate(Entity& entity, EntitySymb characterToSpawn, int toSpawn
 //
 int entityLevelUpLogic(Entity& entity);
 //	Ф-я отрисовки и взаимодействия с инвентарем
-void entityInventoryMode(Inventory &inventory);
+void entityInventoryMode(Character &character);
+//	Ф-я реализует корректное добавление опыта пероснажу
+void characterExpIncrease(Character &character, int additionExp);
+//	Ф-я реализующая использование предметов
+int inventoryItemUseByID(Character &character, int itemIndex);
+//	Ф-ии-сеттеры для модификаций.
+void characterModifDamageSet(Character &character, int newState);
+void characterModifVisionSet(Character &character, int newState);
+void characterModifHealthSet(Character &character, int newState);
 
 
 #endif // !_RL_ENTITY_STRUCT_H
