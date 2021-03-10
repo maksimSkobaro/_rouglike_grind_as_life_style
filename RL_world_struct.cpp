@@ -356,6 +356,10 @@ int worldInput(World &world)
 			entityInventoryMode(world.pEntity[world.mainCharacterID]);
 			printWorldLevel(world);
 			break;
+		case KBKey::keyE:
+			worldEntityCharacterDropLogic(world, world.pEntity[world.mainCharacterID]);
+			printWorldLevel(world);
+			break;
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
 			break;
@@ -599,7 +603,7 @@ void worldMapMode(World &world)
 			exit(ERR_NO_ERR);
 			break;
 		default:
-			break;	//	сообщение в UI : нет такой кнопки
+			break;
 		}
 
 		worldDirectionLogic(world, world.pEntity[world.cameraID]);
@@ -778,4 +782,45 @@ int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CON
 		}
 	}
 	return ERR_NO_ERR;
+}
+
+void worldEntityCharacterDropLogic(World &world, Entity &mainEntity)
+{
+	bool isLocalEOI = false;
+	while(!isLocalEOI)
+	{
+		bool wasTarget = false;
+		int targetIndex = 0;
+
+		for(int characterX = mainEntity.coords.x - 1; characterX <= mainEntity.coords.x + 1; characterX++)
+		{
+			for(int characterY = mainEntity.coords.y - 1; characterY <= mainEntity.coords.y + 1; characterY++)
+			{
+				for(int targetEntity = 0; targetEntity < world.entityAmount; targetEntity++)
+				{
+					if(world.pEntity[targetEntity].character == nullptr)
+					{
+						continue;
+					}
+
+					if(!world.pEntity[targetEntity].character->isAlive && world.pEntity[targetEntity].character->inventory.itemsAmount > 0 &&
+					   world.pEntity[targetEntity].coords.x == characterX && world.pEntity[targetEntity].coords.y == characterY)
+					{
+						wasTarget = true;
+						targetIndex = targetEntity;
+					}
+				}
+			}
+		}
+
+		if(wasTarget)
+		{
+			entityInventoryModeDrop(mainEntity, world.pEntity[targetIndex], isLocalEOI);
+		}
+		else
+		{
+			worldUIStrAdd(world.ConditionString, "Нечего забирать!");
+			isLocalEOI = true;
+		}
+	}
 }

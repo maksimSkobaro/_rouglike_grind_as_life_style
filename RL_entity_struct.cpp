@@ -273,6 +273,137 @@ void entityInventoryMode(Entity &entity)
 	} while(!isLocalEOI);
 }
 
+void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isLocalEOI)
+{
+	Character &mainCharacter = *mainEntity.character;
+	Character &targetCharacter = *targetEntity.character;
+	int chosenItemIndex = 0;
+
+	do
+	{
+		system("cls");
+		printf_s("Занято слотов/Всего слотов: %i/%i\n", mainCharacter.inventory.itemsAmount, mainCharacter.inventory.capacityCurrent);
+		printf_s("Инвентарь: \n");
+		if(mainCharacter.inventory.itemsAmount > 0)
+		{
+			for(int itemIndex = 0; itemIndex < mainCharacter.inventory.itemsAmount; itemIndex++)
+			{
+				printf_s("\t[%i] %s(%i/%i)", itemIndex + 1, mainCharacter.inventory.items[itemIndex].name, mainCharacter.inventory.items[itemIndex].amount, mainCharacter.inventory.items[itemIndex].stackMax);
+				if(mainCharacter.inventory.items[itemIndex].isEquipable)
+				{
+					printf_s("%s", mainCharacter.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
+				}
+				putchar('\n');
+			}
+		}
+		else
+		{
+			printf_s("\tПусто.\n");
+		}
+
+		printf_s("\n\nЦелевой инвентарь:\n");
+		if(targetCharacter.inventory.itemsAmount > 0)
+		{
+			for(int itemIndex = 0; itemIndex < targetCharacter.inventory.itemsAmount; itemIndex++)
+			{
+				if(chosenItemIndex == itemIndex)
+				{
+					putchar('\t');
+				}
+				printf_s("\t[%i] %s(%i/%i)\n", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name, targetCharacter.inventory.items[itemIndex].amount, targetCharacter.inventory.items[itemIndex].stackMax);
+			}
+		}
+		else
+		{
+			printf_s("\tПусто.\n");
+		}
+
+		printf_s("\n\nУправление: \n\t[t/T] Выбросить [1/ВСЕ] единиц предмета\n\t[g/G] Забрать [1/ЗАДАННОЕ] кол-во предмета\n\t[Стрелки] Перемещение курсора\n\t[e] Закрыть инвентарь");
+
+		switch((KBKey) _getch())
+		{
+		case KBKey::keyT:
+			inventoryItemRemoveByID(targetCharacter.inventory, chosenItemIndex, 1);
+			break;
+		case KBKey::keyTU:
+			inventoryItemRemoveByID(targetCharacter.inventory, chosenItemIndex, 1, true);
+			break;
+		case KBKey::keyE:
+			isLocalEOI = true;
+			break;
+		case KBKey::keyG:
+			inventoryItemRelocate(targetCharacter.inventory, mainCharacter.inventory, targetCharacter.inventory.items[chosenItemIndex].itemID, 1);
+			break;
+		case KBKey::keyGU:
+			isLocalEOI = true;
+			break;
+		case KBKey::keyUpArrow:
+			chosenItemIndex -= chosenItemIndex > 0 ? 1 : 0;
+			break;
+		case KBKey::keyDownArrow:
+			chosenItemIndex += chosenItemIndex < targetCharacter.inventory.itemsAmount - 1 ? 1 : 0;
+			break;
+		case KBKey::key9:
+			exit(ERR_NO_ERR);
+			break;
+		default:
+			break;
+		}
+	} while(!isLocalEOI);
+}
+
+void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity)
+{
+
+}
+
+int inventoryItemRelocate(Inventory &fromInventory, Inventory &toInventory, ItemID itemID, int amount)
+{
+	bool wasIn = false;
+	int fromInventoryItemIndex = 0;
+	for(int i = 0; i < fromInventory.itemsAmount; i++)
+	{
+		if(fromInventory.items[i].itemID == itemID && fromInventory.items[i].amount >= amount)
+		{
+			wasIn = true;
+			fromInventoryItemIndex = i;
+		}
+	}
+
+	if(!wasIn)
+	{
+		system("cls");
+		printf_s("Недостаточно предмета в целевом инвентаре.\nНажмите любую кнопку чтобы продолжить . . .");
+		_getch();
+		return ERR_NO_ERR;
+	}
+
+	bool anoughCapacity = toInventory.capacityCurrent > toInventory.itemsAmount ? true : false;
+	for(int i = 0; i < toInventory.itemsAmount; i++)
+	{
+		if(toInventory.items[i].itemID == itemID && toInventory.items[i].stackMax - toInventory.items[i].amount > amount)
+		{
+			anoughCapacity = true;
+		}
+	}
+
+	if(!anoughCapacity)
+	{
+		system("cls");
+		printf_s("Недостаточно места в инвентаре\nНажмите любую кнопку чтобы продолжить . . .");
+		_getch();
+		return ERR_NO_ERR;
+	}
+
+	if(wasIn && anoughCapacity)
+	{
+		inventoryItemRemoveByID(fromInventory, fromInventoryItemIndex, amount);
+		inventoryItemAdd(toInventory, itemID, amount);
+	}
+
+	return ERR_NO_ERR;
+}
+
 int inventiryModeEquipMode(Character &character, int itemIndex)
 {
 	Inventory &inventory = character.inventory;
@@ -361,6 +492,7 @@ int inventiryModeEquipMode(Character &character, int itemIndex)
 	{
 		character.healthReal = character.healthCurrent;
 	}
+	return ERR_NO_ERR;
 }
 
 int inventoryItemUseByID(Entity &entity, int itemIndex)
@@ -672,7 +804,7 @@ int EntityRemove(Entity *&entity, int &entityAmount, int ID)
 			wasIn = true;
 			break;
 		}
-	}
+		}
 
 	if(wasIn)
 	{
@@ -700,10 +832,10 @@ int EntityRemove(Entity *&entity, int &entityAmount, int ID)
 		return ERR_ENTITY_REMOVE;
 #endif // DEBUG
 
-}
+	}
 
 	return ERR_NO_ERR;
-}
+	}
 
 //	DEPRICATED
 int getEntityMainCharacterID(const Entity *const worldEntity, int entityAmount)

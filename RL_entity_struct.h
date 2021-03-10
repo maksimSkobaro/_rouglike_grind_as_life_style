@@ -145,13 +145,12 @@ struct Entity
 ////////////////////FUNCTIONS_DECLARATION///////////////////
 ////////////////////////////////////////////////////////////
 
-//	Увеличивает кол-во предмета, или если его небыло то добавляет
+//	Изменяет кол-во предмета.
 //	Работайте с инвентарем только через эти ф-и
 int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount = 1);
-//	Уменьшает кол-во предмета, или если его кол-во <= 0 удаляет его.
-//	Работайте с инвентарем только через эти ф-ии
 int inventoryItemRemove(Inventory &inventory, ItemID itemID, int amount = 1, bool fullRemove = false);
 int inventoryItemRemoveByID(Inventory &inventory, int itemIndex, int amount = 1, bool fullRemove = false);
+int inventoryItemRelocate(Inventory &fromInventory, Inventory &toInventory, ItemID itemID, int amount = 1);
 //	Создает объект Character, в Entity.
 //	Если вы переприсваиваете Character * !почистите память с помощью EntityCharacterRemove()
 int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbol);
@@ -175,8 +174,10 @@ int entitySpawnerCreate(Entity& entity, EntitySymb characterToSpawn, int toSpawn
 //
 //
 int entityLevelUpLogic(Entity& entity);
-//	Ф-я отрисовки и взаимодействия с инвентарем
+//	Ф-ии отрисовки и взаимодействия с инвентарем(ями)
 void entityInventoryMode(Entity &entity);
+void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity);
+void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isLocalEOI);
 //	Ф-я реализует корректное добавление опыта пероснажу
 void characterExpIncrease(Character &character, int additionExp);
 //	Ф-ии реализующие использование предметов

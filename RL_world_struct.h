@@ -106,6 +106,8 @@ void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_ST
 void worldAiLogic(World &world, Entity &entity);
 //	Ф-я обработки удара
 void worldCharacterHit(World &world, Entity &attacker, Entity &victim);
+//	Ф-я обработки инвентарей. Дроп/Магазин
+void worldEntityCharacterDropLogic(World &world, Entity &mainEntity);
 
 
 #endif // !_RL_WORLD_STRUCT_H_
