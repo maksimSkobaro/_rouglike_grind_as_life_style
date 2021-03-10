@@ -14,7 +14,7 @@ int main()
 
 	inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::healFlaskLarge, 2);
 	inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::oldSword);
-	inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::oldArmor);
+	inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::oldSword);
 
 	while(true)
 	{

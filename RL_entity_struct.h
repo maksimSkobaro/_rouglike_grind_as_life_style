@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////
 
 #define ENTITY_NAME_LEN_MAX 32
-#define ITEM_NAME_LEN_MAX 32
+#define ITEM_NAME_LEN_MAX 64
 #define INVENTORY_CAPACITY_MAX 32
 #define SPAWN_AMOUNT_MAX 16
 
@@ -16,6 +16,7 @@
 #define ERR_INVENTORY_REMOVE 101
 #define ERR_INVENTORY_USE_OUT_OF_RANGE 401
 #define ERR_INVENTORY_USE_EQUIP_INDEX_FAIL 402
+#define ERR_INVENTORY_BUY_LOW_MONEY 403
 #define ERR_INVENTORY_USE 400
 #define ERR_ENTITY_CREATION 200
 #define ERR_ENTITY_REMOVE 201
@@ -30,16 +31,12 @@ enum class ItemID
 	empty,
 	gold,
 	oldSword,
-	oldKnife,
 	oldArmor,
 	weakRingOfHealth,
 	weakRingOfDamage,
 	healFlaskLittle,
 	healFlaskMedium,
 	healFlaskLarge,
-	manaFlaskLittle,
-	manaFlaskMedium,
-	manaFlaskLarge,
 	_last
 };
 
@@ -78,6 +75,7 @@ struct Item
 	bool isEquipable;
 	int amount;	//	Количество предмета одного типа, если он стакается.
 	int stackMax;	//	Максимальное кол-во предмета в 1 клетке.
+	int sellPrice;
 	ItemID itemID;
 	char name[ITEM_NAME_LEN_MAX]{};
 };
@@ -176,8 +174,11 @@ int entitySpawnerCreate(Entity& entity, EntitySymb characterToSpawn, int toSpawn
 int entityLevelUpLogic(Entity& entity);
 //	Ф-ии отрисовки и взаимодействия с инвентарем(ями)
 void entityInventoryMode(Entity &entity);
-void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity);
+void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity, bool &isLocalEOI);
 void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isLocalEOI);
+void InventoryStoreModeBuyAction(Inventory &inventory, Item *item, int amount);
+void InventoryStoreModeSellAction(Inventory &inventory, Item *item, int amount);
+void inventoryItemNormalize(Inventory &inventory, ItemID itemToNormalize);
 //	Ф-я реализует корректное добавление опыта пероснажу
 void characterExpIncrease(Character &character, int additionExp);
 //	Ф-ии реализующие использование предметов

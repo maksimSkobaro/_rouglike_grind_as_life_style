@@ -7,7 +7,6 @@
 
 int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 {
-
 	while(amount != 0)
 	{
 		bool wasInNotFull = false;
@@ -47,7 +46,8 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 				{
 					char name[] = "Золото";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-					inventory.items[inventory.itemsAmount].stackMax = 50000;
+					inventory.items[inventory.itemsAmount].stackMax = 5000;
+					inventory.items[inventory.itemsAmount].sellPrice = 1;
 				}
 				break;
 			case ItemID::oldSword:
@@ -56,6 +56,8 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 10;
+					inventory.items[inventory.itemsAmount].sellPrice = 50;
 				}
 				break;
 			case ItemID::oldArmor:
@@ -64,6 +66,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 50;
 				}
 				break;
 			case ItemID::weakRingOfHealth:
@@ -72,6 +75,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 300;
 				}
 				break;
 			case ItemID::weakRingOfDamage:
@@ -80,6 +84,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 400;
 				}
 				break;
 			case ItemID::healFlaskLittle:
@@ -87,6 +92,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					char name[] = "Малое зелье регенерации";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 30;
+					inventory.items[inventory.itemsAmount].sellPrice = 150;
 				}
 				break;
 			case ItemID::healFlaskMedium:
@@ -94,6 +100,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					char name[] = "Среднее зелье регенерации";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 30;
+					inventory.items[inventory.itemsAmount].sellPrice = 500;
 				}
 				break;
 			case ItemID::healFlaskLarge:
@@ -101,6 +108,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					char name[] = "Большое зелье регенерации";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 30;
+					inventory.items[inventory.itemsAmount].sellPrice = 1500;
 				}
 				break;
 			default:
@@ -109,7 +117,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					char name[] = "?_Пусто";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 100;
-					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 0;
 				}
 				break;
 			}
@@ -237,12 +245,14 @@ void entityInventoryMode(Entity &entity)
 				}
 				putchar('\n');
 			}
+			printf_s("\nСтоимость: %i\n", character.inventory.items[chosenItemIndex].sellPrice);
 			printf_s("\nУправление: \n\t[t/T] Выбросить [1/ВСЕ] единиц предмета\n\t[e] [Использовать/Одеть/Снять] предмет\n\t[Стрелки] Перемещение курсора\n\t[i] Закрыть инвентарь");
 		}
 		else
 		{
 			printf_s("\tПусто.\n");
 		}
+
 
 		switch((KBKey) _getch())
 		{
@@ -312,6 +322,7 @@ void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isL
 				}
 				printf_s("\t[%i] %s(%i/%i)\n", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name, targetCharacter.inventory.items[itemIndex].amount, targetCharacter.inventory.items[itemIndex].stackMax);
 			}
+			printf_s("\nСтоимость: %i\n", targetCharacter.inventory.items[chosenItemIndex].sellPrice);
 		}
 		else
 		{
@@ -335,7 +346,7 @@ void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isL
 			inventoryItemRelocate(targetCharacter.inventory, mainCharacter.inventory, targetCharacter.inventory.items[chosenItemIndex].itemID, 1);
 			break;
 		case KBKey::keyGU:
-			isLocalEOI = true;
+			inventoryItemRelocate(targetCharacter.inventory, mainCharacter.inventory, targetCharacter.inventory.items[chosenItemIndex].itemID, getInt("Введите желаемое количество предмета: ", 0));
 			break;
 		case KBKey::keyUpArrow:
 			chosenItemIndex -= chosenItemIndex > 0 ? 1 : 0;
@@ -349,12 +360,241 @@ void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isL
 		default:
 			break;
 		}
+
+		for(int i = 0; i < mainEntity.character->inventory.itemsAmount; i++)
+		{
+			inventoryItemNormalize(mainEntity.character->inventory, mainEntity.character->inventory.items[i].itemID);
+		}
+
 	} while(!isLocalEOI);
 }
 
-void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity)
+void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity, bool &isLocalEOI)
 {
+	Character &mainCharacter = *mainEntity.character;
+	Character &targetCharacter = *targetEntity.character;
+	int chosenItemIndex = 0;
 
+	do
+	{
+		system("cls");
+		printf_s("Занято слотов/Всего слотов: %i/%i\n", mainCharacter.inventory.itemsAmount, mainCharacter.inventory.capacityCurrent);
+		printf_s("Инвентарь: \n");
+		if(mainCharacter.inventory.itemsAmount > 0)
+		{
+			for(int itemIndex = 0; itemIndex < mainCharacter.inventory.itemsAmount; itemIndex++)
+			{
+				if(chosenItemIndex == itemIndex)
+				{
+					putchar('\t');
+				}
+				printf_s("\t[%i] %s(%i/%i)", itemIndex + 1, mainCharacter.inventory.items[itemIndex].name, mainCharacter.inventory.items[itemIndex].amount, mainCharacter.inventory.items[itemIndex].stackMax);
+				if(mainCharacter.inventory.items[itemIndex].isEquipable)
+				{
+					printf_s("%s", mainCharacter.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
+				}
+				putchar('\n');
+			}
+		}
+		else
+		{
+			printf_s("\tПусто.\n");
+		}
+
+		printf_s("\n\nИнвентарь торговца:\n");
+		if(targetCharacter.inventory.itemsAmount > 0)
+		{
+			for(int itemIndex = 0; itemIndex < targetCharacter.inventory.itemsAmount; itemIndex++)
+			{
+				if(chosenItemIndex == itemIndex + mainCharacter.inventory.itemsAmount)
+				{
+					putchar('\t');
+				}
+				printf_s("\t[%i] %s\n", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name);
+			}
+		}
+		else
+		{
+			printf_s("\tПусто.\n");
+		}
+
+		printf_s("\nСтоимость: %i\n",
+				 chosenItemIndex < mainCharacter.inventory.itemsAmount ? mainCharacter.inventory.items[chosenItemIndex].sellPrice : targetCharacter.inventory.items[chosenItemIndex - mainCharacter.inventory.itemsAmount].sellPrice);
+		printf_s("\n\nУправление: \n\t[b/B] Купить/Продать [1/ЗАДАННОЕ] кол-во предмета\n\t[Стрелки] Перемещение курсора\n\t[s] Закрыть меню покупки");
+
+		switch((KBKey) _getch())
+		{
+		case KBKey::keyS:
+			isLocalEOI = true;
+			break;
+		case KBKey::keyB:
+			if(chosenItemIndex < mainCharacter.inventory.itemsAmount)
+			{
+				InventoryStoreModeSellAction(mainCharacter.inventory, &mainCharacter.inventory.items[chosenItemIndex], 1);
+			}
+			else
+			{
+				InventoryStoreModeBuyAction(mainCharacter.inventory, &targetCharacter.inventory.items[chosenItemIndex - mainCharacter.inventory.itemsAmount], 1);
+			}
+			break;
+		case KBKey::keyBU:
+			if(chosenItemIndex < mainCharacter.inventory.itemsAmount)
+			{
+				InventoryStoreModeSellAction(mainCharacter.inventory, &mainCharacter.inventory.items[chosenItemIndex], getInt("Введите желаемое количество: ", 0));
+			}
+			else
+			{
+				InventoryStoreModeBuyAction(mainCharacter.inventory, &targetCharacter.inventory.items[chosenItemIndex - mainCharacter.inventory.itemsAmount], getInt("Введите желаемое количество: ", 0));
+			}
+			break;
+		case KBKey::keyUpArrow:
+			chosenItemIndex -= chosenItemIndex > 0 ? 1 : 0;
+			break;
+		case KBKey::keyDownArrow:
+			chosenItemIndex += chosenItemIndex < mainCharacter.inventory.itemsAmount + targetCharacter.inventory.itemsAmount - 1 ? 1 : 0;
+			break;
+		case KBKey::key9:
+			exit(ERR_NO_ERR);
+			break;
+		default:
+			break;
+		}
+	} while(!isLocalEOI);
+}
+
+void InventoryStoreModeBuyAction(Inventory &inventory, Item *item, int amount)
+{
+	int finCoast = amount * item->sellPrice;
+	int goldAmount = 0;
+	int spaceCount = 0;
+
+	for(int i = 0; i < inventory.itemsAmount; i++)
+	{
+		if(inventory.items[i].itemID == ItemID::gold)
+		{
+			goldAmount += inventory.items[i].amount;
+		}
+
+		if(inventory.items[i].itemID == item->itemID)
+		{
+			spaceCount += inventory.items[i].stackMax - inventory.items[i].amount;
+		}
+	}
+	spaceCount += (inventory.capacityCurrent - inventory.itemsAmount) * item->stackMax;
+
+
+	if(goldAmount < finCoast)
+	{
+		system("cls");
+		printf_s("Недостаточно золота.\nНажмите любую конпку, чтобы продолжить . . .");
+		_getch();
+		return;
+	}
+
+	if(amount > spaceCount)
+	{
+		system("cls");
+		printf_s("Недостаточно места.\nНажмите любую конпку, чтобы продолжить . . .");
+		_getch();
+		return;
+	}
+
+	inventoryItemRemove(inventory, ItemID::gold, finCoast);
+	inventoryItemAdd(inventory, item->itemID, amount);
+	for(int i = 0; i < inventory.itemsAmount; i++)
+	{
+		inventoryItemNormalize(inventory, inventory.items[i].itemID);
+	}
+}
+
+void InventoryStoreModeSellAction(Inventory &inventory, Item *item, int amount)
+{
+	if(item->isEquiped)
+	{
+		system("cls");
+		printf_s("Продовец не будет сам снимать с вас предмет.\nНажмите любую конпку, чтобы продолжить . . .");
+		_getch();
+		return;
+	}
+
+	if(item->itemID == ItemID::gold)
+	{
+		system("cls");
+		printf_s("Продовец не будет обменивать золото на золото.\nНажмите любую конпку, чтобы продолжить . . .");
+		_getch();
+		return;
+	}
+
+	int finCoast = amount * item->sellPrice;
+	int itemAmount = 0;
+	int spaceCount = 0;
+
+	for(int i = 0; i < inventory.itemsAmount; i++)
+	{
+		if(inventory.items[i].itemID == ItemID::gold)
+		{
+			spaceCount += inventory.items[i].stackMax - inventory.items[i].amount;
+		}
+
+		if(inventory.items[i].itemID == item->itemID)
+		{
+			itemAmount += inventory.items[i].amount;
+		}
+	}
+	spaceCount += (inventory.capacityCurrent - inventory.itemsAmount) * 5000;	//	Убрать отсюда этот хардкод н***й.
+
+	if(finCoast > spaceCount)
+	{
+		system("cls");
+		printf_s("Недостаточно места.\nНажмите любую конпку, чтобы продолжить . . .");
+		_getch();
+		return;
+	}
+
+	inventoryItemRemove(inventory, item->itemID, amount);
+	inventoryItemAdd(inventory, ItemID::gold, finCoast);
+	for(int i = 0; i < inventory.itemsAmount; i++)
+	{
+		inventoryItemNormalize(inventory, inventory.items[i].itemID);
+	}
+}
+
+void inventoryItemNormalize(Inventory &inventory, ItemID itemToNormalize)
+{
+	int firstNotFullIndex = -1, secondNotFullIndex = -1;
+	bool wasChange = false;
+	do
+	{
+		firstNotFullIndex = -1; secondNotFullIndex = -1;
+		wasChange = false;
+		for(int i = 0; i < inventory.itemsAmount; i++)
+		{
+			if(firstNotFullIndex == -1 && inventory.items[i].itemID == itemToNormalize && inventory.items[i].amount < inventory.items[i].stackMax)
+			{
+				firstNotFullIndex = i;
+			}
+			else if(secondNotFullIndex == -1 && inventory.items[i].itemID == itemToNormalize && inventory.items[i].amount < inventory.items[i].stackMax)
+			{
+				secondNotFullIndex = i;
+			}
+
+			if(firstNotFullIndex != -1 && secondNotFullIndex != -1)
+			{
+				if(inventory.items[firstNotFullIndex].stackMax - inventory.items[firstNotFullIndex].amount >= inventory.items[secondNotFullIndex].amount)
+				{
+					inventory.items[firstNotFullIndex].amount += inventory.items[secondNotFullIndex].amount;
+					inventoryItemRemoveByID(inventory, secondNotFullIndex, 1, true);
+				}
+				else
+				{
+					inventory.items[secondNotFullIndex].amount -= inventory.items[firstNotFullIndex].stackMax - inventory.items[firstNotFullIndex].amount;
+					inventory.items[firstNotFullIndex].amount = inventory.items[firstNotFullIndex].stackMax;
+				}
+				wasChange = true;
+				break;
+			}
+		}
+	} while(wasChange);
 }
 
 int inventoryItemRelocate(Inventory &fromInventory, Inventory &toInventory, ItemID itemID, int amount)
@@ -437,7 +677,6 @@ int inventiryModeEquipMode(Character &character, int itemIndex)
 			switch(inventory.items[i].itemID)
 			{
 			case ItemID::oldSword:
-			case ItemID::oldKnife:
 				if(isMele)
 				{
 					inventory.items[i].isEquiped = i == itemIndex ? true : false;
@@ -488,10 +727,6 @@ int inventiryModeEquipMode(Character &character, int itemIndex)
 		}
 	}
 
-	if(character.healthReal > character.healthCurrent)
-	{
-		character.healthReal = character.healthCurrent;
-	}
 	return ERR_NO_ERR;
 }
 
@@ -507,9 +742,6 @@ int inventoryItemUseByID(Entity &entity, int itemIndex)
 	switch(character.inventory.items[itemIndex].itemID)
 	{
 	case ItemID::oldSword:
-		inventiryModeEquipMode(*entity.character, itemIndex);
-		break;
-	case ItemID::oldKnife:
 		inventiryModeEquipMode(*entity.character, itemIndex);
 		break;
 	case ItemID::oldArmor:
@@ -595,6 +827,10 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->visionRangeBase = 1;
 		pCharacter->visionRangeModification = 9;
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
+		for(int i = 2; i < (int) ItemID::_last; i++)
+		{
+			inventoryItemAdd(pCharacter->inventory, (ItemID) i, 1);
+		}
 		break;
 	case EntitySymb::enemyWarden:
 		pCharacter->killExpReward = 5;
@@ -804,7 +1040,7 @@ int EntityRemove(Entity *&entity, int &entityAmount, int ID)
 			wasIn = true;
 			break;
 		}
-		}
+	}
 
 	if(wasIn)
 	{
@@ -835,7 +1071,7 @@ int EntityRemove(Entity *&entity, int &entityAmount, int ID)
 	}
 
 	return ERR_NO_ERR;
-	}
+}
 
 //	DEPRICATED
 int getEntityMainCharacterID(const Entity *const worldEntity, int entityAmount)

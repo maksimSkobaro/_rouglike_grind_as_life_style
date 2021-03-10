@@ -58,6 +58,8 @@ enum class KBKey
 	keySU = 0x73 - 0x20,
 	keyG = 0x67,
 	keyGU = 0x67 - 0x20,
+	keyB = 0x62,
+	keyBU = 0x62 - 0x20,
 	key0 = 0x30,
 	key1 = 0x31,
 	key2 = 0x32,
@@ -87,6 +89,7 @@ struct Point
 ////////////////////////////////////////////////////////////
 
 int log(const char *logString, const char *const logFileName = PATH_LOG);
-
+int getInt(const char *prompt = "¬ведите число: ", int a = INT_MIN, int b = INT_MAX);
+void swapInt(int &a, int &b);
 
 #endif // !_GLOBAL_H_

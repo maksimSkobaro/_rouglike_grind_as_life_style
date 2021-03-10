@@ -26,3 +26,20 @@ int log(const char *logString, const char *const logFileName)
 
 	return ERR_NO_ERR;
 }
+
+int getInt(const char* prompt,int a, int b)
+{
+	int retVal = 0;
+	do
+	{
+		putchar('\n');
+		fputs(prompt, stdout);
+		scanf_s("%i", &retVal);
+	} while(retVal > b || retVal < a);
+	return retVal;
+}
+
+void swapInt(int &a, int &b)
+{
+	int c = a; a = b; b = c;
+}

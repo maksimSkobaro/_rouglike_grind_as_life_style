@@ -108,6 +108,9 @@ void worldAiLogic(World &world, Entity &entity);
 void worldCharacterHit(World &world, Entity &attacker, Entity &victim);
 //	Ф-я обработки инвентарей. Дроп/Магазин
 void worldEntityCharacterDropLogic(World &world, Entity &mainEntity);
+void worldEntityCharacterShopLogic(World &world, Entity &mainEntity);
+//	Ф-я чистит все пустые Character
+void worldEmptyCharacterClear(World &world);
 
 
 #endif // !_RL_WORLD_STRUCT_H_

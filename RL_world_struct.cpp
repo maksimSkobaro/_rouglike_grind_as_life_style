@@ -21,7 +21,7 @@ void printWorldDebug(const World &world)
 		if(world.pEntity[i].character != nullptr)
 		{
 			printf_s(": %s|TEAM:%i|DMG:%i|HLTH:%i/%i|MNA:%i|LVL:%i|INV:%i/%i|isVisn:%c",
-					 world.pEntity[i].character->isAlive ? "ALIVE" : "DEAD", world.pEntity[i].character->team, world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthReal ,world.pEntity[i].character->healthCurrent,
+					 world.pEntity[i].character->isAlive ? "ALIVE" : "DEAD", world.pEntity[i].character->team, world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthReal, world.pEntity[i].character->healthCurrent,
 					 world.pEntity[i].character->manaCurrent, world.pEntity[i].character->level, world.pEntity[i].character->inventory.itemsAmount, world.pEntity[i].character->inventory.capacityCurrent, world.pEntity[i].isInRange ? 'T' : 'F');
 		}
 		putchar('\n');
@@ -360,6 +360,10 @@ int worldInput(World &world)
 			worldEntityCharacterDropLogic(world, world.pEntity[world.mainCharacterID]);
 			printWorldLevel(world);
 			break;
+		case KBKey::keyS:
+			worldEntityCharacterShopLogic(world, world.pEntity[world.mainCharacterID]);
+			printWorldLevel(world);
+			break;
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
 			break;
@@ -396,6 +400,11 @@ int worldLogic(World &world)
 			world.pEntity[i].character->manaCurrent = world.pEntity[i].character->manaBase + world.pEntity[i].character->manaModifitaion;
 			world.pEntity[i].character->visionRangeCurrent = world.pEntity[i].character->visionRangeBase + world.pEntity[i].character->visionRangeModification;
 			world.pEntity[i].character->inventory.capacityCurrent = world.pEntity[i].character->inventory.capacityBase + world.pEntity[i].character->inventory.capacityModiffication;
+			if(world.pEntity[i].character->healthReal > world.pEntity[i].character->healthCurrent)
+			{
+				world.pEntity[i].character->healthReal = world.pEntity[i].character->healthCurrent;
+			}
+
 			//	Entity.MainCharacter - эвенты
 			if(world.pEntity[i].ID == world.mainCharacterID)
 			{
@@ -409,9 +418,14 @@ int worldLogic(World &world)
 		}
 	}
 
+	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
 	worldUILogic(world);
 	worldVisionLogic(world);
-	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
+	if(world.globTick % 32 == 0)
+	{
+		worldEmptyCharacterClear(world);
+	}
+
 	return ERR_NO_ERR;
 }
 
@@ -434,7 +448,7 @@ void worldUILogic(World &world)
 	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, "/");
 	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, tmpNextLevelExp);
 
-	char tmpHealth[16], tmpHealthReal[16],tmpDamage[16], tmpVisionRange[16];
+	char tmpHealth[16], tmpHealthReal[16], tmpDamage[16], tmpVisionRange[16];
 	_itoa_s(world.pEntity[world.mainCharacterID].character->healthCurrent, tmpHealth, 16, 10);
 	_itoa_s(world.pEntity[world.mainCharacterID].character->healthReal, tmpHealthReal, 16, 10);
 	_itoa_s(world.pEntity[world.mainCharacterID].character->damageCurrent, tmpDamage, 16, 10);
@@ -821,6 +835,58 @@ void worldEntityCharacterDropLogic(World &world, Entity &mainEntity)
 		{
 			worldUIStrAdd(world.ConditionString, "Нечего забирать!");
 			isLocalEOI = true;
+		}
+	}
+}
+
+void worldEntityCharacterShopLogic(World &world, Entity &mainEntity)
+{
+	bool isLocalEOI = false;
+	while(!isLocalEOI)
+	{
+		bool wasTarget = false;
+		int targetIndex = 0;
+
+		for(int characterX = mainEntity.coords.x - 1; characterX <= mainEntity.coords.x + 1; characterX++)
+		{
+			for(int characterY = mainEntity.coords.y - 1; characterY <= mainEntity.coords.y + 1; characterY++)
+			{
+				for(int targetEntity = 0; targetEntity < world.entityAmount; targetEntity++)
+				{
+					if(world.pEntity[targetEntity].character == nullptr)
+					{
+						continue;
+					}
+
+					if(world.pEntity[targetEntity].entitySymb == EntitySymb::store &&
+					   world.pEntity[targetEntity].coords.x == characterX && world.pEntity[targetEntity].coords.y == characterY)
+					{
+						wasTarget = true;
+						targetIndex = targetEntity;
+					}
+				}
+			}
+		}
+
+		if(wasTarget)
+		{
+			entityInventoryModeStore(mainEntity, world.pEntity[targetIndex], isLocalEOI);
+		}
+		else
+		{
+			worldUIStrAdd(world.ConditionString, "По близости нет торговцев!");
+			isLocalEOI = true;
+		}
+	}
+}
+
+void worldEmptyCharacterClear(World &world)
+{
+	for(int i = 0; i < world.entityAmount; i++)
+	{
+		if(world.pEntity[i].character != nullptr && world.pEntity[i].character->inventory.itemsAmount <= 0 && !world.pEntity[i].character->isAlive)
+		{
+			EntityRemove(world.pEntity, world.entityAmount, world.pEntity[i].ID);
 		}
 	}
 }
