@@ -384,10 +384,16 @@ int inventoryItemUseByID(Entity &entity, int itemIndex)
 		inventiryModeEquipMode(*entity.character, itemIndex);
 		break;
 	case ItemID::healFlaskLittle:
+		entityCharacterGetHeal(entity, 300);
+		inventoryItemRemoveByID(character.inventory, itemIndex, 1);
 		break;
 	case ItemID::healFlaskMedium:
+		entityCharacterGetHeal(entity, 1200);
+		inventoryItemRemoveByID(character.inventory, itemIndex, 1);
 		break;
 	case ItemID::healFlaskLarge:
+		entityCharacterGetHeal(entity, 5000);
+		inventoryItemRemoveByID(character.inventory, itemIndex, 1);
 		break;
 	default:
 		break;
