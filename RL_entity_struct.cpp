@@ -39,6 +39,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 			}
 
 			inventory.items[inventory.itemsAmount].isEquipable = false;
+			inventory.items[inventory.itemsAmount].effect = 0;
 
 			switch(itemID)
 			{
@@ -58,6 +59,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					inventory.items[inventory.itemsAmount].isEquipable = true;
 					inventory.items[inventory.itemsAmount].sellPrice = 10;
 					inventory.items[inventory.itemsAmount].sellPrice = 50;
+					inventory.items[inventory.itemsAmount].effect = 10;
 				}
 				break;
 			case ItemID::oldArmor:
@@ -67,6 +69,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
 					inventory.items[inventory.itemsAmount].sellPrice = 50;
+					inventory.items[inventory.itemsAmount].effect = 20;
 				}
 				break;
 			case ItemID::weakRingOfHealth:
@@ -76,6 +79,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
 					inventory.items[inventory.itemsAmount].sellPrice = 300;
+					inventory.items[inventory.itemsAmount].effect = 30;
 				}
 				break;
 			case ItemID::weakRingOfDamage:
@@ -85,6 +89,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
 					inventory.items[inventory.itemsAmount].sellPrice = 400;
+					inventory.items[inventory.itemsAmount].effect = 15;
 				}
 				break;
 			case ItemID::healFlaskLittle:
@@ -93,6 +98,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 30;
 					inventory.items[inventory.itemsAmount].sellPrice = 150;
+					inventory.items[inventory.itemsAmount].effect = 100;
 				}
 				break;
 			case ItemID::healFlaskMedium:
@@ -101,6 +107,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 30;
 					inventory.items[inventory.itemsAmount].sellPrice = 500;
+					inventory.items[inventory.itemsAmount].effect = 400;
 				}
 				break;
 			case ItemID::healFlaskLarge:
@@ -109,6 +116,7 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 30;
 					inventory.items[inventory.itemsAmount].sellPrice = 1500;
+					inventory.items[inventory.itemsAmount].effect = 1500;
 				}
 				break;
 			default:
@@ -241,7 +249,11 @@ void entityInventoryMode(Entity &entity)
 				printf_s("\t[%i] %s(%i/%i)", itemIndex + 1, character.inventory.items[itemIndex].name, character.inventory.items[itemIndex].amount, character.inventory.items[itemIndex].stackMax);
 				if(character.inventory.items[itemIndex].isEquipable)
 				{
-					printf_s("%s", character.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
+					printf_s("%s ", character.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
+				}
+				if(character.inventory.items[itemIndex].effect > 0)
+				{
+					printf_s("(+%i) ", character.inventory.items[itemIndex].effect);
 				}
 				putchar('\n');
 			}
@@ -301,7 +313,11 @@ void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isL
 				printf_s("\t[%i] %s(%i/%i)", itemIndex + 1, mainCharacter.inventory.items[itemIndex].name, mainCharacter.inventory.items[itemIndex].amount, mainCharacter.inventory.items[itemIndex].stackMax);
 				if(mainCharacter.inventory.items[itemIndex].isEquipable)
 				{
-					printf_s("%s", mainCharacter.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
+					printf_s("%s ", mainCharacter.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
+				}
+				if(mainCharacter.inventory.items[itemIndex].effect > 0)
+				{
+					printf_s("(+%i) ", mainCharacter.inventory.items[itemIndex].effect);
 				}
 				putchar('\n');
 			}
@@ -320,7 +336,12 @@ void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isL
 				{
 					putchar('\t');
 				}
-				printf_s("\t[%i] %s(%i/%i)\n", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name, targetCharacter.inventory.items[itemIndex].amount, targetCharacter.inventory.items[itemIndex].stackMax);
+				printf_s("\t[%i] %s(%i/%i) ", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name, targetCharacter.inventory.items[itemIndex].amount, targetCharacter.inventory.items[itemIndex].stackMax);
+				if(targetCharacter.inventory.items[itemIndex].effect > 0)
+				{
+					printf_s("(+%i) ", targetCharacter.inventory.items[itemIndex].effect);
+				}
+				putchar('\n');
 			}
 			printf_s("\nСтоимость: %i\n", targetCharacter.inventory.items[chosenItemIndex].sellPrice);
 		}
@@ -388,10 +409,14 @@ void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity, bool &is
 				{
 					putchar('\t');
 				}
-				printf_s("\t[%i] %s(%i/%i)", itemIndex + 1, mainCharacter.inventory.items[itemIndex].name, mainCharacter.inventory.items[itemIndex].amount, mainCharacter.inventory.items[itemIndex].stackMax);
+				printf_s("\t[%i] %s(%i/%i) ", itemIndex + 1, mainCharacter.inventory.items[itemIndex].name, mainCharacter.inventory.items[itemIndex].amount, mainCharacter.inventory.items[itemIndex].stackMax);
 				if(mainCharacter.inventory.items[itemIndex].isEquipable)
 				{
-					printf_s("%s", mainCharacter.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
+					printf_s("%s ", mainCharacter.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
+				}
+				if(mainCharacter.inventory.items[itemIndex].effect > 0)
+				{
+					printf_s("(+%i) ", mainCharacter.inventory.items[itemIndex].effect);
 				}
 				putchar('\n');
 			}
@@ -410,7 +435,12 @@ void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity, bool &is
 				{
 					putchar('\t');
 				}
-				printf_s("\t[%i] %s\n", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name);
+				printf_s("\t[%i] %s ", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name);
+				if(targetCharacter.inventory.items[itemIndex].effect > 0)
+				{
+					printf_s("(+%i) ", targetCharacter.inventory.items[itemIndex].effect);
+				}
+				putchar('\n');
 			}
 		}
 		else
@@ -778,6 +808,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		exit(ERR_MEMORY);
 	}
 
+	pCharacter->spawnPoint = {worldEntity.coords.x, worldEntity.coords.y};
 
 	//	Присваивание стнадартных значений при создании персонажей
 	switch(characterToCreateSymbol)
@@ -802,7 +833,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->manaBase = 100;
 		pCharacter->manaModifitaion = 0;
 		pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
-		pCharacter->visionRangeBase = 3;
+		pCharacter->visionRangeBase = 16; //3;
 		pCharacter->visionRangeModification = 0;
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
@@ -825,7 +856,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->manaModifitaion = 15000;
 		pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
 		pCharacter->visionRangeBase = 1;
-		pCharacter->visionRangeModification = 9;
+		pCharacter->visionRangeModification = 4;
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		for(int i = 2; i < (int) ItemID::_last; i++)
 		{

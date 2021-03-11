@@ -19,6 +19,8 @@
 
 #define ERR_UI_OUTPUT 300
 #define ERR_UI_INPUT 301
+#define ERR_AI 500
+#define ERR_AI_POINTER_ACCESS 501
 
 
 ///////////////////////////////////////////////////////
@@ -90,20 +92,21 @@ int worldDirectionLogic(World &world, Entity &entity);
 //	Ф-я области видимости, изучения карты.
 void worldVisionLogic(World &world);
 //	Ф-я атаки
-int worldCharacterAttack(World &world, Entity& entity, bool& isEOI);
+int worldCharacterAttack(World &world, Entity &entity, bool &isEOI, Point attackPoint = {0,0});
 //	Ф-я реализует механизм прокрутки камеры
 void worldMapMode(World &world);
 //	Ф-я корректного измененния положения Entity в пространстве. 
 //	При телепортации на занятую клетку в isGhost моде, клетка перестает быть isGhost навсегда.
 void worldEntityGoto(World &world, Entity &entity, Point toGoPoint, bool isGhost = false);
 //	Ф-я реализующая логику работы spawner'ов(лагерей)
-int worldEntitySpawnerLogic(World& world, int spawnerID);
+int worldEntitySpawnerLogic(World &world, int spawnerID);
 //	Ф-я обновления UI
-void worldUILogic(World& world);
+void worldUILogic(World &world);
 //	Ф-я добавление новой строки состояние в UI
-void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX], const char* newString);
+void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX], const char *newString);
 //	Ф-я Обработки ИИ (пожалуйста не смотрите ф-ию, тут слишком сложные алгоритмы, серьезный ии короче).
-void worldAiLogic(World &world, Entity &entity);
+int worldAiLogic(World &world, Entity &entity); 
+void worldAiLogicChooseAction(World &world, Entity &entity, bool agressive);
 //	Ф-я обработки удара
 void worldCharacterHit(World &world, Entity &attacker, Entity &victim);
 //	Ф-я обработки инвентарей. Дроп/Магазин

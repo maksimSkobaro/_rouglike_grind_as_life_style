@@ -71,8 +71,9 @@ enum class Team
 
 struct Item
 {
-	bool isEquiped;
-	bool isEquipable;
+	bool isEquiped,
+		isEquipable;
+	int effect;
 	int amount;	//	Количество предмета одного типа, если он стакается.
 	int stackMax;	//	Максимальное кол-во предмета в 1 клетке.
 	int sellPrice;
@@ -110,6 +111,8 @@ struct Character
 
 	int killExpReward;
 
+	Point spawnPoint;
+
 	Team team;
 
 	bool isAlive;
@@ -130,7 +133,7 @@ struct Entity
 {
 	bool isInRange;
 	int ID;
-	Spawner* spawner;
+	Spawner *spawner;
 	EntitySymb entitySymb;
 	Character *character;
 	Direction direction;
@@ -165,13 +168,13 @@ int EntityRemove(Entity *&entity, int &entityAmount, int ID);
 int getEntityMainCharacterID(const Entity *const worldEntity, int entityAmount);
 //
 //
-int entitySpawnerRemove(Entity& entity);
+int entitySpawnerRemove(Entity &entity);
 //
 //
-int entitySpawnerCreate(Entity& entity, EntitySymb characterToSpawn, int toSpawnCount);
+int entitySpawnerCreate(Entity &entity, EntitySymb characterToSpawn, int toSpawnCount);
 //
 //
-int entityLevelUpLogic(Entity& entity);
+int entityLevelUpLogic(Entity &entity);
 //	Ф-ии отрисовки и взаимодействия с инвентарем(ями)
 void entityInventoryMode(Entity &entity);
 void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity, bool &isLocalEOI);
@@ -191,6 +194,7 @@ void characterModifHealthSet(Character &character, int newState);
 //	Ф-ии для обработки урона/хила
 void entityCharacterGetDamage(Entity &entity, int damageAmount, bool fullKill = false);
 void entityCharacterGetHeal(Entity &entity, int healAmount, bool fullHeal = false);
+
 
 #endif // !_RL_ENTITY_STRUCT_H
 
