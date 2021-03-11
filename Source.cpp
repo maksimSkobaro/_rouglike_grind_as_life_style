@@ -16,7 +16,6 @@ int main()
 
 	World *pWorld = nullptr;
 	worldInit(pWorld, {178, 22}, PATH_LEVEL_DEV);
-	entityCharacterDie(pWorld->pEntity[EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyDragon, {6,10})]);
 	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::store, {184,18});
 	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyWarden, {188,22}, true, 3);
 
