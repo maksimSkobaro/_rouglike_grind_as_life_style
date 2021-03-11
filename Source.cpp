@@ -9,8 +9,8 @@ int main()
 	World *pWorld = nullptr;
 	worldInit(pWorld, {5, 10}, PATH_LEVEL_DEV);
 	entityCharacterDie(pWorld->pEntity[EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyDragon, {6,10})]);
-	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::store, {51,1});
-	EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyWarden, { 15,10 }, true, 3);
+	//EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::store, {51,1});
+	//EntityAdd(pWorld->pEntity, pWorld->entityAmount, EntitySymb::enemyWarden, { 15,10 }, true, 3);
 
 	inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::healFlaskLarge, 2);
 	inventoryItemAdd(pWorld->pEntity[pWorld->mainCharacterID].character->inventory, ItemID::oldSword);
