@@ -12,6 +12,8 @@
 
 #define MAP_WIDTH_MAX 512
 #define MAP_HEIGTH_MAX 512
+#define LIST_LEN_MAX 128
+#define LIST_ROWS_MAX 64
 
 #define CAMERA_RANGE_MAX 24
 #define CAMERA_RANGE_Y_DEVIDER 2
@@ -114,6 +116,7 @@ void worldEntityCharacterDropLogic(World &world, Entity &mainEntity);
 void worldEntityCharacterShopLogic(World &world, Entity &mainEntity);
 //	Ф-я чистит все пустые Character
 void worldEmptyCharacterClear(World &world);
-
+//	Ф-я вывода текста
+void worldEntityListLogic(char array[LIST_LEN_MAX][LIST_ROWS_MAX], int rowsCount);
 
 #endif // !_RL_WORLD_STRUCT_H_
