@@ -404,10 +404,19 @@ int worldLogic(World &world)
 			{
 				world.pEntity[i].character->healthReal = world.pEntity[i].character->healthCurrent;
 			}
+			if(world.pEntity[i].character->healthReal < 0)
+			{
+				world.pEntity[i].character->healthReal = 0;
+			}
 
 			//	Entity.MainCharacter - эвенты
 			if(world.pEntity[i].ID == world.mainCharacterID)
 			{
+				if(!world.pEntity[i].character->isAlive)
+				{
+					exit(ERR_NO_ERR);
+				}
+
 				entityLevelUpLogic(world.pEntity[i]);
 			}
 			//	Entity.!MainCharacter - эвенты
