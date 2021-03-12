@@ -66,6 +66,8 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 	worldDestruct(world);
 	world = pWorldNew;
 
+	worldReserchArea(*world, {167, 0}, {255,48});
+
 	return ERR_NO_ERR;
 }
 
@@ -270,34 +272,48 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 					SetConsoleTextAttribute(hStdout, FOREGROUND_BLUE);
 				}
 				putchar((char) world.pCell[j][i].cellSymb);
-			}
-
-			for(int k = 0; k < world.entityAmount; k++)
-			{
-				if(world.pEntity[k].isInRange && world.pEntity[k].coords.x == j && world.pEntity[k].coords.y == i && world.pEntity[k].ID != world.pEntity[world.cameraID].ID)
+				for(int k = 0; k < world.entityAmount; k++)
 				{
-					putchar('\b');
-					switch(world.pEntity[k].entitySymb)
+					if((world.pEntity[k].isInRange || world.pEntity[k].spawner != nullptr) && world.pEntity[k].coords.x == j && world.pEntity[k].coords.y == i && world.pEntity[k].ID != world.pEntity[world.cameraID].ID)
 					{
-					case EntitySymb::mainCharacter:
-						SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-						break;
-					case EntitySymb::store:
-						SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY | COMMON_LVB_UNDERSCORE);
-						break;
-					case EntitySymb::enemyWardenDrop:
-					case EntitySymb::enemyDragonDrop:
-						SetConsoleTextAttribute(hStdout, FOREGROUND_RED | COMMON_LVB_UNDERSCORE);
-						break;
-					case EntitySymb::enemyWarden:
-					case EntitySymb::enemyDragon:
-						SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_INTENSITY | COMMON_LVB_UNDERSCORE);
-						break;
-					default:
-						break;
+						putchar('\b');
+						switch(world.pEntity[k].entitySymb)
+						{
+						case EntitySymb::mainCharacter:
+							SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+							break;
+						case EntitySymb::store:
+							SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY | COMMON_LVB_UNDERSCORE);
+							break;
+						case EntitySymb::enemyZombyDrop:
+						case EntitySymb::enemySkeletonDrop:
+						case EntitySymb::enemyGiantDrop:
+						case EntitySymb::enemyLarvaDrop:
+						case EntitySymb::enemyCorgDrop:
+						case EntitySymb::enemyBeastmanDrop:
+						case EntitySymb::enemyKriDrop:
+						case EntitySymb::enemyJudgeDrop:
+						case EntitySymb::enemyDragonDrop:
+							SetConsoleTextAttribute(hStdout, FOREGROUND_RED | COMMON_LVB_UNDERSCORE);
+							break;
+						case EntitySymb::enemyZomby:
+						case EntitySymb::enemySkeleton:
+						case EntitySymb::enemyGiant:
+						case EntitySymb::enemyLarva:
+						case EntitySymb::enemyCorg:
+						case EntitySymb::enemyBeastman:
+						case EntitySymb::enemyKri:
+						case EntitySymb::enemyJudge:
+						case EntitySymb::enemyDragon:
+							SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_INTENSITY | COMMON_LVB_UNDERSCORE);
+							break;
+						default:
+							break;
+						}
+						putchar((char) world.pEntity[k].entitySymb);
 					}
-					putchar((char) world.pEntity[k].entitySymb);
 				}
+
 			}
 			if(attackMode && attackPoint.y == i && attackPoint.x == j)
 			{
@@ -422,7 +438,10 @@ int worldLogic(World &world)
 			//	Entity.!MainCharacter - эвенты
 			else
 			{
-				worldAiLogic(world, world.pEntity[i]);
+				if(world.pEntity[i].character->isAlive)
+				{
+					worldAiLogic(world, world.pEntity[i]);
+				}
 			}
 		}
 	}
@@ -1134,8 +1153,25 @@ void worldEntityListLogic(char array[LIST_LEN_MAX][LIST_ROWS_MAX], int rowsCount
 {
 	system("cls");
 
-	for (int i = 0; i < rowsCount; i++)
+	for(int i = 0; i < rowsCount; i++)
 	{
 		printf("%s", array[i]);
+	}
+}
+
+void worldReserchArea(World &world, Point leftHightPoint, Point rightLowPoint)
+{
+	if(leftHightPoint.x < 0 || leftHightPoint.x >= world.cellsColsAmount || leftHightPoint.y < 0 || leftHightPoint.y >= world.cellsRowsAmount)
+	{
+		log("worldReserchArea(): переданы невозможные значения.");
+		return;
+	}
+
+	for(int x = leftHightPoint.x; x <= rightLowPoint.x; x++)
+	{
+		for(int y = leftHightPoint.y; y <= rightLowPoint.y; y++)
+		{
+			world.pCell[x][y].isReserched = true;
+		}
 	}
 }

@@ -39,7 +39,11 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 			}
 
 			inventory.items[inventory.itemsAmount].isEquipable = false;
-			inventory.items[inventory.itemsAmount].effect = 0;
+			inventory.items[inventory.itemsAmount].dmgEffect = 0;
+			inventory.items[inventory.itemsAmount].healEffect = 0;
+			inventory.items[inventory.itemsAmount].healthEffect = 0;
+			inventory.items[inventory.itemsAmount].additionDmgTo = EntitySymb::empty;
+			inventory.items[inventory.itemsAmount].reduceDamageFrom = EntitySymb::empty;
 
 			switch(itemID)
 			{
@@ -51,74 +55,242 @@ int inventoryItemAdd(Inventory &inventory, ItemID itemID, int amount)
 					inventory.items[inventory.itemsAmount].sellPrice = 1;
 				}
 				break;
+
+
 			case ItemID::oldSword:
 				{
-					char name[] = "Поношенный старый меч";
+					char name[] = "Сточившийся старый меч";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
-					inventory.items[inventory.itemsAmount].sellPrice = 10;
-					inventory.items[inventory.itemsAmount].sellPrice = 50;
-					inventory.items[inventory.itemsAmount].effect = 10;
+					inventory.items[inventory.itemsAmount].sellPrice = 495;
+					inventory.items[inventory.itemsAmount].dmgEffect = 18;
 				}
 				break;
-			case ItemID::oldArmor:
+			case ItemID::dworfAxe:
 				{
-					char name[] = "Поношенная старая броня";
+					char name[] = "Секира дворфа";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
-					inventory.items[inventory.itemsAmount].sellPrice = 50;
-					inventory.items[inventory.itemsAmount].effect = 20;
+					inventory.items[inventory.itemsAmount].sellPrice = 1008;
+					inventory.items[inventory.itemsAmount].dmgEffect = 42;
 				}
 				break;
-			case ItemID::weakRingOfHealth:
+			case ItemID::volcanSword:
 				{
-					char name[] = "Слабое кольцо добавочного здоровья";
+					char name[] = "Меч из вулканического камня";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
-					inventory.items[inventory.itemsAmount].sellPrice = 300;
-					inventory.items[inventory.itemsAmount].effect = 30;
+					inventory.items[inventory.itemsAmount].sellPrice = 1256;
+					inventory.items[inventory.itemsAmount].dmgEffect = 56;
 				}
 				break;
-			case ItemID::weakRingOfDamage:
+			case ItemID::silverSpear:
 				{
-					char name[] = "Слабое кольцо добавочного урона";
+					char name[] = "Копье серебряного генерала";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 1;
 					inventory.items[inventory.itemsAmount].isEquipable = true;
-					inventory.items[inventory.itemsAmount].sellPrice = 400;
-					inventory.items[inventory.itemsAmount].effect = 15;
+					inventory.items[inventory.itemsAmount].sellPrice = 2112;
+					inventory.items[inventory.itemsAmount].dmgEffect = 75;
 				}
 				break;
+			case ItemID::goldenSword:
+				{
+					char name[] = "Меч золотого генерала";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 3418;
+					inventory.items[inventory.itemsAmount].dmgEffect = 96;
+				}
+				break;
+
+
+			case ItemID::hunterArmor:
+				{
+					char name[] = "Броня охотника";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 310;
+					inventory.items[inventory.itemsAmount].healthEffect = 25;
+				}
+				break;
+			case ItemID::leatherArmor:
+				{
+					char name[] = "Потрепанный кожаный доспех";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 119;
+					inventory.items[inventory.itemsAmount].healthEffect = 12;
+				}
+				break;
+			case ItemID::corgArmor:
+				{
+					char name[] = "Доспех корга";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 942;
+					inventory.items[inventory.itemsAmount].healthEffect = 50;
+				}
+				break;
+			case ItemID::chainMail:
+				{
+					char name[] = "Кольчуга";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 640;
+					inventory.items[inventory.itemsAmount].healthEffect = 40;
+				}
+				break;
+			case ItemID::silverArmor:
+				{
+					char name[] = "Доспехи серебряного генерала";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 1200;
+					inventory.items[inventory.itemsAmount].healthEffect = 70;
+				}
+				break;
+			case ItemID::goldenArmor:
+				{
+					char name[] = "Доспехи золотого генерала";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 2700;
+					inventory.items[inventory.itemsAmount].healthEffect = 135;
+				}
+				break;
+
+
 			case ItemID::healFlaskLittle:
 				{
-					char name[] = "Малое зелье регенерации";
+					char name[] = "Плохое зелье регенерации";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 30;
-					inventory.items[inventory.itemsAmount].sellPrice = 150;
-					inventory.items[inventory.itemsAmount].effect = 100;
+					inventory.items[inventory.itemsAmount].sellPrice = 50;
+					inventory.items[inventory.itemsAmount].healEffect = 80;
 				}
 				break;
 			case ItemID::healFlaskMedium:
 				{
-					char name[] = "Среднее зелье регенерации";
+					char name[] = "Обычное зелье регенерации";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
 					inventory.items[inventory.itemsAmount].stackMax = 30;
-					inventory.items[inventory.itemsAmount].sellPrice = 500;
-					inventory.items[inventory.itemsAmount].effect = 400;
+					inventory.items[inventory.itemsAmount].sellPrice = 420;
+					inventory.items[inventory.itemsAmount].healEffect = 380;
 				}
 				break;
 			case ItemID::healFlaskLarge:
 				{
-					char name[] = "Большое зелье регенерации";
+					char name[] = "Великое зелье регенерации";
 					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
-					inventory.items[inventory.itemsAmount].stackMax = 30;
-					inventory.items[inventory.itemsAmount].sellPrice = 1500;
-					inventory.items[inventory.itemsAmount].effect = 1500;
+					inventory.items[inventory.itemsAmount].stackMax = 10;
+					inventory.items[inventory.itemsAmount].sellPrice = 890;
+					inventory.items[inventory.itemsAmount].healEffect = 50000;
 				}
 				break;
+
+
+			case ItemID::dragonScaleArmor:
+				{
+					char name[] = "Броня из драконьей чешуи";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].sellPrice = 8500;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].healthEffect = 250;
+					inventory.items[inventory.itemsAmount].reduceDamageFrom = EntitySymb::enemyDragon;
+				}
+				break;
+			case ItemID::godsMadeArmor:
+				{
+					char name[] = "Броня сотворенная богами";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].sellPrice = 14500;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].healthEffect = 900;
+					inventory.items[inventory.itemsAmount].reduceDamageFrom = EntitySymb::enemyKri;
+				}
+				break;
+			case ItemID::undeadKingArmor:
+				{
+					char name[] = "Броня короля нежити";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].sellPrice = 11000;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].healthEffect = 330;
+					inventory.items[inventory.itemsAmount].dmgEffect = 80;
+				}
+				break;
+			case ItemID::justiceMantle:
+				{
+					char name[] = "Мантия верховного судьи";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 13000;
+					inventory.items[inventory.itemsAmount].healthEffect = 470;
+					inventory.items[inventory.itemsAmount].dmgEffect = 100;
+					inventory.items[inventory.itemsAmount].reduceDamageFrom = EntitySymb::enemyKri;
+				}
+
+			case ItemID::huntingGroundsSword:
+				{
+					char name[] = "Меч охотничьих угодий";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].sellPrice = 6400;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].dmgEffect = 84;
+					inventory.items[inventory.itemsAmount].additionDmgTo = EntitySymb::enemyBeastman;
+				}
+				break;
+			case ItemID::atlantAxe:
+				{
+					char name[] = "Секира Атланата";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 8900;
+					inventory.items[inventory.itemsAmount].dmgEffect = 140;
+					inventory.items[inventory.itemsAmount].additionDmgTo = EntitySymb::enemyGiant;
+				}
+				break;
+			case ItemID::spiritHammer:
+				{
+					char name[] = "Молот духа земли";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 9600;
+					inventory.items[inventory.itemsAmount].dmgEffect = 150;
+					inventory.items[inventory.itemsAmount].additionDmgTo = EntitySymb::enemyCorg;
+				}
+				break;
+			case ItemID::justiceHummer:
+				{
+					char name[] = "Молот верховного судьи";
+					strcpy_s(inventory.items[inventory.itemsAmount].name, ITEM_NAME_LEN_MAX, name);
+					inventory.items[inventory.itemsAmount].stackMax = 1;
+					inventory.items[inventory.itemsAmount].isEquipable = true;
+					inventory.items[inventory.itemsAmount].sellPrice = 14000;
+					inventory.items[inventory.itemsAmount].dmgEffect = 220;
+					inventory.items[inventory.itemsAmount].additionDmgTo = EntitySymb::enemyKri;
+				}
+				break;
+
+
 			default:
 				{
 					log("inventoryItemAdd(): Неизвестный ItemID");
@@ -217,13 +389,93 @@ int inventoryItemRemoveByID(Inventory &inventory, int itemIndex, int amount, boo
 		}
 		inventory.items[inventory.itemsAmount - 1].amount = 0;
 		inventory.items[inventory.itemsAmount - 1].itemID = ItemID::empty;
-		inventory.items[inventory.itemsAmount - 1].stackMax = 0;
 		char name[] = "Пусто";
 		strcpy_s(inventory.items[inventory.itemsAmount--].name, ITEM_NAME_LEN_MAX, name);
 	}
 
 
 	return ERR_NO_ERR;
+}
+
+void itemInfoPrint(ItemID itemID)
+{
+	switch(itemID)
+	{
+	case ItemID::empty:
+		readList("./lists/list-empty.list");
+		break;
+	case ItemID::gold:
+		readList("./lists/list-gold.list");
+		break;
+	case ItemID::oldSword:
+		readList("./lists/list-oldSword.list");
+		break;
+	case ItemID::dworfAxe:
+		readList("./lists/list-dworfAxe.list");
+		break;
+	case ItemID::volcanSword:
+		readList("./lists/list-volcanSword.list");
+		break;
+	case ItemID::silverSpear:
+		readList("./lists/list-silverSpear.list");
+		break;
+	case ItemID::goldenSword:
+		readList("./lists/list-goldenSword.list");
+		break;
+	case ItemID::leatherArmor:
+		readList("./lists/list-leatherArmor.list");
+		break;
+	case ItemID::hunterArmor:
+		readList("./lists/list-hunterArmor.list");
+		break;
+	case ItemID::corgArmor:
+		readList("./lists/list-corgArmor.list");
+		break;
+	case ItemID::chainMail:
+		readList("./lists/list-chainMail.list");
+		break;
+	case ItemID::silverArmor:
+		readList("./lists/list-silverArmor.list");
+		break;
+	case ItemID::goldenArmor:
+		readList("./lists/list-goldenArmor.list");
+		break;
+	case ItemID::healFlaskLittle:
+		readList("./lists/list-healFlaskLittle.list");
+		break;
+	case ItemID::healFlaskMedium:
+		readList("./lists/list-healFlaskMedium.list");
+		break;
+	case ItemID::healFlaskLarge:
+		readList("./lists/list-healFlaskLarge.list");
+		break;
+	case ItemID::dragonScaleArmor:
+		readList("./lists/list-dragonScaleArmor.list");
+		break;
+	case ItemID::godsMadeArmor:
+		readList("./lists/list-godsMadeArmor.list");
+		break;
+	case ItemID::undeadKingArmor:
+		readList("./lists/list-undeadKingArmor.list");
+		break;
+	case ItemID::justiceMantle:
+		readList("./lists/list-justiceMantle.list");
+		break;
+	case ItemID::huntingGroundsSword:
+		readList("./lists/list-huntingGroundsSword.list");
+		break;
+	case ItemID::atlantAxe:
+		readList("./lists/list-atlantAxe.list");
+		break;
+	case ItemID::spiritHammer:
+		readList("./lists/list-spiritHammer.list");
+		break;
+	case ItemID::justiceHummer:
+		readList("./lists/list-justiceHummer.list");
+		break;
+	default:
+		break;
+	}
 }
 
 void entityInventoryMode(Entity &entity)
@@ -251,14 +503,22 @@ void entityInventoryMode(Entity &entity)
 				{
 					printf_s("%s ", character.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
 				}
-				if(character.inventory.items[itemIndex].effect > 0)
+				if(character.inventory.items[itemIndex].dmgEffect > 0)
 				{
-					printf_s("(+%i) ", character.inventory.items[itemIndex].effect);
+					printf_s("(+%i DMG) ", character.inventory.items[itemIndex].dmgEffect);
+				}
+				if(character.inventory.items[itemIndex].healthEffect > 0)
+				{
+					printf_s("(+%i HP) ", character.inventory.items[itemIndex].healthEffect);
+				}
+				if(character.inventory.items[itemIndex].healEffect > 0)
+				{
+					printf_s("(+%i HEAL) ", character.inventory.items[itemIndex].healEffect);
 				}
 				putchar('\n');
 			}
-			printf_s("\nСтоимость: %i\n", character.inventory.items[chosenItemIndex].sellPrice);
-			printf_s("\nУправление: \n\t[t/T] Выбросить [1/ВСЕ] единиц предмета\n\t[e] [Использовать/Одеть/Снять] предмет\n\t[Стрелки] Перемещение курсора\n\t[i] Закрыть инвентарь");
+			printf_s("\nСредняя стоимость: %i\n", character.inventory.items[chosenItemIndex].sellPrice);
+			printf_s("\nУправление: \n\t[t/T] Выбросить [1/ВСЕ] единиц предмета\n\t[e] [Использовать/Одеть/Снять] предмет\n\t[Стрелки] Перемещение курсора\n\t[i] Закрыть инвентарь\n\t[I] Посмотреть расширенную информацию о предмете");
 		}
 		else
 		{
@@ -285,6 +545,9 @@ void entityInventoryMode(Entity &entity)
 			break;
 		case KBKey::keyI:
 			isLocalEOI = true;
+			break;
+		case KBKey::keyIU:
+			itemInfoPrint(character.inventory.items[chosenItemIndex].itemID);
 			break;
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
@@ -315,9 +578,17 @@ void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isL
 				{
 					printf_s("%s ", mainCharacter.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
 				}
-				if(mainCharacter.inventory.items[itemIndex].effect > 0)
+				if(mainCharacter.inventory.items[itemIndex].dmgEffect > 0)
 				{
-					printf_s("(+%i) ", mainCharacter.inventory.items[itemIndex].effect);
+					printf_s("(+%i DMG) ", mainCharacter.inventory.items[itemIndex].dmgEffect);
+				}
+				if(mainCharacter.inventory.items[itemIndex].healthEffect > 0)
+				{
+					printf_s("(+%i HP) ", mainCharacter.inventory.items[itemIndex].healthEffect);
+				}
+				if(mainCharacter.inventory.items[itemIndex].healEffect > 0)
+				{
+					printf_s("(+%i HEAL) ", mainCharacter.inventory.items[itemIndex].healEffect);
 				}
 				putchar('\n');
 			}
@@ -336,21 +607,29 @@ void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isL
 				{
 					putchar('\t');
 				}
-				printf_s("\t[%i] %s(%i/%i) ", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name, targetCharacter.inventory.items[itemIndex].amount, targetCharacter.inventory.items[itemIndex].stackMax);
-				if(targetCharacter.inventory.items[itemIndex].effect > 0)
+				printf_s("\t[%i] %12s(%i/%i) ", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name, targetCharacter.inventory.items[itemIndex].amount, targetCharacter.inventory.items[itemIndex].stackMax);
+				if(targetCharacter.inventory.items[itemIndex].dmgEffect > 0)
 				{
-					printf_s("(+%i) ", targetCharacter.inventory.items[itemIndex].effect);
+					printf_s("(+%i DMG) ", targetCharacter.inventory.items[itemIndex].dmgEffect);
+				}
+				if(targetCharacter.inventory.items[itemIndex].healthEffect > 0)
+				{
+					printf_s("(+%i HP) ", targetCharacter.inventory.items[itemIndex].healthEffect);
+				}
+				if(targetCharacter.inventory.items[itemIndex].healEffect > 0)
+				{
+					printf_s("(+%i HEAL) ", targetCharacter.inventory.items[itemIndex].healEffect);
 				}
 				putchar('\n');
 			}
-			printf_s("\nСтоимость: %i\n", targetCharacter.inventory.items[chosenItemIndex].sellPrice);
+			printf_s("\nСреднняя стоимость: %i\n", targetCharacter.inventory.items[chosenItemIndex].sellPrice);
 		}
 		else
 		{
 			printf_s("\tПусто.\n");
 		}
 
-		printf_s("\n\nУправление: \n\t[t/T] Выбросить [1/ВСЕ] единиц предмета\n\t[g/G] Забрать [1/ЗАДАННОЕ] кол-во предмета\n\t[Стрелки] Перемещение курсора\n\t[e] Закрыть инвентарь");
+		printf_s("\n\nУправление: \n\t[t/T] Выбросить [1/ВСЕ] единиц предмета\n\t[g/G] Забрать [1/ЗАДАННОЕ] кол-во предмета\n\t[Стрелки] Перемещение курсора\n\t[e] Закрыть инвентарь\n\t[I] Посмотреть расширенную информацию о предмете");
 
 		switch((KBKey) _getch())
 		{
@@ -374,6 +653,9 @@ void entityInventoryModeDrop(Entity &mainEntity, Entity &targetEntity, bool &isL
 			break;
 		case KBKey::keyDownArrow:
 			chosenItemIndex += chosenItemIndex < targetCharacter.inventory.itemsAmount - 1 ? 1 : 0;
+			break;
+		case KBKey::keyIU:
+			itemInfoPrint(targetCharacter.inventory.items[chosenItemIndex].itemID);
 			break;
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
@@ -414,9 +696,17 @@ void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity, bool &is
 				{
 					printf_s("%s ", mainCharacter.inventory.items[itemIndex].isEquiped ? "(+)" : "(-)");
 				}
-				if(mainCharacter.inventory.items[itemIndex].effect > 0)
+				if(mainCharacter.inventory.items[itemIndex].dmgEffect > 0)
 				{
-					printf_s("(+%i) ", mainCharacter.inventory.items[itemIndex].effect);
+					printf_s("(+%i DMG) ", mainCharacter.inventory.items[itemIndex].dmgEffect);
+				}
+				if(mainCharacter.inventory.items[itemIndex].healthEffect > 0)
+				{
+					printf_s("(+%i HP) ", mainCharacter.inventory.items[itemIndex].healthEffect);
+				}
+				if(mainCharacter.inventory.items[itemIndex].healEffect > 0)
+				{
+					printf_s("(+%i HEAL) ", mainCharacter.inventory.items[itemIndex].healEffect);
 				}
 				putchar('\n');
 			}
@@ -435,10 +725,18 @@ void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity, bool &is
 				{
 					putchar('\t');
 				}
-				printf_s("\t[%i] %s ", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name);
-				if(targetCharacter.inventory.items[itemIndex].effect > 0)
+				printf_s("\t[%i] %12s ", itemIndex + 1, targetCharacter.inventory.items[itemIndex].name);
+				if(targetCharacter.inventory.items[itemIndex].dmgEffect > 0)
 				{
-					printf_s("(+%i) ", targetCharacter.inventory.items[itemIndex].effect);
+					printf_s("(+%i DMG) ", targetCharacter.inventory.items[itemIndex].dmgEffect);
+				}
+				if(targetCharacter.inventory.items[itemIndex].healthEffect > 0)
+				{
+					printf_s("(+%i HP) ", targetCharacter.inventory.items[itemIndex].healthEffect);
+				}
+				if(targetCharacter.inventory.items[itemIndex].healEffect > 0)
+				{
+					printf_s("(+%i HEAL) ", targetCharacter.inventory.items[itemIndex].healEffect);
 				}
 				putchar('\n');
 			}
@@ -448,9 +746,9 @@ void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity, bool &is
 			printf_s("\tПусто.\n");
 		}
 
-		printf_s("\nСтоимость: %i\n",
-				 chosenItemIndex < mainCharacter.inventory.itemsAmount ? mainCharacter.inventory.items[chosenItemIndex].sellPrice : targetCharacter.inventory.items[chosenItemIndex - mainCharacter.inventory.itemsAmount].sellPrice);
-		printf_s("\n\nУправление: \n\t[b/B] Купить/Продать [1/ЗАДАННОЕ] кол-во предмета\n\t[Стрелки] Перемещение курсора\n\t[s] Закрыть меню покупки");
+		printf_s("\nСтоимость покупки/продажи: %i\n",
+				 chosenItemIndex < mainCharacter.inventory.itemsAmount ? int( mainCharacter.inventory.items[chosenItemIndex].sellPrice * 0.75) : int(targetCharacter.inventory.items[chosenItemIndex - mainCharacter.inventory.itemsAmount].sellPrice * 1.25));
+		printf_s("\n\nУправление: \n\t[b/B] Купить/Продать [1/ЗАДАННОЕ] кол-во предмета\n\t[Стрелки] Перемещение курсора\n\t[s] Закрыть меню покупки\n\t[I] Посмотреть расширенную информацию о предмете");
 
 		switch((KBKey) _getch())
 		{
@@ -477,6 +775,16 @@ void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity, bool &is
 				InventoryStoreModeBuyAction(mainCharacter.inventory, &targetCharacter.inventory.items[chosenItemIndex - mainCharacter.inventory.itemsAmount], getInt("Введите желаемое количество: ", 0));
 			}
 			break;
+		case KBKey::keyIU:
+			if(chosenItemIndex < mainCharacter.inventory.itemsAmount)
+			{
+				itemInfoPrint(mainCharacter.inventory.items[chosenItemIndex].itemID);
+			}
+			else
+			{
+				itemInfoPrint(targetCharacter.inventory.items[chosenItemIndex - mainCharacter.inventory.itemsAmount].itemID);
+			}
+			break;
 		case KBKey::keyUpArrow:
 			chosenItemIndex -= chosenItemIndex > 0 ? 1 : 0;
 			break;
@@ -494,7 +802,7 @@ void entityInventoryModeStore(Entity &mainEntity, Entity &targetEntity, bool &is
 
 void InventoryStoreModeBuyAction(Inventory &inventory, Item *item, int amount)
 {
-	int finCoast = amount * item->sellPrice;
+	int finCoast = amount * item->sellPrice * 1.25;
 	int goldAmount = 0;
 	int spaceCount = 0;
 
@@ -555,7 +863,7 @@ void InventoryStoreModeSellAction(Inventory &inventory, Item *item, int amount)
 		return;
 	}
 
-	int finCoast = amount * item->sellPrice;
+	int finCoast = amount * item->sellPrice * 0.75;
 	int itemAmount = 0;
 	int spaceCount = 0;
 
@@ -571,7 +879,7 @@ void InventoryStoreModeSellAction(Inventory &inventory, Item *item, int amount)
 			itemAmount += inventory.items[i].amount;
 		}
 	}
-	spaceCount += (inventory.capacityCurrent - inventory.itemsAmount) * 5000;	//	Убрать отсюда этот хардкод н***й.
+	spaceCount += (inventory.capacityCurrent - inventory.itemsAmount) * 5000;	//	хардкод
 
 	if(finCoast > spaceCount)
 	{
@@ -678,21 +986,38 @@ int inventiryModeEquipMode(Character &character, int itemIndex)
 {
 	Inventory &inventory = character.inventory;
 
+	if(!inventory.items[itemIndex].isEquipable)
+	{
+		return ERR_INVENTORY_USE_EQUIP_INDEX_FAIL;
+	}
+
 	bool isMele = false;
 	bool isArmor = false;
-	bool isOther = false;
 
 	switch(inventory.items[itemIndex].itemID)
 	{
 	case ItemID::oldSword:
+	case ItemID::dworfAxe:
+	case ItemID::volcanSword:
+	case ItemID::silverSpear:
+	case ItemID::goldenSword:
+	case ItemID::justiceMantle:
+	case ItemID::huntingGroundsSword:
+	case ItemID::atlantAxe:
+	case ItemID::spiritHammer:
+	case ItemID::justiceHummer:
 		isMele = true;
 		break;
-	case ItemID::oldArmor:
+	case ItemID::leatherArmor:
+	case ItemID::hunterArmor:
+	case ItemID::corgArmor:
+	case ItemID::chainMail:
+	case ItemID::silverArmor:
+	case ItemID::goldenArmor:
+	case ItemID::dragonScaleArmor:
+	case ItemID::godsMadeArmor:
+	case ItemID::undeadKingArmor:
 		isArmor = true;
-		break;
-	case ItemID::weakRingOfHealth:
-	case ItemID::weakRingOfDamage:
-		isOther = true;
 		break;
 	default:
 		return ERR_INVENTORY_USE_EQUIP_INDEX_FAIL;
@@ -707,20 +1032,30 @@ int inventiryModeEquipMode(Character &character, int itemIndex)
 			switch(inventory.items[i].itemID)
 			{
 			case ItemID::oldSword:
+			case ItemID::dworfAxe:
+			case ItemID::volcanSword:
+			case ItemID::silverSpear:
+			case ItemID::goldenSword:
+			case ItemID::justiceMantle:
+			case ItemID::huntingGroundsSword:
+			case ItemID::atlantAxe:
+			case ItemID::spiritHammer:
+			case ItemID::justiceHummer:
 				if(isMele)
 				{
 					inventory.items[i].isEquiped = i == itemIndex ? true : false;
 				}
 				break;
-			case ItemID::oldArmor:
+			case ItemID::leatherArmor:
+			case ItemID::hunterArmor:
+			case ItemID::corgArmor:
+			case ItemID::chainMail:
+			case ItemID::silverArmor:
+			case ItemID::goldenArmor:
+			case ItemID::dragonScaleArmor:
+			case ItemID::godsMadeArmor:
+			case ItemID::undeadKingArmor:
 				if(isArmor)
-				{
-					inventory.items[i].isEquiped = i == itemIndex ? true : false;
-				}
-				break;
-			case ItemID::weakRingOfHealth:
-			case ItemID::weakRingOfDamage:
-				if(isOther)
 				{
 					inventory.items[i].isEquiped = i == itemIndex ? true : false;
 				}
@@ -741,19 +1076,9 @@ int inventiryModeEquipMode(Character &character, int itemIndex)
 	{
 		if(inventory.items[i].isEquiped)
 		{
-			switch(inventory.items[i].itemID)
-			{
-			case ItemID::oldSword:
-				characterModifDamageSet(character, 30);
-				break;
-			case ItemID::oldArmor:
-				characterModifHealthSet(character, 60);
-				break;
-			case ItemID::weakRingOfHealth:
-				break;
-			case ItemID::weakRingOfDamage:
-				break;
-			}
+			characterModifDamageIncrease(character, inventory.items[i].dmgEffect);
+			//characterModifVisionIncrease(character, inventory.items[i].visionEffect);
+			characterModifHealthIncrease(character, inventory.items[i].healthEffect);
 		}
 	}
 
@@ -772,24 +1097,31 @@ int inventoryItemUseByID(Entity &entity, int itemIndex)
 	switch(character.inventory.items[itemIndex].itemID)
 	{
 	case ItemID::oldSword:
-		inventiryModeEquipMode(*entity.character, itemIndex);
-		break;
-	case ItemID::oldArmor:
+	case ItemID::dworfAxe:
+	case ItemID::volcanSword:
+	case ItemID::silverSpear:
+	case ItemID::goldenSword:
+	case ItemID::leatherArmor:
+	case ItemID::hunterArmor:
+	case ItemID::corgArmor:
+	case ItemID::chainMail:
+	case ItemID::silverArmor:
+	case ItemID::goldenArmor:
+	case ItemID::dragonScaleArmor:
+	case ItemID::godsMadeArmor:
+	case ItemID::undeadKingArmor:
+	case ItemID::justiceMantle:
+	case ItemID::huntingGroundsSword:
+	case ItemID::atlantAxe:
+	case ItemID::spiritHammer:
+	case ItemID::justiceHummer:
 		inventiryModeEquipMode(*entity.character, itemIndex);
 		break;
 	case ItemID::healFlaskLittle:
-		entityCharacterGetHeal(entity, 300);
-		inventoryItemRemoveByID(character.inventory, itemIndex, 1);
-		break;
 	case ItemID::healFlaskMedium:
-		entityCharacterGetHeal(entity, 1200);
-		inventoryItemRemoveByID(character.inventory, itemIndex, 1);
-		break;
 	case ItemID::healFlaskLarge:
-		entityCharacterGetHeal(entity, 5000);
+		entityCharacterGetHeal(entity, character.inventory.items[itemIndex].healEffect);
 		inventoryItemRemoveByID(character.inventory, itemIndex, 1);
-		break;
-	default:
 		break;
 	}
 
@@ -809,6 +1141,9 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 	}
 
 	pCharacter->spawnPoint = {worldEntity.coords.x, worldEntity.coords.y};
+	pCharacter->manaBase = 0;
+	pCharacter->manaModifitaion = 0;
+	pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
 
 	//	Присваивание стнадартных значений при создании персонажей
 	switch(characterToCreateSymbol)
@@ -830,15 +1165,12 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->healthModification = 0;
 		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
 		pCharacter->healthReal = pCharacter->healthCurrent;
-		pCharacter->manaBase = 100;
-		pCharacter->manaModifitaion = 0;
-		pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
-		pCharacter->visionRangeBase = 16; //3;
+		pCharacter->visionRangeBase = 4;
 		pCharacter->visionRangeModification = 0;
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
 	case EntitySymb::store:
-		pCharacter->killExpReward = -100;
+		pCharacter->killExpReward = -1000;
 		pCharacter->team = Team::neutral;
 		pCharacter->level = 100;
 		pCharacter->inventory.itemsAmount = 0;
@@ -852,59 +1184,183 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->healthModification = 50000;
 		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
 		pCharacter->healthReal = pCharacter->healthCurrent;
-		pCharacter->manaBase = 0;
-		pCharacter->manaModifitaion = 15000;
-		pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
 		pCharacter->visionRangeBase = 1;
 		pCharacter->visionRangeModification = 4;
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
-		for(int i = 2; i < (int) ItemID::_last; i++)
+		for(int i = 2; i < (int) ItemID::_nextNotBuyable; i++)
 		{
 			inventoryItemAdd(pCharacter->inventory, (ItemID) i, 1);
 		}
 		break;
-	case EntitySymb::enemyWarden:
-		pCharacter->killExpReward = 5;
+	case EntitySymb::enemyZomby:
+		pCharacter->killExpReward = rand() % 15;
 		pCharacter->team = Team::enemy;
 		pCharacter->level = 1;
 		pCharacter->inventory.itemsAmount = 0;
 		pCharacter->inventory.capacityBase = 2;
 		pCharacter->inventory.capacityModiffication = 0;
 		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
-		pCharacter->damageBase = 20;
+		pCharacter->damageBase = 8 + rand() % 4;
 		pCharacter->damageModification = 0;
 		pCharacter->damageCurrent = pCharacter->damageBase + pCharacter->damageModification;
-		pCharacter->healthBase = 80;
+		pCharacter->healthBase = 50;
 		pCharacter->healthModification = 0;
 		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
 		pCharacter->healthReal = pCharacter->healthCurrent;
-		pCharacter->manaBase = 10;
-		pCharacter->manaModifitaion = 0;
-		pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
 		pCharacter->visionRangeBase = 2;
 		pCharacter->visionRangeModification = 0;
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
-	case EntitySymb::enemyDragon:
-		pCharacter->killExpReward = 250;
+	case EntitySymb::enemySkeleton:
+		pCharacter->killExpReward = 20 + rand() % 10;
 		pCharacter->team = Team::enemy;
-		pCharacter->level = 10;
+		pCharacter->level = 1;
 		pCharacter->inventory.itemsAmount = 0;
-		pCharacter->inventory.capacityBase = 1;
+		pCharacter->inventory.capacityBase = 2;
 		pCharacter->inventory.capacityModiffication = 0;
 		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
-		pCharacter->damageBase = 150;
+		pCharacter->damageBase = 30 + rand() % 10;
+		pCharacter->damageModification = 0;
+		pCharacter->damageCurrent = pCharacter->damageBase + pCharacter->damageModification;
+		pCharacter->healthBase = 125;
+		pCharacter->healthModification = 0;
+		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
+		pCharacter->visionRangeBase = 2;
+		pCharacter->visionRangeModification = 0;
+		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
+		break;
+	case EntitySymb::enemyGiant:
+		pCharacter->killExpReward = 50 + rand() % 20;
+		pCharacter->team = Team::enemy;
+		pCharacter->level = 1;
+		pCharacter->inventory.itemsAmount = 0;
+		pCharacter->inventory.capacityBase = 2;
+		pCharacter->inventory.capacityModiffication = 0;
+		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
+		pCharacter->damageBase = 100 + rand() % 40;
+		pCharacter->damageModification = 0;
+		pCharacter->damageCurrent = pCharacter->damageBase + pCharacter->damageModification;
+		pCharacter->healthBase = 1340;
+		pCharacter->healthModification = 0;
+		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
+		pCharacter->visionRangeBase = 4;
+		pCharacter->visionRangeModification = 0;
+		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
+		break;
+	case EntitySymb::enemyLarva:
+		pCharacter->killExpReward = 40 + rand() % 20;
+		pCharacter->team = Team::enemy;
+		pCharacter->level = 1;
+		pCharacter->inventory.itemsAmount = 0;
+		pCharacter->inventory.capacityBase = 2;
+		pCharacter->inventory.capacityModiffication = 0;
+		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
+		pCharacter->damageBase = 90 + rand() % 15;
+		pCharacter->damageModification = 0;
+		pCharacter->damageCurrent = pCharacter->damageBase + pCharacter->damageModification;
+		pCharacter->healthBase = 950;
+		pCharacter->healthModification = 0;
+		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
+		pCharacter->visionRangeBase = 3;
+		pCharacter->visionRangeModification = 0;
+		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
+		break;
+	case EntitySymb::enemyCorg:
+		pCharacter->killExpReward = 55 + rand() % 30;
+		pCharacter->team = Team::enemy;
+		pCharacter->level = 1;
+		pCharacter->inventory.itemsAmount = 0;
+		pCharacter->inventory.capacityBase = 2;
+		pCharacter->inventory.capacityModiffication = 0;
+		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
+		pCharacter->damageBase = 120 + rand() % 30;
 		pCharacter->damageModification = 0;
 		pCharacter->damageCurrent = pCharacter->damageBase + pCharacter->damageModification;
 		pCharacter->healthBase = 1200;
 		pCharacter->healthModification = 0;
 		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
 		pCharacter->healthReal = pCharacter->healthCurrent;
-		pCharacter->manaBase = 400;
-		pCharacter->manaModifitaion = 0;
-		pCharacter->manaCurrent = pCharacter->manaBase + pCharacter->manaModifitaion;
+		pCharacter->visionRangeBase = 5;
+		pCharacter->visionRangeModification = 0;
+		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
+		break;
+	case EntitySymb::enemyBeastman:
+		pCharacter->killExpReward = 50 + rand() % 40;
+		pCharacter->team = Team::enemy;
+		pCharacter->level = 1;
+		pCharacter->inventory.itemsAmount = 0;
+		pCharacter->inventory.capacityBase = 2;
+		pCharacter->inventory.capacityModiffication = 0;
+		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
+		pCharacter->damageBase = 80 + rand() % 20;
+		pCharacter->damageModification = 0;
+		pCharacter->damageCurrent = pCharacter->damageBase + pCharacter->damageModification;
+		pCharacter->healthBase = 860;
+		pCharacter->healthModification = 0;
+		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
 		pCharacter->visionRangeBase = 4;
-		pCharacter->visionRangeModification = 2;
+		pCharacter->visionRangeModification = 0;
+		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
+		break;
+	case EntitySymb::enemyJudge:
+		pCharacter->killExpReward = 250 + rand() % 100;
+		pCharacter->team = Team::enemy;
+		pCharacter->level = 1;
+		pCharacter->inventory.itemsAmount = 0;
+		pCharacter->inventory.capacityBase = 2;
+		pCharacter->inventory.capacityModiffication = 0;
+		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
+		pCharacter->damageBase = 190 + rand() % 80;
+		pCharacter->damageModification = 0;
+		pCharacter->damageCurrent = pCharacter->damageBase + pCharacter->damageModification;
+		pCharacter->healthBase = 1900;
+		pCharacter->healthModification = 0;
+		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
+		pCharacter->visionRangeBase = 6;
+		pCharacter->visionRangeModification = 0;
+		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
+		break;
+	case EntitySymb::enemyDragon:
+		pCharacter->killExpReward = 500 + rand() % 150;
+		pCharacter->team = Team::enemy;
+		pCharacter->level = 1;
+		pCharacter->inventory.itemsAmount = 0;
+		pCharacter->inventory.capacityBase = 2;
+		pCharacter->inventory.capacityModiffication = 0;
+		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
+		pCharacter->damageBase = 250 + rand() % 200;
+		pCharacter->damageModification = 0;
+		pCharacter->damageCurrent = pCharacter->damageBase + pCharacter->damageModification;
+		pCharacter->healthBase = 1700;
+		pCharacter->healthModification = 0;
+		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
+		pCharacter->visionRangeBase = 6;
+		pCharacter->visionRangeModification = 0;
+		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
+		break;
+	case EntitySymb::enemyKri:
+		pCharacter->killExpReward = 1000 + rand() % 500;
+		pCharacter->team = Team::enemy;
+		pCharacter->level = 1;
+		pCharacter->inventory.itemsAmount = 0;
+		pCharacter->inventory.capacityBase = 2;
+		pCharacter->inventory.capacityModiffication = 0;
+		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
+		pCharacter->damageBase = 1000 + rand() % 400;
+		pCharacter->damageModification = 0;
+		pCharacter->damageCurrent = pCharacter->damageBase + pCharacter->damageModification;
+		pCharacter->healthBase = 5500;
+		pCharacter->healthModification = 0;
+		pCharacter->healthCurrent = pCharacter->healthBase + pCharacter->healthModification;
+		pCharacter->healthReal = pCharacter->healthCurrent;
+		pCharacter->visionRangeBase = 6;
+		pCharacter->visionRangeModification = 0;
 		pCharacter->visionRangeCurrent = pCharacter->visionRangeBase + pCharacter->visionRangeModification;
 		break;
 	default:
@@ -917,6 +1373,8 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 
 int entityCharacterDie(Entity &worldEntity)
 {
+	int dropRandomizer = rand() % 100;
+
 	if(worldEntity.character->isAlive)
 	{
 		worldEntity.direction = Direction::stay;
@@ -930,34 +1388,200 @@ int entityCharacterDie(Entity &worldEntity)
 	{
 	case EntitySymb::mainCharacter:
 		break;
-	case EntitySymb::enemyWarden:
-		worldEntity.entitySymb = EntitySymb::enemyWardenDrop;
-		if(rand() % 2)
+	case EntitySymb::store:
+		break;
+	case EntitySymb::enemyZomby:
+		worldEntity.entitySymb = EntitySymb::enemyZombyDrop;
+		if(dropRandomizer < 10)
 		{
-			switch(rand() % 8)
-			{
-			case 0:
-			case 1:
-			case 2:
-				inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 15 + rand() % 11);
-				break;
-			case 3:
-			case 4:
-			case 5:
-				inventoryItemAdd(worldEntity.character->inventory, ItemID::healFlaskLittle, 1 + rand() % 2);
-				break;
-			case 6:
-				inventoryItemAdd(worldEntity.character->inventory, ItemID::oldArmor, 1);
-				break;
-			case 7:
-				inventoryItemAdd(worldEntity.character->inventory, ItemID::oldSword, 1);
-				break;
-			}
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::leatherArmor);
 		}
+		else if(dropRandomizer < 15)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::hunterArmor);
+		}
+		else if(dropRandomizer < 16)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::undeadKingArmor);
+		}
+		else if(dropRandomizer < 20)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::chainMail);
+		}
+		else if(dropRandomizer < 30)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::oldSword);
+		}
+		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 10 + rand() % 10);
+		break;
+	case EntitySymb::enemySkeleton:
+		worldEntity.entitySymb = EntitySymb::enemySkeletonDrop;
+		if(dropRandomizer < 10)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::oldSword);
+		}
+		else if(dropRandomizer < 15)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::hunterArmor);
+		}
+		else if(dropRandomizer < 16)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::undeadKingArmor);
+		}
+		else if(dropRandomizer < 20)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::chainMail);
+		}
+		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 30 + rand() % 20);
+		break;
+	case EntitySymb::enemyGiant:
+		worldEntity.entitySymb = EntitySymb::enemyGiantDrop;
+		if(dropRandomizer < 5)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::dragonScaleArmor);
+		}
+		else if(dropRandomizer < 10)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::atlantAxe);
+		}
+		else if(dropRandomizer < 15)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::spiritHammer);
+		}
+		else if(dropRandomizer < 30)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::dworfAxe);
+		}
+		else if(dropRandomizer < 35)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::goldenArmor);
+		}
+		else if(dropRandomizer < 40)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::silverArmor);
+		}
+		else if(dropRandomizer < 45)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::silverSpear);
+		}
+		else if(dropRandomizer < 50)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::goldenSword);
+		}
+		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 200 + rand() % 100);
+		break;
+	case EntitySymb::enemyLarva:
+		worldEntity.entitySymb = EntitySymb::enemyLarvaDrop;
+		if(dropRandomizer < 10)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::atlantAxe);
+		}
+		else if(dropRandomizer < 15)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::goldenArmor);
+		}
+		else if(dropRandomizer < 20)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::silverArmor);
+		}
+		else if(dropRandomizer < 25)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::silverSpear);
+		}
+		else if(dropRandomizer < 30)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::goldenSword);
+		}
+		else if(dropRandomizer < 35)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::volcanSword);
+		}
+		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 150 + rand() % 100);
+		break;
+	case EntitySymb::enemyCorg:
+		worldEntity.entitySymb = EntitySymb::enemyCorgDrop;
+		if(dropRandomizer < 10)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::corgArmor);
+		}
+		else if(dropRandomizer < 25)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::dworfAxe);
+		}
+		else if(dropRandomizer < 30)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::volcanSword);
+		}
+		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 250 + rand() % 100);
+		break;
+	case EntitySymb::enemyBeastman:
+		if(dropRandomizer < 5)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::huntingGroundsSword);
+		}
+		else if(dropRandomizer < 10)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::goldenArmor);
+		}
+		else if(dropRandomizer < 15)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::silverArmor);
+		}
+		else if(dropRandomizer < 20)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::silverSpear);
+		}
+		else if(dropRandomizer < 25)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::goldenSword);
+		}
+		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 180 + rand() % 100);
+		break;
+		worldEntity.entitySymb = EntitySymb::enemyBeastmanDrop;
+		break;
+	case EntitySymb::enemyKri:
+		if(dropRandomizer < 5)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::godsMadeArmor);
+		}
+		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 6500 + rand() % 1000);
+		worldEntity.entitySymb = EntitySymb::enemyKriDrop;
+		break;
+	case EntitySymb::enemyJudge:
+		if(dropRandomizer < 5)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::godsMadeArmor);
+		}
+		else if(dropRandomizer < 10)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::justiceHummer);
+		}
+		else if(dropRandomizer < 15)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::justiceMantle);
+		}
+		else if(dropRandomizer < 20)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::goldenArmor);
+		}
+		else if(dropRandomizer < 25)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::goldenSword);
+		}
+		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 1500 + rand() % 500);
+		worldEntity.entitySymb = EntitySymb::enemyJudgeDrop;
 		break;
 	case EntitySymb::enemyDragon:
+		if(dropRandomizer < 5)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::godsMadeArmor);
+		}
+		else if(dropRandomizer < 10)
+		{
+			inventoryItemAdd(worldEntity.character->inventory, ItemID::spiritHammer);
+		}
+		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 2500 + rand() % 1000);
 		worldEntity.entitySymb = EntitySymb::enemyDragonDrop;
-		inventoryItemAdd(worldEntity.character->inventory, ItemID::gold, 2000 + abs(rand() * rand()) % 1000);
 		break;
 	}
 
@@ -1015,41 +1639,89 @@ int EntityAdd(Entity *&entity, int &entityAmount, EntitySymb entitySymb, Point c
 		{
 		case EntitySymb::mainCharacter:
 			{
-				char name[ENTITY_NAME_LEN_MAX] = "М'айк лжец";	//	Да, это рофл мы его переназавем.
+				char name[ENTITY_NAME_LEN_MAX] = "Хеймид";
 				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
 			}
-			break;
 		case EntitySymb::store:
 			{
 				char name[ENTITY_NAME_LEN_MAX] = "Странствующий торговец";
 				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
 			}
-			break;
-		case EntitySymb::enemyWarden:
+		case EntitySymb::enemyZomby:
 			{
-				char name[ENTITY_NAME_LEN_MAX] = "Защитник подземелия";
+				char name[ENTITY_NAME_LEN_MAX] = "Гниющий мертвец";
 				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
 			}
-			break;
+		case EntitySymb::enemySkeleton:
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Оживший скелет";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
+			}
+		case EntitySymb::enemyGiant:
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Великан";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
+			}
+		case EntitySymb::enemyLarva:
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Кислотная ларва";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
+			}
+		case EntitySymb::enemyCorg:
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Корг";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
+			}
+		case EntitySymb::enemyBeastman:
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Зверолюд";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
+			}
+		case EntitySymb::enemyKri:
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Крий";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
+			}
+		case EntitySymb::enemyJudge:
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Вершащий закон";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
+			}
 		case EntitySymb::enemyDragon:
 			{
 				char name[ENTITY_NAME_LEN_MAX] = "Дракон";
 				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
 			}
-			break;
 		case EntitySymb::camera:
 			{
 				char name[ENTITY_NAME_LEN_MAX] = "_Camera";
 				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
 			}
-			break;
+		case EntitySymb::spawner:
+			{
+				char name[ENTITY_NAME_LEN_MAX] = "Алтарь";
+				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
+			}
 		default:
 			{
-				log("worldEntityAdd(): Неизветсный тип добавляемого Entity.");
-				char name[ENTITY_NAME_LEN_MAX] = "_?_Entity";
+				log("worldEntityAdd(): Неизветсный тип добавляемого Entity");
+				char name[ENTITY_NAME_LEN_MAX] = "_Empty";
 				strcpy_s(pEntityNew[entityAmount - 1].name, ENTITY_NAME_LEN_MAX, name);
+				break;
 			}
-			break;
 		}
 	}
 
@@ -1162,32 +1834,31 @@ int entityLevelUpLogic(Entity &entity)
 		entity.character->expa -= entity.character->nextLevelExp;
 		entity.character->nextLevelExp = sqrt(entity.character->level) * 100;
 		system("cls");
+		bool isUpdateVision = entity.character->visionRangeCurrent < 12 ? true : false;
 		bool isUpdateInventory = entity.character->inventory.capacityCurrent < INVENTORY_CAPACITY_MAX;
-		int rightBorder = 4;
 		int num;
 		do
 		{
 			printf("Выберетите что бы вы хотели прокачать \n"
-				   "\t[1] Прокачать урон на 30 едениц\n"
-				   "\t[2] Прокачать здоровье на 60 едениц\n"
-				   "\t[3] Прокачать диапазон видимости на 1 еденицу\n");
+				   "\t[1] Прокачать урон на 15 едениц\n"
+				   "\t[2] Прокачать здоровье на 25 едениц\n");
+			if(isUpdateVision)
+			{
+				printf("\t[3] Прокачать диапазон видимости на 1 еденицу\n");
+			}
 			if(isUpdateInventory)
 			{
 				printf("\t[4] Прокачать вместимость инвентаря на 1 еденицу\n");
 			}
 			scanf_s("%i", &num);
-			if(!isUpdateInventory)
-			{
-				rightBorder = 3;
-			}
-		} while(num <= 0 || num > rightBorder);
+		} while(num <= 0 || num > 2 || (isUpdateVision && num == 3) || (isUpdateInventory && num == 4));
 		switch(num)
 		{
 		case 1:
-			entity.character->damageModification += 30;
+			entity.character->damageModification += 15;
 			break;
 		case 2:
-			entity.character->healthModification += 60;
+			entity.character->healthModification += 25;
 			break;
 		case 3:
 			entity.character->visionRangeModification += 1;
@@ -1221,6 +1892,21 @@ void characterModifVisionSet(Character &character, int newState)
 void characterModifHealthSet(Character &character, int newState)
 {
 	character.healthModification = newState;
+}
+
+void characterModifDamageIncrease(Character &character, int increase)
+{
+	character.damageModification += increase;
+}
+
+void characterModifVisionIncrease(Character &character, int increase)
+{
+	character.visionRangeModification += increase;
+}
+
+void characterModifHealthIncrease(Character &character, int increase)
+{
+	character.healthModification += increase;
 }
 
 void entityCharacterGetDamage(Entity &entity, int damageAmount, bool fullKill)

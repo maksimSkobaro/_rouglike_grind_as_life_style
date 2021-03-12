@@ -27,7 +27,7 @@ int log(const char *logString, const char *const logFileName)
 	return ERR_NO_ERR;
 }
 
-int getInt(const char* prompt,int a, int b)
+int getInt(const char *prompt, int a, int b)
 {
 	int retVal = 0;
 	do
@@ -42,4 +42,28 @@ int getInt(const char* prompt,int a, int b)
 void swapInt(int &a, int &b)
 {
 	int c = a; a = b; b = c;
+}
+
+void readList(const char *listPath)
+{
+	FILE *pListToRead = nullptr;
+
+	if(fopen_s(&pListToRead, listPath, "r"))
+	{
+		exit(ERR_FILE);
+	}
+
+	system("cls");
+
+	char oneStr[FILE_ONE_LINE_SYMBS_MAX]{};
+	while(!feof(pListToRead))
+	{
+		fgets(oneStr, FILE_ONE_LINE_SYMBS_MAX, pListToRead);
+		fputs(oneStr, stdout);
+	}
+
+	puts("По прочтении нажмите любую кнопу . . .");
+	_getch();
+
+	fclose(pListToRead);
 }

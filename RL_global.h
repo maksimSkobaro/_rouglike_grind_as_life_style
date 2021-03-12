@@ -16,20 +16,18 @@
 ////////////////////DEFINES////////////////////
 ///////////////////////////////////////////////
 
-#define DEBUG
+//#define DEBUG
+#define BETA
 
 #define ERR_NO_ERR 0
 #define ERR_FILE 10
 #define ERR_MEMORY 20
 
+#define FILE_ONE_LINE_SYMBS_MAX 256
 #define PATH_NAME_LEN_MAX 32
 #define PATH_LOG "./log/log.log"
 #define PATH_LOG_MAP "./log/_map_log.log"
-#define PATH_LEVEL_DEV "./levels/level_dev.level"
-#define PATH_LEVEL_1 "./levels/level_1.level"
-#define PATH_LEVEL_2 "./levels/level_2.level"
-#define PATH_LEVEL_3 "./levels/level_3.level"
-
+#define PATH_LEVEL "./levels/level.level"
 
 //////////////////////////////////////////////////
 ////////////////////ENUMIRATIONS//////////////////
@@ -91,5 +89,6 @@ struct Point
 int log(const char *logString, const char *const logFileName = PATH_LOG);
 int getInt(const char *prompt = "¬ведите число: ", int a = INT_MIN, int b = INT_MAX);
 void swapInt(int &a, int &b);
+void readList(const char *listPath);
 
 #endif // !_GLOBAL_H_

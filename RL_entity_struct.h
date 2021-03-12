@@ -31,13 +31,31 @@ enum class ItemID
 	empty,
 	gold,
 	oldSword,
-	oldArmor,
-	weakRingOfHealth,
-	weakRingOfDamage,
+	dworfAxe,
+	volcanSword,
+	silverSpear,
+	goldenSword,
+	leatherArmor,
+	hunterArmor,
+	corgArmor,
+	chainMail,
+	silverArmor,
+	goldenArmor,
 	healFlaskLittle,
 	healFlaskMedium,
 	healFlaskLarge,
-	_last
+
+	_nextNotBuyable,
+
+	dragonScaleArmor,
+	godsMadeArmor,
+	undeadKingArmor,
+	justiceMantle,
+
+	huntingGroundsSword,
+	atlantAxe,
+	spiritHammer,
+	justiceHummer,
 };
 
 enum class Direction
@@ -53,8 +71,22 @@ enum class EntitySymb : char
 {
 	mainCharacter = '@',
 	store = '$',
-	enemyWardenDrop = 'w',
-	enemyWarden = 'W',
+	enemyZombyDrop = 'z',
+	enemyZomby = 'Z',
+	enemySkeletonDrop = 's',
+	enemySkeleton = 'S',
+	enemyGiantDrop = 'g',
+	enemyGiant = 'G',
+	enemyLarvaDrop = 'l',
+	enemyLarva = 'L',
+	enemyCorgDrop = 'c',
+	enemyCorg = 'C',
+	enemyBeastmanDrop = 'b',
+	enemyBeastman = 'B',
+	enemyKriDrop = 'k',
+	enemyKri = 'K',
+	enemyJudgeDrop = 'j',
+	enemyJudge = 'J',
 	enemyDragonDrop = 'd',
 	enemyDragon = 'D',
 	camera = '?',
@@ -73,7 +105,14 @@ struct Item
 {
 	bool isEquiped,
 		isEquipable;
-	int effect;
+
+	int dmgEffect,
+		healthEffect,
+		healEffect;
+
+	EntitySymb additionDmgTo,
+		reduceDamageFrom;
+
 	int amount;	//	Количество предмета одного типа, если он стакается.
 	int stackMax;	//	Максимальное кол-во предмета в 1 клетке.
 	int sellPrice;
@@ -191,6 +230,10 @@ int inventiryModeEquipMode(Character &character, int itemIndex);
 void characterModifDamageSet(Character &character, int newState);
 void characterModifVisionSet(Character &character, int newState);
 void characterModifHealthSet(Character &character, int newState);
+void characterModifDamageIncrease(Character &character, int increase);
+void characterModifVisionIncrease(Character &character, int increase);
+void characterModifHealthIncrease(Character &character, int increase);
+void itemInfoPrint(ItemID itemID);
 //	Ф-ии для обработки урона/хила
 void entityCharacterGetDamage(Entity &entity, int damageAmount, bool fullKill = false);
 void entityCharacterGetHeal(Entity &entity, int healAmount, bool fullHeal = false);

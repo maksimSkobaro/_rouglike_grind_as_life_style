@@ -76,7 +76,7 @@ void printWorldDebug(const World &world);
 //	Загружает уровень из файла в массив[][] структур
 int worldLoadLevel(World &world);
 //	Инициализирует стандартными значениями World
-int worldInit(World *&world, Point mainCharacterCoord = {3, 20}, const char *const worldName = PATH_LEVEL_1);
+int worldInit(World *&world, Point mainCharacterCoord = {3, 20}, const char *const worldName = PATH_LEVEL);
 //	Корретно удаляет World
 int worldDestruct(World *&world);
 //	Ф-я вывода уровня из **Cell в консоль.
@@ -118,5 +118,7 @@ void worldEntityCharacterShopLogic(World &world, Entity &mainEntity);
 void worldEmptyCharacterClear(World &world);
 //	Ф-я вывода текста
 void worldEntityListLogic(char array[LIST_LEN_MAX][LIST_ROWS_MAX], int rowsCount);
+//	Ф-я удалленного изучения территории
+void worldReserchArea(World &world, Point leftHightPoint, Point rightLowPoint);
 
 #endif // !_RL_WORLD_STRUCT_H_
