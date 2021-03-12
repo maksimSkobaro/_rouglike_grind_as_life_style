@@ -1155,7 +1155,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		pCharacter->nextLevelExp = sqrt(pCharacter->level) * 100;
 		pCharacter->expa = 0;
 		pCharacter->inventory.itemsAmount = 0;
-		pCharacter->inventory.capacityBase = 4;
+		pCharacter->inventory.capacityBase = 5;
 		pCharacter->inventory.capacityModiffication = 0;
 		pCharacter->inventory.capacityCurrent = pCharacter->inventory.capacityBase + pCharacter->inventory.capacityModiffication;
 		pCharacter->damageBase = 50;
@@ -1193,7 +1193,7 @@ int entityCharacterCreate(Entity &worldEntity, EntitySymb characterToCreateSymbo
 		}
 		break;
 	case EntitySymb::enemyZomby:
-		pCharacter->killExpReward = rand() % 15;
+		pCharacter->killExpReward =  5 + rand() % 10;
 		pCharacter->team = Team::enemy;
 		pCharacter->level = 1;
 		pCharacter->inventory.itemsAmount = 0;
@@ -1834,7 +1834,7 @@ int entityLevelUpLogic(Entity &entity)
 		entity.character->expa -= entity.character->nextLevelExp;
 		entity.character->nextLevelExp = sqrt(entity.character->level) * 100;
 		system("cls");
-		bool isUpdateVision = entity.character->visionRangeCurrent < 12 ? true : false;
+		bool isUpdateVision = entity.character->visionRangeCurrent < 11 ? true : false;
 		bool isUpdateInventory = entity.character->inventory.capacityCurrent < INVENTORY_CAPACITY_MAX;
 		int num;
 		do

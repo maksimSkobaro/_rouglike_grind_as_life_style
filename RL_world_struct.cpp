@@ -396,18 +396,6 @@ int worldLogic(World &world)
 	// Entity - эвенты
 	for(int i = 0; i < world.entityAmount; i++)
 	{
-		world.pEntity[world.cameraID].coords = world.pEntity[world.mainCharacterID].coords;
-
-		// Entity.Spawner - эвенты
-		if(world.pEntity[i].spawner != nullptr)
-		{
-			worldEntitySpawnerLogic(world, world.pEntity[i].ID);
-		}
-
-
-		worldDirectionLogic(world, world.pEntity[i]);
-
-
 		// Entity.Character - эвенты
 		if(world.pEntity[i].character != nullptr)
 		{
@@ -444,8 +432,18 @@ int worldLogic(World &world)
 				}
 			}
 		}
-	}
 
+		world.pEntity[world.cameraID].coords = world.pEntity[world.mainCharacterID].coords;
+
+		// Entity.Spawner - эвенты
+		if(world.pEntity[i].spawner != nullptr)
+		{
+			worldEntitySpawnerLogic(world, world.pEntity[i].ID);
+		}
+
+		worldDirectionLogic(world, world.pEntity[i]);
+
+	}
 	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
 	worldUILogic(world);
 	worldVisionLogic(world);
@@ -453,6 +451,7 @@ int worldLogic(World &world)
 	{
 		worldEmptyCharacterClear(world);
 	}
+
 
 	return ERR_NO_ERR;
 }
