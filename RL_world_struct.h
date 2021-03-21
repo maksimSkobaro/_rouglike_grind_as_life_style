@@ -4,18 +4,25 @@
 #include "RL_global.h"
 #include "RL_entity_struct.h"
 
+
+
 ///////////////////////////////////////////////
 ////////////////////DEFINES////////////////////
 ///////////////////////////////////////////////
 
 #define MAP_WIDTH_MAX 512
 #define MAP_HEIGTH_MAX 512
+#define LIST_LEN_MAX 128
+#define LIST_ROWS_MAX 64
 
 #define CAMERA_RANGE_MAX 24
+#define CAMERA_RANGE_Y_DEVIDER 2
 #define CONDITION_STR_ONELINE_MAX 64
 
 #define ERR_UI_OUTPUT 300
 #define ERR_UI_INPUT 301
+#define ERR_AI 500
+#define ERR_AI_POINTER_ACCESS 501
 
 
 ///////////////////////////////////////////////////////
@@ -54,7 +61,7 @@ struct World
 	int entityAmount;
 	Entity *pEntity = nullptr;
 	char levelName[64];
-	char ConditionString[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX];
+	char ConditionString[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX];
 };
 
 
@@ -69,13 +76,13 @@ void printWorldDebug(const World &world);
 //	Загружает уровень из файла в массив[][] структур
 int worldLoadLevel(World &world);
 //	Инициализирует стандартными значениями World
-int worldInit(World *&world, Point mainCharacterCoord = {3, 20}, const char *const worldName = PATH_LEVEL_1);
+int worldInit(World *&world, Point mainCharacterCoord = {3, 20}, const char *const worldName = PATH_LEVEL);
 //	Корретно удаляет World
 int worldDestruct(World *&world);
 //	Ф-я вывода уровня из **Cell в консоль.
 int printWorldLevel(const World &world, bool attackMode = false, Point attackPoint = {0,0});
 //	обработка UI и строки сотояния
-int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int curY);
+int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX], int curY);
 //	Ф-я обрабатывающая нажатия на кнопки.
 int worldInput(World &world);
 //	Ф-я реализующая логику игры.
@@ -87,18 +94,31 @@ int worldDirectionLogic(World &world, Entity &entity);
 //	Ф-я области видимости, изучения карты.
 void worldVisionLogic(World &world);
 //	Ф-я атаки
-int worldCharacterAttack(const World& world, Entity& entity, bool& isEOI);
+int worldCharacterAttack(World &world, Entity &entity, bool &isEOI, Point attackPoint = {0,0});
 //	Ф-я реализует механизм прокрутки камеры
 void worldMapMode(World &world);
 //	Ф-я корректного измененния положения Entity в пространстве. 
 //	При телепортации на занятую клетку в isGhost моде, клетка перестает быть isGhost навсегда.
 void worldEntityGoto(World &world, Entity &entity, Point toGoPoint, bool isGhost = false);
 //	Ф-я реализующая логику работы spawner'ов(лагерей)
-int worldEntitySpawnerLogic(World& world, int spawnerID);
+int worldEntitySpawnerLogic(World &world, int spawnerID);
 //	Ф-я обновления UI
-void worldUILogic(World& world);
+void worldUILogic(World &world);
 //	Ф-я добавление новой строки состояние в UI
-void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], const char* newString);
-
+void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX], const char *newString);
+//	Ф-я Обработки ИИ (пожалуйста не смотрите ф-ию, тут слишком сложные алгоритмы, серьезный ии короче).
+int worldAiLogic(World &world, Entity &entity); 
+void worldAiLogicChooseAction(World &world, Entity &entity, bool agressive);
+//	Ф-я обработки удара
+void worldCharacterHit(World &world, Entity &attacker, Entity &victim);
+//	Ф-я обработки инвентарей. Дроп/Магазин
+void worldEntityCharacterDropLogic(World &world, Entity &mainEntity);
+void worldEntityCharacterShopLogic(World &world, Entity &mainEntity);
+//	Ф-я чистит все пустые Character
+void worldEmptyCharacterClear(World &world);
+//	Ф-я вывода текста
+void worldEntityListLogic(char array[LIST_LEN_MAX][LIST_ROWS_MAX], int rowsCount);
+//	Ф-я удалленного изучения территории
+void worldReserchArea(World &world, Point leftHightPoint, Point rightLowPoint);
 
 #endif // !_RL_WORLD_STRUCT_H_

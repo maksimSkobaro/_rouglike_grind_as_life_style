@@ -12,7 +12,6 @@ int log(const char *logString, const char *const logFileName)
 
 	if(fopen_s(&logfile, logFileName, "a"))
 	{
-		//log("log(): Не получилось открыть файл-лог.");	:-]
 		exit(ERR_FILE);
 	}
 
@@ -26,4 +25,45 @@ int log(const char *logString, const char *const logFileName)
 	fclose(logfile);
 
 	return ERR_NO_ERR;
+}
+
+int getInt(const char *prompt, int a, int b)
+{
+	int retVal = 0;
+	do
+	{
+		putchar('\n');
+		fputs(prompt, stdout);
+		scanf_s("%i", &retVal);
+	} while(retVal > b || retVal < a);
+	return retVal;
+}
+
+void swapInt(int &a, int &b)
+{
+	int c = a; a = b; b = c;
+}
+
+void readList(const char *listPath)
+{
+	FILE *pListToRead = nullptr;
+
+	if(fopen_s(&pListToRead, listPath, "r"))
+	{
+		exit(ERR_FILE);
+	}
+
+	system("cls");
+
+	char oneStr[FILE_ONE_LINE_SYMBS_MAX]{};
+	while(!feof(pListToRead))
+	{
+		fgets(oneStr, FILE_ONE_LINE_SYMBS_MAX, pListToRead);
+		fputs(oneStr, stdout);
+	}
+
+	puts("По прочтении нажмите любую кнопу . . .");
+	_getch();
+
+	fclose(pListToRead);
 }

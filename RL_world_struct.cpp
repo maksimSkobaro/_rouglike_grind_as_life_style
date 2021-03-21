@@ -20,7 +20,8 @@ void printWorldDebug(const World &world)
 		}
 		if(world.pEntity[i].character != nullptr)
 		{
-			printf_s(": %s|DMG:%i|HLTH:%i|MNA:%i|LVL:%i|INV:%i/%i|isVisn:%c", world.pEntity[i].character->isAlive ? "ALIVE" : "DEAD", world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthCurrent,
+			printf_s(": %s|TEAM:%i|DMG:%i|HLTH:%i/%i|MNA:%i|LVL:%i|INV:%i/%i|isVisn:%c",
+					 world.pEntity[i].character->isAlive ? "ALIVE" : "DEAD", world.pEntity[i].character->team, world.pEntity[i].character->damageCurrent, world.pEntity[i].character->healthReal, world.pEntity[i].character->healthCurrent,
 					 world.pEntity[i].character->manaCurrent, world.pEntity[i].character->level, world.pEntity[i].character->inventory.itemsAmount, world.pEntity[i].character->inventory.capacityCurrent, world.pEntity[i].isInRange ? 'T' : 'F');
 		}
 		putchar('\n');
@@ -54,16 +55,18 @@ int worldInit(World *&world, Point mainCharacterCoords, const char *const worldN
 	strcpy_s(pWorldNew->levelName, PATH_NAME_LEN_MAX, worldName);
 	worldLoadLevel(*pWorldNew);
 
-	for(int i = 0; i < CAMERA_RANGE_MAX / 3 * 2 - 1; i++)
+	for(int i = 0; i < CAMERA_RANGE_MAX * 2 - 1; i++)
 	{
 		for(int j = 0; j < CONDITION_STR_ONELINE_MAX; j++)
 		{
 			pWorldNew->ConditionString[i][j] = '\0';
 		}
 	}
+	worldReserchArea(*pWorldNew, {167, 0}, {255,48});
 
 	worldDestruct(world);
 	world = pWorldNew;
+
 
 	return ERR_NO_ERR;
 }
@@ -221,11 +224,12 @@ int worldLoadLevel(World &world)
 
 int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 {
+	system("cls");
 	// Хэндл консоли ( если не понятно - гуглите/забейте )
 	static HANDLE hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
 	int textAttr = NULL;
 
-	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / 3, curStr = 0; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / 3) + 1; i++, curStr++)
+	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / CAMERA_RANGE_Y_DEVIDER, curStr = 0; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / CAMERA_RANGE_Y_DEVIDER) + 1; i++, curStr++)
 	{
 		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
 		{
@@ -268,34 +272,48 @@ int printWorldLevel(const World &world, bool attackMode, Point attackPoint)
 					SetConsoleTextAttribute(hStdout, FOREGROUND_BLUE);
 				}
 				putchar((char) world.pCell[j][i].cellSymb);
-			}
-
-			for(int k = 0; k < world.entityAmount; k++)
-			{
-				if(world.pEntity[k].isInRange && world.pEntity[k].coords.x == j && world.pEntity[k].coords.y == i && world.pEntity[k].ID != world.pEntity[world.cameraID].ID)
+				for(int k = 0; k < world.entityAmount; k++)
 				{
-					putchar('\b');
-					switch(world.pEntity[k].entitySymb)
+					if((world.pEntity[k].isInRange || world.pEntity[k].spawner != nullptr) && world.pEntity[k].coords.x == j && world.pEntity[k].coords.y == i && world.pEntity[k].ID != world.pEntity[world.cameraID].ID)
 					{
-					case EntitySymb::mainCharacter:
-						SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
-						break;
-					case EntitySymb::store:
-						SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY | COMMON_LVB_UNDERSCORE);
-						break;
-					case EntitySymb::enemyWardenDrop:
-					case EntitySymb::enemyDragonDrop:
-						SetConsoleTextAttribute(hStdout, FOREGROUND_RED | COMMON_LVB_UNDERSCORE);
-						break;
-					case EntitySymb::enemyWarden:
-					case EntitySymb::enemyDragon:
-						SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_INTENSITY | COMMON_LVB_UNDERSCORE);
-						break;
-					default:
-						break;
+						putchar('\b');
+						switch(world.pEntity[k].entitySymb)
+						{
+						case EntitySymb::mainCharacter:
+							SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+							break;
+						case EntitySymb::store:
+							SetConsoleTextAttribute(hStdout, FOREGROUND_GREEN | FOREGROUND_INTENSITY | COMMON_LVB_UNDERSCORE);
+							break;
+						case EntitySymb::enemyZombyDrop:
+						case EntitySymb::enemySkeletonDrop:
+						case EntitySymb::enemyGiantDrop:
+						case EntitySymb::enemyLarvaDrop:
+						case EntitySymb::enemyCorgDrop:
+						case EntitySymb::enemyBeastmanDrop:
+						case EntitySymb::enemyKriDrop:
+						case EntitySymb::enemyJudgeDrop:
+						case EntitySymb::enemyDragonDrop:
+							SetConsoleTextAttribute(hStdout, FOREGROUND_RED | COMMON_LVB_UNDERSCORE);
+							break;
+						case EntitySymb::enemyZomby:
+						case EntitySymb::enemySkeleton:
+						case EntitySymb::enemyGiant:
+						case EntitySymb::enemyLarva:
+						case EntitySymb::enemyCorg:
+						case EntitySymb::enemyBeastman:
+						case EntitySymb::enemyKri:
+						case EntitySymb::enemyJudge:
+						case EntitySymb::enemyDragon:
+							SetConsoleTextAttribute(hStdout, FOREGROUND_RED | FOREGROUND_INTENSITY | COMMON_LVB_UNDERSCORE);
+							break;
+						default:
+							break;
+						}
+						putchar((char) world.pEntity[k].entitySymb);
 					}
-					putchar((char) world.pEntity[k].entitySymb);
 				}
+
 			}
 			if(attackMode && attackPoint.y == i && attackPoint.x == j)
 			{
@@ -344,15 +362,29 @@ int worldInput(World &world)
 			break;
 		case KBKey::keyM:
 			worldMapMode(world);
+			printWorldLevel(world);
 			break;
 		case KBKey::keyA:
 			worldCharacterAttack(world, world.pEntity[world.mainCharacterID], isEOI);
+			printWorldLevel(world);
+			break;
+		case KBKey::keyI:
+			entityInventoryMode(world.pEntity[world.mainCharacterID]);
+			printWorldLevel(world);
+			break;
+		case KBKey::keyE:
+			worldEntityCharacterDropLogic(world, world.pEntity[world.mainCharacterID]);
+			printWorldLevel(world);
+			break;
+		case KBKey::keyS:
+			worldEntityCharacterShopLogic(world, world.pEntity[world.mainCharacterID]);
+			printWorldLevel(world);
 			break;
 		case KBKey::key9:
 			exit(ERR_NO_ERR);
 			break;
 		default:
-			break;	//	сообщение в UI : нет такой кнопки
+			break;
 		}
 	} while(!isEOI);
 
@@ -364,6 +396,43 @@ int worldLogic(World &world)
 	// Entity - эвенты
 	for(int i = 0; i < world.entityAmount; i++)
 	{
+		// Entity.Character - эвенты
+		if(world.pEntity[i].character != nullptr)
+		{
+			world.pEntity[i].character->damageCurrent = world.pEntity[i].character->damageBase + world.pEntity[i].character->damageModification;
+			world.pEntity[i].character->healthCurrent = world.pEntity[i].character->healthBase + world.pEntity[i].character->healthModification;
+			world.pEntity[i].character->manaCurrent = world.pEntity[i].character->manaBase + world.pEntity[i].character->manaModifitaion;
+			world.pEntity[i].character->visionRangeCurrent = world.pEntity[i].character->visionRangeBase + world.pEntity[i].character->visionRangeModification;
+			world.pEntity[i].character->inventory.capacityCurrent = world.pEntity[i].character->inventory.capacityBase + world.pEntity[i].character->inventory.capacityModiffication;
+			if(world.pEntity[i].character->healthReal > world.pEntity[i].character->healthCurrent)
+			{
+				world.pEntity[i].character->healthReal = world.pEntity[i].character->healthCurrent;
+			}
+			if(world.pEntity[i].character->healthReal < 0)
+			{
+				world.pEntity[i].character->healthReal = 0;
+			}
+
+			//	Entity.MainCharacter - эвенты
+			if(world.pEntity[i].ID == world.mainCharacterID)
+			{
+				if(!world.pEntity[i].character->isAlive)
+				{
+					exit(ERR_NO_ERR);
+				}
+
+				entityLevelUpLogic(world.pEntity[i]);
+			}
+			//	Entity.!MainCharacter - эвенты
+			else
+			{
+				if(world.pEntity[i].character->isAlive)
+				{
+					worldAiLogic(world, world.pEntity[i]);
+				}
+			}
+		}
+
 		world.pEntity[world.cameraID].coords = world.pEntity[world.mainCharacterID].coords;
 
 		// Entity.Spawner - эвенты
@@ -374,59 +443,249 @@ int worldLogic(World &world)
 
 		worldDirectionLogic(world, world.pEntity[i]);
 
+	}
+	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
+	worldUILogic(world);
+	worldVisionLogic(world);
+	if(world.globTick % 32 == 0)
+	{
+		worldEmptyCharacterClear(world);
+	}
 
-		// Entity.Character - эвенты
-		if(world.pEntity[i].character != nullptr)
+
+	return ERR_NO_ERR;
+}
+
+int worldAiLogic(World &world, Entity &entity)
+{
+	if(entity.character == nullptr)
+	{
+		return ERR_AI_POINTER_ACCESS;
+	}
+
+	bool soLong = false;
+	if(abs(world.pEntity[world.mainCharacterID].coords.x - entity.coords.x) > CAMERA_RANGE_MAX || abs(world.pEntity[world.mainCharacterID].coords.y - entity.coords.y) > CAMERA_RANGE_MAX)
+	{
+		soLong = true;
+	}
+	bool agressive = false;
+
+	//	Обработка врагов
+	if(entity.character->team == Team::enemy)
+	{
+		//	В зоне отрисовки
+		if(!soLong)
 		{
-			//	Entity.MainCharacter - эвенты
-			if(world.pEntity[i].ID == world.mainCharacterID)
+			for(int visionX = entity.coords.x - entity.character->visionRangeCurrent; visionX <= entity.coords.x + entity.character->visionRangeCurrent; visionX++)
 			{
+				for(int visionY = entity.coords.y - entity.character->visionRangeCurrent; visionY <= entity.coords.y + entity.character->visionRangeCurrent; visionY++)
+				{
+					if(visionX == world.pEntity[world.mainCharacterID].coords.x && visionY == world.pEntity[world.mainCharacterID].coords.y)
+					{
+						agressive = true;
+					}
+				}
+			}
+			worldAiLogicChooseAction(world, entity, agressive);
+		}
+	}
+	//	Обработка нейтралов
+	else if(entity.character->team == Team::neutral)
+	{
+		worldAiLogicChooseAction(world, entity, agressive);
+	}
+	//	Обработка союзников
+	else if(entity.character->team == Team::ally)
+	{
+		worldAiLogicChooseAction(world, entity, agressive);
+	}
+
+	return ERR_NO_ERR;
+}
+
+void worldAiLogicChooseAction(World &world, Entity &entity, bool agressive)
+{
+	int mX = world.pEntity[world.mainCharacterID].coords.x;
+	int mY = world.pEntity[world.mainCharacterID].coords.y;
+	int eX = entity.coords.x;
+	int eY = entity.coords.y;
+
+	Direction newDirection = Direction::stay;
+	if(agressive)
+	{
+		bool canAttack = abs(mX - eX) == 1 ? abs(mY - eY) == 0 ? true : false : abs(mY - eY) == 1 && abs(mX - eX) == 0 ? true : false;
+
+		if(canAttack)
+		{
+			bool trash;
+			worldCharacterAttack(world, entity, trash, {mX, mY});
+			return;
+		}
+
+		if(eX < mX)
+		{
+			if(eY < mY)
+			{
+				newDirection = rand() % 2 ? Direction::down : Direction::right;
+			}
+			else if(eY > mY)
+			{
+				newDirection = rand() % 2 ? Direction::up : Direction::right;
+			}
+			else
+			{
+				newDirection = Direction::right;
+			}
+		}
+		else if(eX > mX)
+		{
+			if(eY < mY)
+			{
+				newDirection = rand() % 2 ? Direction::down : Direction::left;
+			}
+			else if(eY > mY)
+			{
+				newDirection = rand() % 2 ? Direction::up : Direction::left;
+			}
+			else
+			{
+				newDirection = Direction::left;
+			}
+		}
+		else
+		{
+			if(eY < mY)
+			{
+				newDirection = Direction::down;
+			}
+			else if(eY > mY)
+			{
+				newDirection = Direction::up;
+			}
+			else
+			{
+				newDirection = Direction::stay;
+			}
+		}
+	}
+	else
+	{
+		bool soLongFromSpawnPoint = true;
+		for(int x = eX - entity.character->visionRangeCurrent; x <= eX + entity.character->visionRangeCurrent; x++)
+		{
+			for(int y = eY - entity.character->visionRangeCurrent; y <= eY + entity.character->visionRangeCurrent; y++)
+			{
+				if(y == entity.character->spawnPoint.y && x == entity.character->spawnPoint.x)
+				{
+					soLongFromSpawnPoint = false;
+					break;
+				}
+			}
+		}
+
+		if(!soLongFromSpawnPoint)
+		{
+
+			switch(rand() % 8)
+			{
+			case 0: newDirection = Direction::down; break;
+			case 1: newDirection = Direction::up; break;
+			case 2: newDirection = Direction::left; break;
+			case 3: newDirection = Direction::right; break;
+			default: break;
+			}
+		}
+		else
+		{
+			if(eX < entity.character->spawnPoint.x)
+			{
+				if(eY < entity.character->spawnPoint.y)
+				{
+					newDirection = rand() % 2 ? Direction::down : Direction::right;
+				}
+				else if(eY > entity.character->spawnPoint.y)
+				{
+					newDirection = rand() % 2 ? Direction::up : Direction::right;
+				}
+				else
+				{
+					newDirection = Direction::right;
+				}
+			}
+			else if(eX > entity.character->spawnPoint.x)
+			{
+				if(eY < entity.character->spawnPoint.y)
+				{
+					newDirection = rand() % 2 ? Direction::down : Direction::left;
+				}
+				else if(eY > entity.character->spawnPoint.y)
+				{
+					newDirection = rand() % 2 ? Direction::up : Direction::left;
+				}
+				else
+				{
+					newDirection = Direction::left;
+				}
+			}
+			else
+			{
+				if(eY < entity.character->spawnPoint.y)
+				{
+					newDirection = Direction::down;
+				}
+				else if(eY > entity.character->spawnPoint.y)
+				{
+					newDirection = Direction::up;
+				}
+				else
+				{
+					newDirection = Direction::stay;
+				}
 			}
 		}
 	}
 
-	worldUILogic(world);
-	worldVisionLogic(world);
-	worldIncreaseHistoryTime(world.globTick, world.globBigTick);
-	char tmp[16];
-	_itoa_s(world.globTick, tmp, 16, 10);
-	worldUIStrAdd(world.ConditionString, tmp);
-	return ERR_NO_ERR;
+	entity.direction = newDirection;
 }
 
 void worldUILogic(World &world)
 {
-	char tmpLevel[16];
+	char tmpLevel[16], tmpExp[16], tmpNextLevelExp[16];
 	_itoa_s(world.pEntity[world.mainCharacterID].character->level, tmpLevel, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->expa, tmpExp, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->nextLevelExp, tmpNextLevelExp, 16, 10);
 	strcpy_s(world.ConditionString[0], ENTITY_NAME_LEN_MAX, world.pEntity[world.mainCharacterID].name);
 	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, ", LVL: ");
 	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, tmpLevel);
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, ", EXP: ");
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, tmpExp);
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, "/");
+	strcat_s(world.ConditionString[0], CONDITION_STR_ONELINE_MAX, tmpNextLevelExp);
 
-	char tmpHealth[16], tmpDamage[16], tmpMana[16], tmpVisionRange[16];
+	char tmpHealth[16], tmpHealthReal[16], tmpDamage[16], tmpVisionRange[16];
 	_itoa_s(world.pEntity[world.mainCharacterID].character->healthCurrent, tmpHealth, 16, 10);
+	_itoa_s(world.pEntity[world.mainCharacterID].character->healthReal, tmpHealthReal, 16, 10);
 	_itoa_s(world.pEntity[world.mainCharacterID].character->damageCurrent, tmpDamage, 16, 10);
-	_itoa_s(world.pEntity[world.mainCharacterID].character->manaCurrent, tmpMana, 16, 10);
 	_itoa_s(world.pEntity[world.mainCharacterID].character->visionRangeCurrent, tmpVisionRange, 16, 10);
 	strcpy_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, "HP: ");
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpHealthReal);
+	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, "/");
 	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpHealth);
 	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", DMG: ");
 	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpDamage);
-	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", MNA: ");
-	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpMana);
 	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, ", VSN: ");
 	strcat_s(world.ConditionString[1], CONDITION_STR_ONELINE_MAX, tmpVisionRange);
 }
 
-void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], const char *newString)
+void worldUIStrAdd(char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX], const char *newString)
 {
-	for(int i = CAMERA_RANGE_MAX / 3 * 2 - 2; i > 2; i--)
+	for(int i = CAMERA_RANGE_MAX * 2 - 2; i > 2; i--)
 	{
 		strcpy_s(ConditionString[i], CONDITION_STR_ONELINE_MAX, ConditionString[i - 1]);
 	}
 	strcpy_s(ConditionString[2], CONDITION_STR_ONELINE_MAX, newString);
 }
 
-// FIX TP ISVISION
 void worldVisionLogic(World &world)
 {
 	for(int q = 0; q < world.entityAmount; q++)
@@ -434,29 +693,15 @@ void worldVisionLogic(World &world)
 		world.pEntity[q].isInRange = false;
 	}
 
-	for(int curY = world.pEntity[world.mainCharacterID].coords.y, _i = 0; curY <= world.pEntity[world.mainCharacterID].coords.y + world.pEntity[world.mainCharacterID].character->visionRangeCurrent + 1; curY++, _i++)
+	for(int i = world.pEntity[world.cameraID].coords.y - world.cameraRange / CAMERA_RANGE_Y_DEVIDER; i != (world.pEntity[world.cameraID].coords.y + world.cameraRange / CAMERA_RANGE_Y_DEVIDER) + 1; i++)
 	{
-		for(int curX = world.pEntity[world.mainCharacterID].coords.x; curX <= world.pEntity[world.mainCharacterID].coords.x + world.pEntity[world.mainCharacterID].character->visionRangeCurrent - _i + 1; curX++)
+		for(int j = world.pEntity[world.cameraID].coords.x - world.cameraRange; j != world.pEntity[world.cameraID].coords.x + world.cameraRange + 1; j++)
 		{
-			int reversedY = curY - 2 * abs(world.pEntity[world.mainCharacterID].coords.y - curY);
-			int reversedX = curX - 2 * abs(world.pEntity[world.mainCharacterID].coords.x - curX);
-
-			world.pCell[curX][curY].isInRange = false;
-
-
-			if(reversedX < world.cellsColsAmount && reversedX >= 0)
+			if(i < 0 || i >= world.cellsRowsAmount || j < 0 || j >= world.cellsColsAmount)
 			{
-				world.pCell[reversedX][curY].isInRange = false;
-
-				if(reversedY < world.cellsRowsAmount && reversedY >= 0)
-				{
-					world.pCell[reversedX][reversedY].isInRange = false;
-				}
+				continue;
 			}
-			if(reversedY < world.cellsRowsAmount && reversedY >= 0)
-			{
-				world.pCell[curX][reversedY].isInRange = false;
-			}
+			world.pCell[j][i].isInRange = false;
 		}
 	}
 
@@ -586,7 +831,7 @@ void worldMapMode(World &world)
 			exit(ERR_NO_ERR);
 			break;
 		default:
-			break;	//	сообщение в UI : нет такой кнопки
+			break;
 		}
 
 		worldDirectionLogic(world, world.pEntity[world.cameraID]);
@@ -595,16 +840,68 @@ void worldMapMode(World &world)
 	}
 
 	world.pEntity[world.cameraID].coords = world.pEntity[world.mainCharacterID].coords;
-	system("cls");
-	printWorldLevel(world);
 	world.pEntity[world.cameraID].direction = Direction::stay;
 }
 
-int worldCharacterAttack(const World &world, Entity &entity, bool &isEOI)
+void worldCharacterHit(World &world, Entity &attacker, Entity &victim)
 {
-	Point attackPoint = {entity.coords.x, entity.coords.y - 1};
+	if(victim.character->team != Team::enemy && attacker.ID == world.mainCharacterID)
+	{
+		worldUIStrAdd(world.ConditionString, "Атаковать возможно только вражеские войска!");
+	}
+	else if(!victim.character->isAlive && attacker.ID == world.mainCharacterID)
+	{
+		worldUIStrAdd(world.ConditionString, "Атаковать возможно только живые войска!");
+	}
+	else
+	{
+		victim.character->healthReal -= attacker.character->damageCurrent;
+		char tmp[64];
+		char tmp2[16];
+		if(victim.character->healthReal <= 0)
+		{
+			characterExpIncrease(*attacker.character, victim.character->killExpReward);
+			if(attacker.ID == world.mainCharacterID)
+			{
+				strcpy_s(tmp, 64, "Вы получили ");
+				_itoa_s(victim.character->killExpReward, tmp2, 16, 10);
+				strcat_s(tmp, 64, tmp2);
+				strcat_s(tmp, 64, " EXP");
+				worldUIStrAdd(world.ConditionString, tmp);
+			}
+			else if(victim.ID == world.mainCharacterID)
+			{
+				worldUIStrAdd(world.ConditionString, "Вы умерли");
+			}
+			entityCharacterDie(victim);
+		}
+		else
+		{
+			if(attacker.ID == world.mainCharacterID)
+			{
+				strcpy_s(tmp, 64, "У противника осталось ");
+				_itoa_s(victim.character->healthReal, tmp2, 16, 10);
+				strcat_s(tmp, 64, tmp2);
+				strcat_s(tmp, 64, " HP");
+				worldUIStrAdd(world.ConditionString, tmp);
+			}
+			else if(victim.ID == world.mainCharacterID)
+			{
+				strcpy_s(tmp, 64, "Противник нанес вам ");
+				_itoa_s(attacker.character->damageCurrent, tmp2, 16, 10);
+				strcat_s(tmp, 64, tmp2);
+				strcat_s(tmp, 64, " DMG");
+				worldUIStrAdd(world.ConditionString, tmp);
+			}
+		}
+	}
+}
+
+int worldCharacterAttack(World &world, Entity &entity, bool &isEOI, Point attackPoint)
+{
 	if(entity.ID == world.mainCharacterID)
 	{
+		attackPoint = {entity.coords.x, entity.coords.y - 1};
 		while(true)
 		{
 			system("cls");
@@ -628,19 +925,13 @@ int worldCharacterAttack(const World &world, Entity &entity, bool &isEOI)
 				{
 					if(world.pEntity[i].character != nullptr && world.pEntity[i].coords.x == attackPoint.x && world.pEntity[i].coords.y == attackPoint.y)
 					{
-						world.pEntity[i].character->healthCurrent -= entity.character->damageCurrent;
-						if(world.pEntity[i].character->healthCurrent <= 0)
-						{
-							entityCharacterDie(world.pEntity[i]);
-						}
+						worldCharacterHit(world, entity, world.pEntity[i]);
 					}
 				}
 				isEOI = true;
 				return ERR_NO_ERR;
 				break;
 			case KBKey::keyA:
-				system("cls");
-				printWorldLevel(world);
 				isEOI = false;
 				return ERR_NO_ERR;
 				break;
@@ -652,7 +943,13 @@ int worldCharacterAttack(const World &world, Entity &entity, bool &isEOI)
 	}
 	else
 	{
-
+		for(int i = 0; i < world.entityAmount; i++)
+		{
+			if(world.pEntity[i].character != nullptr && world.pEntity[i].coords.x == attackPoint.x && world.pEntity[i].coords.y == attackPoint.y)
+			{
+				worldCharacterHit(world, entity, world.pEntity[i]);
+			}
+		}
 	}
 
 	return ERR_NO_ERR;
@@ -718,11 +1015,18 @@ void worldEntityGoto(World &world, Entity &entity, Point toGoPoint, bool isGhost
 			world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
 			world.pCell[toGoPoint.x][toGoPoint.y].isGhost = false;
 		}
+		else
+		{
+			if(entity.ID != world.cameraID)
+			{
+				world.pCell[entity.coords.x][entity.coords.y].isGhost = true;
+			}
+		}
 		entity.coords = toGoPoint;
 	}
 }
 
-int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1][CONDITION_STR_ONELINE_MAX], int curY)
+int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX * 2 - 1][CONDITION_STR_ONELINE_MAX], int curY)
 {
 
 	if(curY > 3)
@@ -749,4 +1053,124 @@ int worldPrintLevelUI(const char(&ConditionString)[CAMERA_RANGE_MAX / 3 * 2 - 1]
 		}
 	}
 	return ERR_NO_ERR;
+}
+
+void worldEntityCharacterDropLogic(World &world, Entity &mainEntity)
+{
+	bool isLocalEOI = false;
+	while(!isLocalEOI)
+	{
+		bool wasTarget = false;
+		int targetIndex = 0;
+
+		for(int characterX = mainEntity.coords.x - 1; characterX <= mainEntity.coords.x + 1; characterX++)
+		{
+			for(int characterY = mainEntity.coords.y - 1; characterY <= mainEntity.coords.y + 1; characterY++)
+			{
+				for(int targetEntity = 0; targetEntity < world.entityAmount; targetEntity++)
+				{
+					if(world.pEntity[targetEntity].character == nullptr)
+					{
+						continue;
+					}
+
+					if(!world.pEntity[targetEntity].character->isAlive && world.pEntity[targetEntity].character->inventory.itemsAmount > 0 &&
+					   world.pEntity[targetEntity].coords.x == characterX && world.pEntity[targetEntity].coords.y == characterY)
+					{
+						wasTarget = true;
+						targetIndex = targetEntity;
+					}
+				}
+			}
+		}
+
+		if(wasTarget)
+		{
+			entityInventoryModeDrop(mainEntity, world.pEntity[targetIndex], isLocalEOI);
+		}
+		else
+		{
+			worldUIStrAdd(world.ConditionString, "Нечего забирать!");
+			isLocalEOI = true;
+		}
+	}
+}
+
+void worldEntityCharacterShopLogic(World &world, Entity &mainEntity)
+{
+	bool isLocalEOI = false;
+	while(!isLocalEOI)
+	{
+		bool wasTarget = false;
+		int targetIndex = 0;
+
+		for(int characterX = mainEntity.coords.x - 1; characterX <= mainEntity.coords.x + 1; characterX++)
+		{
+			for(int characterY = mainEntity.coords.y - 1; characterY <= mainEntity.coords.y + 1; characterY++)
+			{
+				for(int targetEntity = 0; targetEntity < world.entityAmount; targetEntity++)
+				{
+					if(world.pEntity[targetEntity].character == nullptr)
+					{
+						continue;
+					}
+
+					if(world.pEntity[targetEntity].entitySymb == EntitySymb::store &&
+					   world.pEntity[targetEntity].coords.x == characterX && world.pEntity[targetEntity].coords.y == characterY)
+					{
+						wasTarget = true;
+						targetIndex = targetEntity;
+					}
+				}
+			}
+		}
+
+		if(wasTarget)
+		{
+			entityInventoryModeStore(mainEntity, world.pEntity[targetIndex], isLocalEOI);
+		}
+		else
+		{
+			worldUIStrAdd(world.ConditionString, "По близости нет торговцев!");
+			isLocalEOI = true;
+		}
+	}
+}
+
+void worldEmptyCharacterClear(World &world)
+{
+	for(int i = 0; i < world.entityAmount; i++)
+	{
+		if(world.pEntity[i].character != nullptr && world.pEntity[i].character->inventory.itemsAmount <= 0 && !world.pEntity[i].character->isAlive && i != world.mainCharacterID)
+		{
+			EntityRemove(world.pEntity, world.entityAmount, world.pEntity[i].ID);
+		}
+	}
+}
+
+void worldEntityListLogic(char array[LIST_LEN_MAX][LIST_ROWS_MAX], int rowsCount)
+{
+	system("cls");
+
+	for(int i = 0; i < rowsCount; i++)
+	{
+		printf("%s", array[i]);
+	}
+}
+
+void worldReserchArea(World &world, Point leftHightPoint, Point rightLowPoint)
+{
+	if(leftHightPoint.x < 0 || leftHightPoint.x >= world.cellsColsAmount || leftHightPoint.y < 0 || leftHightPoint.y >= world.cellsRowsAmount)
+	{
+		log("worldReserchArea(): переданы невозможные значения.");
+		return;
+	}
+
+	for(int x = leftHightPoint.x; x <= rightLowPoint.x; x++)
+	{
+		for(int y = leftHightPoint.y; y <= rightLowPoint.y; y++)
+		{
+			world.pCell[x][y].isReserched = true;
+		}
+	}
 }

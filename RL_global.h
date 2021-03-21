@@ -16,20 +16,18 @@
 ////////////////////DEFINES////////////////////
 ///////////////////////////////////////////////
 
-#define DEBUG
+//#define DEBUG
+#define BETA
 
 #define ERR_NO_ERR 0
 #define ERR_FILE 10
 #define ERR_MEMORY 20
 
+#define FILE_ONE_LINE_SYMBS_MAX 256
 #define PATH_NAME_LEN_MAX 32
 #define PATH_LOG "./log/log.log"
 #define PATH_LOG_MAP "./log/_map_log.log"
-#define PATH_LEVEL_DEV "./levels/level_dev.level"
-#define PATH_LEVEL_1 "./levels/level_1.level"
-#define PATH_LEVEL_2 "./levels/level_2.level"
-#define PATH_LEVEL_3 "./levels/level_3.level"
-
+#define PATH_LEVEL "./levels/level.level"
 
 //////////////////////////////////////////////////
 ////////////////////ENUMIRATIONS//////////////////
@@ -44,16 +42,22 @@ enum class KBKey
 	keyLeftArrow = 0x4b,
 	keyRightArrow = 0x4d,
 	keyReturn = 0x0d,
+	keyT = 0x74,
+	keyTU = 0x74 - 0x20,
 	keyM = 0x6d,
 	keyMU = 0x6d - 0x20,
 	keyA = 0x61,
 	keyAU = 0x61 - 0x20,
-	keyE = 0x45,
-	keyEU = 0x45 - 0x20,
+	keyE = 0x65,
+	keyEU = 0x65 - 0x20,
 	keyI = 0x69,
 	keyIU = 0x69 - 0x20,
 	keyS = 0x73,
 	keySU = 0x73 - 0x20,
+	keyG = 0x67,
+	keyGU = 0x67 - 0x20,
+	keyB = 0x62,
+	keyBU = 0x62 - 0x20,
 	key0 = 0x30,
 	key1 = 0x31,
 	key2 = 0x32,
@@ -83,6 +87,8 @@ struct Point
 ////////////////////////////////////////////////////////////
 
 int log(const char *logString, const char *const logFileName = PATH_LOG);
-
+int getInt(const char *prompt = "¬ведите число: ", int a = INT_MIN, int b = INT_MAX);
+void swapInt(int &a, int &b);
+void readList(const char *listPath);
 
 #endif // !_GLOBAL_H_
